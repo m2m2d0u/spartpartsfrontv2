@@ -22,6 +22,10 @@ type Props = {
   className?: string;
   onCreateNew?: (searchTerm: string) => void;
   createNewLabel?: (searchTerm: string) => string;
+  /** When provided, disables client-side filtering and delegates search to parent */
+  onSearch?: (term: string) => void;
+  /** Show a loading spinner in the dropdown while server search is in progress */
+  searching?: boolean;
 };
 
 export function SearchableSelect({
@@ -39,6 +43,8 @@ export function SearchableSelect({
   className,
   onCreateNew,
   createNewLabel = (term: string) => `Create "${term}"`,
+  onSearch,
+  searching,
 }: Props) {
   const id = useId();
   const [open, setOpen] = useState(false);
@@ -59,10 +65,12 @@ export function SearchableSelect({
   );
 
   const filtered = useMemo(() => {
+    // When onSearch is provided, parent handles filtering via server
+    if (onSearch) return items;
     if (!search) return items;
     const q = search.toLowerCase();
     return items.filter((i) => i.label.toLowerCase().includes(q));
-  }, [items, search]);
+  }, [items, search, onSearch]);
 
   function handleToggle() {
     if (disabled) return;
@@ -160,7 +168,10 @@ export function SearchableSelect({
                 ref={inputRef}
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  onSearch?.(e.target.value);
+                }}
                 placeholder={searchPlaceholder}
                 className="w-full rounded-md border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none placeholder:text-dark-5 focus:border-primary dark:border-dark-3 dark:text-white dark:placeholder:text-dark-6 dark:focus:border-primary"
               />
@@ -168,7 +179,20 @@ export function SearchableSelect({
 
             {/* Options list */}
             <ul className="max-h-60 overflow-y-auto py-1">
-              {filtered.length === 0 && (
+              {searching && (
+                <li className="px-4 py-3 text-center text-body-sm text-dark-5 dark:text-dark-6">
+                  <svg
+                    className="mx-auto h-5 w-5 animate-spin text-primary"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                </li>
+              )}
+              {!searching && filtered.length === 0 && (
                 <li className="px-4 py-3 text-center text-body-sm text-dark-5 dark:text-dark-6">
                   No results found
                 </li>

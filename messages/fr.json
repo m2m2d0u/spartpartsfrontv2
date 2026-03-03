@@ -38,7 +38,8 @@
     "failed": "L'enregistrement a échoué. Veuillez réessayer.",
     "confirmDeleteTitle": "Confirmer la suppression",
     "confirmDeleteCancel": "Cette action est irréversible.",
-    "status": "Statut"
+    "status": "Statut",
+    "loading": "Chargement..."
   },
   "nav": {
     "spareParts": "PIÈCES DÉTACHÉES",

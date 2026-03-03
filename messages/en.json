@@ -38,7 +38,8 @@
     "failed": "Failed to save. Please try again.",
     "confirmDeleteTitle": "Confirm Deletion",
     "confirmDeleteCancel": "This action cannot be undone.",
-    "status": "Status"
+    "status": "Status",
+    "loading": "Loading..."
   },
   "nav": {
     "spareParts": "SPARE PARTS",

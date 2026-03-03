@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { SearchableSelect } from "@/components/FormElements/searchable-select";
@@ -8,16 +8,13 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { FormDialog } from "@/components/ui/form-dialog";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { cn } from "@/lib/utils";
-import type { Warehouse, WarehouseStock } from "@/types";
-
-type PartOption = { id: string; name: string; partNumber: string };
+import type { Warehouse, WarehouseStock, Part } from "@/types";
 
 type Props = {
   warehouses: Warehouse[];
-  parts: PartOption[];
 };
 
-export function WarehouseStockTable({ warehouses, parts }: Props) {
+export function WarehouseStockTable({ warehouses }: Props) {
   const [selectedWarehouse, setSelectedWarehouse] = useState(
     warehouses[0]?.id || "",
   );
@@ -37,13 +34,14 @@ export function WarehouseStockTable({ warehouses, parts }: Props) {
   const [addPartSaving, setAddPartSaving] = useState(false);
   const [addPartError, setAddPartError] = useState("");
 
+  // Available parts (not already in warehouse)
+  const [availableParts, setAvailableParts] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [loadingParts, setLoadingParts] = useState(false);
+
   const t = useTranslations("warehouseStock");
   const tCommon = useTranslations("common");
-
-  const partItems = parts.map((p) => ({
-    value: p.id,
-    label: `${p.partNumber} — ${p.name}`,
-  }));
 
   const fetchStock = useCallback(async (warehouseId: string) => {
     setLoading(true);
@@ -96,13 +94,49 @@ export function WarehouseStockTable({ warehouses, parts }: Props) {
     setSaving(false);
   }
 
-  function handleOpenAddPart() {
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const fetchAvailableParts = useCallback(
+    async (name?: string) => {
+      setLoadingParts(true);
+      try {
+        const { apiGet } = await import("@/services/api-client");
+        let url = `/parts/not-in-warehouse?warehouseId=${selectedWarehouse}&page=0&size=20`;
+        if (name) url += `&name=${encodeURIComponent(name)}`;
+        const data = await apiGet<{ content: Part[] }>(url);
+        setAvailableParts(
+          data.content.map((p) => {
+            let label = `${p.partNumber} — ${p.name}`;
+            if (p.carBrandName) label += ` — ${p.carBrandName}`;
+            if (p.carModelName) label += ` — ${p.carModelName}`;
+            return { value: p.id, label };
+          }),
+        );
+      } catch {
+        setAddPartError(t("addPartFailed"));
+      } finally {
+        setLoadingParts(false);
+      }
+    },
+    [selectedWarehouse, t],
+  );
+
+  function handlePartSearch(term: string) {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      fetchAvailableParts(term || undefined);
+    }, 300);
+  }
+
+  async function handleOpenAddPart() {
     setAddPartId("");
     setAddPartQty("");
     setAddPartMinStock("");
     setAddPartNotes("");
     setAddPartError("");
+    setAvailableParts([]);
     setAddPartOpen(true);
+    fetchAvailableParts();
   }
 
   async function handleAddPart() {
@@ -293,11 +327,13 @@ export function WarehouseStockTable({ warehouses, parts }: Props) {
       >
         <SearchableSelect
           label={t("selectPart")}
-          items={partItems}
+          items={availableParts}
           value={addPartId}
           onChange={setAddPartId}
           placeholder={t("selectPartPlaceholder")}
           searchPlaceholder={tCommon("search")}
+          onSearch={handlePartSearch}
+          searching={loadingParts}
           required
         />
         <InputGroup
