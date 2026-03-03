@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -23,14 +23,11 @@ export type Column<T> = {
 type DataTableProps<T> = {
   columns: Column<T>[];
   data: T[];
-  totalItems: number;
-  page: number;
-  pageSize: number;
-  onPageChange: (page: number) => void;
+  rowKey: (row: T) => string;
+  pageSize?: number;
   onSearch?: (query: string) => void;
   searchPlaceholder?: string;
   filterSlot?: React.ReactNode;
-  rowKey: (row: T) => string;
   emptyMessage?: string;
   emptyDescription?: string;
   title?: string;
@@ -39,24 +36,36 @@ type DataTableProps<T> = {
 export function DataTable<T>({
   columns,
   data,
-  totalItems,
-  page,
-  pageSize,
-  onPageChange,
+  rowKey,
+  pageSize = 10,
   onSearch,
   searchPlaceholder = "Search...",
   filterSlot,
-  rowKey,
   emptyMessage = "No data found",
   emptyDescription,
   title,
 }: DataTableProps<T>) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+
+  const totalItems = data.length;
   const totalPages = Math.ceil(totalItems / pageSize);
+
+  // Clamp page when data shrinks (search filter / delete)
+  const safePage = page > totalPages && totalPages > 0 ? totalPages : page;
+  if (safePage !== page) {
+    setPage(safePage);
+  }
+
+  const paginatedData = useMemo(() => {
+    const start = (safePage - 1) * pageSize;
+    return data.slice(start, start + pageSize);
+  }, [data, safePage, pageSize]);
 
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
     setSearchQuery(value);
+    setPage(1);
     onSearch?.(value);
   }
 
@@ -122,7 +131,7 @@ export function DataTable<T>({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((row) => (
+              {paginatedData.map((row) => (
                 <TableRow key={rowKey(row)}>
                   {columns.map((col) => (
                     <TableCell key={col.key} className={col.className}>
@@ -138,13 +147,14 @@ export function DataTable<T>({
           <div className="border-t border-stroke px-4 py-4 dark:border-dark-3 sm:px-6">
             <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
               <p className="text-body-sm text-dark-6">
-                Showing {(page - 1) * pageSize + 1} to{" "}
-                {Math.min(page * pageSize, totalItems)} of {totalItems} entries
+                Showing {(safePage - 1) * pageSize + 1} to{" "}
+                {Math.min(safePage * pageSize, totalItems)} of {totalItems}{" "}
+                entries
               </p>
               <Pagination
-                page={page}
+                page={safePage}
                 totalPages={totalPages}
-                onPageChange={onPageChange}
+                onPageChange={setPage}
               />
             </div>
           </div>

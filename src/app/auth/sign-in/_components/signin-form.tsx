@@ -59,7 +59,6 @@ export function SigninForm() {
         }}
         value={email}
         icon={<EmailIcon />}
-        required
       />
 
       <InputGroup
@@ -74,7 +73,6 @@ export function SigninForm() {
         }}
         value={password}
         icon={<PasswordIcon />}
-        required
       />
 
       <button

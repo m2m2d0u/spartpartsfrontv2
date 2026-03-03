@@ -11,12 +11,14 @@ type InputGroupProps = {
   disabled?: boolean;
   active?: boolean;
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   value?: string;
   name?: string;
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
   height?: "sm" | "default";
   defaultValue?: string;
+  error?: string;
 };
 
 const InputGroup: React.FC<InputGroupProps> = ({
@@ -28,6 +30,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
   disabled,
   active,
   handleChange,
+  onBlur,
   icon,
   ...props
 }) => {
@@ -57,10 +60,14 @@ const InputGroup: React.FC<InputGroupProps> = ({
           name={props.name}
           placeholder={placeholder}
           onChange={handleChange}
+          onBlur={onBlur}
           value={props.value}
           defaultValue={props.defaultValue}
           className={cn(
-            "w-full rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition focus:border-primary disabled:cursor-default disabled:bg-gray-2 data-[active=true]:border-primary dark:border-dark-3 dark:bg-dark-2 dark:focus:border-primary dark:disabled:bg-dark dark:data-[active=true]:border-primary",
+            "w-full rounded-lg border-[1.5px] bg-transparent outline-none transition focus:border-primary disabled:cursor-default disabled:bg-gray-2 data-[active=true]:border-primary dark:bg-dark-2 dark:focus:border-primary dark:disabled:bg-dark dark:data-[active=true]:border-primary",
+            props.error
+              ? "border-red dark:border-red"
+              : "border-stroke dark:border-dark-3",
             type === "file"
               ? getFileStyles(props.fileStyleVariant!)
               : "px-5.5 py-3 text-dark placeholder:text-dark-6 dark:text-white",
@@ -74,6 +81,10 @@ const InputGroup: React.FC<InputGroupProps> = ({
 
         {icon}
       </div>
+
+      {props.error && (
+        <p className="mt-1.5 text-body-xs text-red">{props.error}</p>
+      )}
     </div>
   );
 };

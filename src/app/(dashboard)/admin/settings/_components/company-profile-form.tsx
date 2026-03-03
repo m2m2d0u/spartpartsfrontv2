@@ -55,7 +55,6 @@ export function CompanyProfileForm({ settings }: Props) {
           placeholder="Company name"
           value={form.companyName}
           handleChange={handleChange}
-          required
         />
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">

@@ -117,10 +117,6 @@ export function WarehousesTable({
       <DataTable
         columns={columns}
         data={filtered}
-        totalItems={filtered.length}
-        page={1}
-        pageSize={filtered.length || 10}
-        onPageChange={() => {}}
         onSearch={setSearch}
         searchPlaceholder="Search warehouses..."
         filterSlot={

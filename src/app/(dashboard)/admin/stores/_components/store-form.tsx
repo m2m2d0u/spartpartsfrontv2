@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
@@ -11,57 +13,67 @@ type Props = {
   store?: Store;
 };
 
+const storeSchema = Yup.object({
+  name: Yup.string().trim().required("Store name is required"),
+  code: Yup.string().trim().required("Store code is required"),
+  phone: Yup.string(),
+  email: Yup.string().email("Must be a valid email"),
+  isActive: Yup.boolean(),
+  street: Yup.string(),
+  city: Yup.string(),
+  state: Yup.string(),
+  postalCode: Yup.string(),
+  country: Yup.string(),
+});
+
 export function StoreForm({ store }: Props) {
   const router = useRouter();
   const isEditing = !!store;
+  const [serverError, setServerError] = useState("");
 
-  const [form, setForm] = useState({
-    name: store?.name || "",
-    code: store?.code || "",
-    phone: store?.phone || "",
-    email: store?.email || "",
-    isActive: store?.isActive ?? true,
-    street: store?.street || "",
-    city: store?.city || "",
-    state: store?.state || "",
-    postalCode: store?.postalCode || "",
-    country: store?.country || "Sénégal",
+  const formik = useFormik({
+    initialValues: {
+      name: store?.name || "",
+      code: store?.code || "",
+      phone: store?.phone || "",
+      email: store?.email || "",
+      isActive: store?.isActive ?? true,
+      street: store?.street || "",
+      city: store?.city || "",
+      state: store?.state || "",
+      postalCode: store?.postalCode || "",
+      country: store?.country || "Sénégal",
+    },
+    validationSchema: storeSchema,
+    onSubmit: async (values) => {
+      setServerError("");
+      try {
+        if (isEditing) {
+          const { updateStore } = await import("@/services/stores.service");
+          await updateStore(store.id, { ...values });
+          router.push(`/admin/stores/${store.id}`);
+        } else {
+          const { createStore } = await import("@/services/stores.service");
+          const created = await createStore(values);
+          router.push(`/admin/stores/${created.id}`);
+        }
+        router.refresh();
+      } catch {
+        setServerError("Failed to save store. Please try again.");
+      }
+    },
   });
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setError("");
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.name.trim() || !form.code.trim()) {
-      setError("Name and code are required.");
-      return;
-    }
-
-    setSaving(true);
-
-    if (isEditing) {
-      const { updateStore } = await import("@/services/stores.service");
-      await updateStore(store.id, { ...form });
-      router.push(`/admin/stores/${store.id}`);
-    } else {
-      const { createStore } = await import("@/services/stores.service");
-      const created = await createStore(form);
-      router.push(`/admin/stores/${created.id}`);
-    }
-    router.refresh();
+  function fieldError(name: keyof typeof formik.values) {
+    return formik.touched[name] ? (formik.errors[name] as string) : undefined;
   }
 
   return (
     <FormSection title={isEditing ? "Edit Store" : "New Store"}>
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {error && (
+      <form onSubmit={formik.handleSubmit} className="space-y-5">
+        {serverError && (
           <div className="rounded-lg bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318] dark:bg-[#B42318]/10 dark:text-[#FDA29B]">
-            {error}
+            {serverError}
           </div>
         )}
 
@@ -71,8 +83,10 @@ export function StoreForm({ store }: Props) {
             name="name"
             type="text"
             placeholder="e.g. SenParts Dakar"
-            value={form.name}
-            handleChange={handleChange}
+            value={formik.values.name}
+            handleChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={fieldError("name")}
             required
           />
           <InputGroup
@@ -80,8 +94,10 @@ export function StoreForm({ store }: Props) {
             name="code"
             type="text"
             placeholder="e.g. STR-DK"
-            value={form.code}
-            handleChange={handleChange}
+            value={formik.values.code}
+            handleChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={fieldError("code")}
             required
           />
         </div>
@@ -92,16 +108,19 @@ export function StoreForm({ store }: Props) {
             name="phone"
             type="text"
             placeholder="+221 XX XXX XX XX"
-            value={form.phone}
-            handleChange={handleChange}
+            value={formik.values.phone}
+            handleChange={formik.handleChange}
+            onBlur={formik.handleBlur}
           />
           <InputGroup
             label="Email"
             name="email"
             type="email"
             placeholder="store@company.sn"
-            value={form.email}
-            handleChange={handleChange}
+            value={formik.values.email}
+            handleChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={fieldError("email")}
           />
         </div>
 
@@ -115,8 +134,9 @@ export function StoreForm({ store }: Props) {
               name="street"
               type="text"
               placeholder="Street address"
-              value={form.street}
-              handleChange={handleChange}
+              value={formik.values.street}
+              handleChange={formik.handleChange}
+              onBlur={formik.handleBlur}
             />
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               <InputGroup
@@ -124,32 +144,36 @@ export function StoreForm({ store }: Props) {
                 name="city"
                 type="text"
                 placeholder="City"
-                value={form.city}
-                handleChange={handleChange}
+                value={formik.values.city}
+                handleChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
               <InputGroup
                 label="State / Region"
                 name="state"
                 type="text"
                 placeholder="State"
-                value={form.state}
-                handleChange={handleChange}
+                value={formik.values.state}
+                handleChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
               <InputGroup
                 label="Postal Code"
                 name="postalCode"
                 type="text"
                 placeholder="Postal code"
-                value={form.postalCode}
-                handleChange={handleChange}
+                value={formik.values.postalCode}
+                handleChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
               <InputGroup
                 label="Country"
                 name="country"
                 type="text"
                 placeholder="Country"
-                value={form.country}
-                handleChange={handleChange}
+                value={formik.values.country}
+                handleChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </div>
           </div>
@@ -157,19 +181,17 @@ export function StoreForm({ store }: Props) {
 
         <Switch
           label="Store is Active"
-          checked={form.isActive}
-          onChange={(checked) =>
-            setForm((prev) => ({ ...prev, isActive: checked }))
-          }
+          checked={formik.values.isActive}
+          onChange={(checked) => formik.setFieldValue("isActive", checked)}
         />
 
         <div className="flex items-center gap-3 pt-2">
           <button
             type="submit"
-            disabled={saving}
+            disabled={formik.isSubmitting}
             className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
-            {saving
+            {formik.isSubmitting
               ? "Saving..."
               : isEditing
                 ? "Update Store"

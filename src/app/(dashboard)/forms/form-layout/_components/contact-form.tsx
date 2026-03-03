@@ -28,7 +28,6 @@ export function ContactForm() {
           type="email"
           placeholder="Enter your email address"
           className="mb-4.5"
-          required
         />
 
         <InputGroup
