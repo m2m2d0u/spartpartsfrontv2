@@ -245,6 +245,18 @@ export function SettingsIcon(props: PropsType) {
   );
 }
 
+export function StackIcon(props: PropsType) {
+  return (
+    <svg width={24} height={24} viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M11.553 1.106a1 1 0 01.894 0l10 5A1 1 0 0123 7a1 1 0 01-.553.894L12 12.882 1.553 7.894A1 1 0 011 7a1 1 0 01.553-.894l10-5zM4.236 7L12 10.882 19.764 7 12 3.118 4.236 7zM1.106 11.553a1 1 0 011.341-.447L12 15.882l9.553-4.776a1 1 0 01.894 1.788l-10 5a1 1 0 01-.894 0l-10-5a1 1 0 01-.447-1.341zM1.106 16.553a1 1 0 011.341-.447L12 20.882l9.553-4.776a1 1 0 01.894 1.788l-10 5a1 1 0 01-.894 0l-10-5a1 1 0 01-.447-1.341z"
+      />
+    </svg>
+  );
+}
+
 export function ArrowLeftIcon(props: PropsType) {
   return (
     <svg

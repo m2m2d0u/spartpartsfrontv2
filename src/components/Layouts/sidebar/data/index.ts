@@ -94,6 +94,24 @@ export function getNavData(t: (key: string) => string): NavSection[] {
           items: [],
         },
         {
+          title: t("stock"),
+          icon: Icons.StackIcon,
+          items: [
+            {
+              title: t("warehouseStock"),
+              url: "/admin/stock/warehouse-stock",
+            },
+            {
+              title: t("stockMovements"),
+              url: "/admin/stock/movements",
+            },
+            {
+              title: t("stockTransfers"),
+              url: "/admin/stock/transfers",
+            },
+          ],
+        },
+        {
           title: t("locations"),
           icon: Icons.BuildingIcon,
           items: [

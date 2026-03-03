@@ -87,3 +87,43 @@ export function getReturnStatusVariant(
       return "neutral";
   }
 }
+
+export function getStockTransferStatusVariant(
+  status: string,
+): BadgeVariant {
+  switch (status) {
+    case "COMPLETED":
+      return "success";
+    case "IN_TRANSIT":
+      return "info";
+    case "PENDING":
+      return "warning";
+    case "CANCELLED":
+      return "error";
+    default:
+      return "neutral";
+  }
+}
+
+export function getStockMovementTypeVariant(
+  type: string,
+): BadgeVariant {
+  switch (type) {
+    case "PURCHASE":
+    case "TRANSFER_IN":
+    case "RETURN":
+      return "success";
+    case "SALE":
+    case "TRANSFER_OUT":
+    case "CLIENT_ORDER":
+      return "error";
+    case "ADJUSTMENT":
+    case "ORDER_CANCELLATION":
+    case "INVOICE_CANCELLATION":
+      return "warning";
+    case "INITIAL":
+      return "info";
+    default:
+      return "neutral";
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 type FormDialogProps = {
   open: boolean;
@@ -54,7 +55,7 @@ export function FormDialog({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
       <div
         ref={dialogRef}
@@ -90,6 +91,7 @@ export function FormDialog({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
