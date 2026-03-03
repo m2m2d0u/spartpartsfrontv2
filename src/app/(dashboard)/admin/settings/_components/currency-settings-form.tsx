@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { FormSection } from "@/components/FormSection";
@@ -11,6 +12,9 @@ type Props = {
 };
 
 export function CurrencySettingsForm({ settings }: Props) {
+  const t = useTranslations("settings.currency");
+  const tCommon = useTranslations("common");
+
   const [form, setForm] = useState({
     currencySymbol: settings.currencySymbol,
     currencyPosition: settings.currencyPosition,
@@ -36,13 +40,13 @@ export function CurrencySettingsForm({ settings }: Props) {
 
   return (
     <FormSection
-      title="Currency Settings"
-      description="How currency values are displayed across the system"
+      title={t("title")}
+      description={t("description")}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <InputGroup
-            label="Currency Symbol"
+            label={t("currencySymbol")}
             name="currencySymbol"
             type="text"
             placeholder="FCFA"
@@ -53,10 +57,10 @@ export function CurrencySettingsForm({ settings }: Props) {
             }}
           />
           <Select
-            label="Symbol Position"
+            label={t("symbolPosition")}
             items={[
-              { value: "BEFORE", label: "Before amount ($100)" },
-              { value: "AFTER", label: "After amount (100 FCFA)" },
+              { value: "BEFORE", label: t("beforeAmount") },
+              { value: "AFTER", label: t("afterAmount") },
             ]}
             value={form.currencyPosition}
             onChange={(e) => {
@@ -65,7 +69,7 @@ export function CurrencySettingsForm({ settings }: Props) {
             }}
           />
           <Select
-            label="Decimal Places"
+            label={t("decimalPlaces")}
             items={[
               { value: "0", label: "0 (1,000)" },
               { value: "2", label: "2 (1,000.00)" },
@@ -84,7 +88,7 @@ export function CurrencySettingsForm({ settings }: Props) {
 
         <div className="rounded-lg bg-gray-2 p-4 dark:bg-dark-2">
           <p className="text-body-sm text-dark-6">
-            Preview:{" "}
+            {t("preview")}:{" "}
             <span className="font-medium text-dark dark:text-white">
               {form.currencyPosition === "BEFORE"
                 ? `${form.currencySymbol} 1${parseInt(form.currencyDecimals) > 0 ? "." + "0".repeat(parseInt(form.currencyDecimals)) : ",000"}`
@@ -99,11 +103,11 @@ export function CurrencySettingsForm({ settings }: Props) {
             disabled={saving}
             className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save Currency Settings"}
+            {saving ? tCommon("saving") : t("saveCurrency")}
           </button>
           {saved && (
             <span className="text-body-sm text-[#027A48]">
-              Currency settings saved successfully
+              {t("savedSuccess")}
             </span>
           )}
         </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTableSkeleton } from "@/components/DataTable/skeleton";
 import { getCategories } from "@/services/categories.server";
@@ -15,22 +16,25 @@ async function CategoriesData() {
   return <CategoriesTable categories={paged.content} />;
 }
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  const t = await getTranslations("categories");
+  const tNav = await getTranslations("nav");
+
   return (
     <>
       <PageHeader
-        title="Categories"
+        title={t("title")}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Parts", href: "/admin/parts" },
-          { label: "Categories" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("parts"), href: "/admin/parts" },
+          { label: tNav("categories") },
         ]}
         actions={
           <Link
             href="/admin/parts/categories/new"
             className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
           >
-            Add Category
+            {t("addCategory")}
           </Link>
         }
       />

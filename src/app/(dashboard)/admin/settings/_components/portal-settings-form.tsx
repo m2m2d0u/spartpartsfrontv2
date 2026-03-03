@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
@@ -11,6 +12,9 @@ type Props = {
 };
 
 export function PortalSettingsForm({ settings }: Props) {
+  const t = useTranslations("settings.portal");
+  const tCommon = useTranslations("common");
+
   const [form, setForm] = useState({
     portalEnabled: settings.portalEnabled,
     portalMinOrderAmount: settings.portalMinOrderAmount != null ? String(settings.portalMinOrderAmount) : "",
@@ -46,12 +50,12 @@ export function PortalSettingsForm({ settings }: Props) {
 
   return (
     <FormSection
-      title="Client Portal"
-      description="Settings for the customer-facing portal"
+      title={t("title")}
+      description={t("description")}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         <Switch
-          label="Portal Enabled"
+          label={t("portalEnabled")}
           checked={form.portalEnabled}
           onChange={(checked) => {
             setForm((prev) => ({ ...prev, portalEnabled: checked }));
@@ -61,10 +65,10 @@ export function PortalSettingsForm({ settings }: Props) {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <InputGroup
-            label="Minimum Order Amount"
+            label={t("minOrderAmount")}
             name="portalMinOrderAmount"
             type="number"
-            placeholder="Leave empty for no minimum"
+            placeholder={t("minOrderAmountPlaceholder")}
             value={form.portalMinOrderAmount}
             handleChange={(e) => {
               setForm((prev) => ({
@@ -75,7 +79,7 @@ export function PortalSettingsForm({ settings }: Props) {
             }}
           />
           <InputGroup
-            label="Flat Shipping Rate"
+            label={t("flatShippingRate")}
             name="portalShippingFlatRate"
             type="number"
             placeholder="2500"
@@ -89,7 +93,7 @@ export function PortalSettingsForm({ settings }: Props) {
             }}
           />
           <InputGroup
-            label="Free Shipping Above"
+            label={t("freeShippingAbove")}
             name="portalFreeShippingAbove"
             type="number"
             placeholder="50000"
@@ -106,7 +110,7 @@ export function PortalSettingsForm({ settings }: Props) {
 
         <div>
           <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            Terms & Conditions
+            {t("termsAndConditions")}
           </label>
           <textarea
             value={form.portalTermsText}
@@ -119,7 +123,7 @@ export function PortalSettingsForm({ settings }: Props) {
             }}
             rows={4}
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-            placeholder="Terms and conditions for the client portal..."
+            placeholder={t("termsPlaceholder")}
           />
         </div>
 
@@ -129,11 +133,11 @@ export function PortalSettingsForm({ settings }: Props) {
             disabled={saving}
             className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save Portal Settings"}
+            {saving ? tCommon("saving") : t("savePortal")}
           </button>
           {saved && (
             <span className="text-body-sm text-[#027A48]">
-              Portal settings saved successfully
+              {t("savedSuccess")}
             </span>
           )}
         </div>

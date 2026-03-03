@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTableSkeleton } from "@/components/DataTable/skeleton";
 import { getStores } from "@/services/stores.server";
@@ -15,21 +16,24 @@ async function StoresData() {
   return <StoresTable stores={pagedStores.content} />;
 }
 
-export default function StoresPage() {
+export default async function StoresPage() {
+  const t = await getTranslations("stores");
+  const tNav = await getTranslations("nav");
+
   return (
     <>
       <PageHeader
-        title="Stores"
+        title={t("title")}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Stores" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("stores") },
         ]}
         actions={
           <Link
             href="/admin/stores/new"
             className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
           >
-            Add Store
+            {t("addStore")}
           </Link>
         }
       />

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getPartById } from "@/services/parts.server";
 import { getCategories } from "@/services/categories.server";
@@ -22,15 +23,19 @@ export default async function EditPartPage({ params }: Props) {
 
   if (!part) notFound();
 
+  const t = await getTranslations("parts");
+  const tNav = await getTranslations("nav");
+  const tCommon = await getTranslations("common");
+
   return (
     <>
       <PageHeader
-        title={`Edit — ${part.name}`}
+        title={`${tCommon("edit")} — ${part.name}`}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Parts", href: "/admin/parts" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("parts"), href: "/admin/parts" },
           { label: part.name, href: `/admin/parts/${part.id}` },
-          { label: "Edit" },
+          { label: tCommon("edit") },
         ]}
       />
 

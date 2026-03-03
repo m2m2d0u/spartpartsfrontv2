@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FormSection } from "@/components/FormSection";
 import type { TaxRate } from "@/types";
 
@@ -9,6 +10,9 @@ type Props = {
 };
 
 export function TaxSettingsForm({ taxRates: initialRates }: Props) {
+  const t = useTranslations("settings.taxRates");
+  const tCommon = useTranslations("common");
+
   const [taxRates, setTaxRates] = useState<TaxRate[]>(initialRates);
   const [newLabel, setNewLabel] = useState("");
   const [newRate, setNewRate] = useState("");
@@ -56,8 +60,8 @@ export function TaxSettingsForm({ taxRates: initialRates }: Props) {
 
   return (
     <FormSection
-      title="Tax Rates"
-      description="Manage tax rates applied to invoices"
+      title={t("title")}
+      description={t("description")}
     >
       <div className="space-y-4">
         {/* Existing rates */}
@@ -75,7 +79,7 @@ export function TaxSettingsForm({ taxRates: initialRates }: Props) {
               </span>
               {rate.isDefault ? (
                 <span className="rounded-full bg-[#ECFDF3] px-2.5 py-0.5 text-xs font-medium text-[#027A48] dark:bg-[#027A48]/10 dark:text-[#6CE9A6]">
-                  Default
+                  {tCommon("default")}
                 </span>
               ) : (
                 <button
@@ -83,7 +87,7 @@ export function TaxSettingsForm({ taxRates: initialRates }: Props) {
                   onClick={() => handleSetDefault(rate.id)}
                   className="text-xs text-primary hover:underline"
                 >
-                  Set default
+                  {tCommon("setDefault")}
                 </button>
               )}
               <button
@@ -91,7 +95,7 @@ export function TaxSettingsForm({ taxRates: initialRates }: Props) {
                 onClick={() => handleRemove(rate.id)}
                 className="text-xs text-red hover:underline"
               >
-                Remove
+                {tCommon("remove")}
               </button>
             </div>
           ))}
@@ -101,25 +105,25 @@ export function TaxSettingsForm({ taxRates: initialRates }: Props) {
         <div className="flex items-end gap-3">
           <div className="flex-1">
             <label className="mb-1.5 block text-body-sm font-medium text-dark dark:text-white">
-              Label
+              {t("label")}
             </label>
             <input
               type="text"
               value={newLabel}
               onChange={(e) => setNewLabel(e.target.value)}
-              placeholder="e.g. TVA 18%"
+              placeholder={t("labelPlaceholder")}
               className="w-full rounded-lg border border-stroke bg-transparent px-4 py-2.5 text-sm text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             />
           </div>
           <div className="w-28">
             <label className="mb-1.5 block text-body-sm font-medium text-dark dark:text-white">
-              Rate (%)
+              {t("rate")}
             </label>
             <input
               type="number"
               value={newRate}
               onChange={(e) => setNewRate(e.target.value)}
-              placeholder="18"
+              placeholder={t("ratePlaceholder")}
               min="0"
               max="100"
               step="0.01"
@@ -132,13 +136,13 @@ export function TaxSettingsForm({ taxRates: initialRates }: Props) {
             disabled={saving}
             className="rounded-lg border border-primary px-4 py-2.5 text-sm font-medium text-primary hover:bg-primary hover:text-white disabled:opacity-50"
           >
-            Add
+            {tCommon("add")}
           </button>
         </div>
 
         {saved && (
           <span className="text-body-sm text-[#027A48]">
-            Tax rates updated successfully
+            {t("savedSuccess")}
           </span>
         )}
       </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getCategories } from "@/services/categories.server";
 import { PartForm } from "../_components/part-form";
@@ -9,15 +10,17 @@ export const metadata: Metadata = {
 
 export default async function NewPartPage() {
   const categoriesPage = await getCategories();
+  const t = await getTranslations("parts");
+  const tNav = await getTranslations("nav");
 
   return (
     <>
       <PageHeader
-        title="New Part"
+        title={t("newPart")}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Parts", href: "/admin/parts" },
-          { label: "New Part" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("parts"), href: "/admin/parts" },
+          { label: t("newPart") },
         ]}
       />
 

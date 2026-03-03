@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { FormSection } from "@/components/FormSection";
 import type { CompanySettings } from "@/types";
@@ -10,6 +11,9 @@ type Props = {
 };
 
 export function CompanyProfileForm({ settings }: Props) {
+  const t = useTranslations("settings.companyProfile");
+  const tCommon = useTranslations("common");
+
   const [form, setForm] = useState({
     companyName: settings.companyName,
     phone: settings.phone,
@@ -44,33 +48,33 @@ export function CompanyProfileForm({ settings }: Props) {
 
   return (
     <FormSection
-      title="Company Profile"
-      description="Basic business information shown on invoices and documents"
+      title={t("title")}
+      description={t("description")}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         <InputGroup
-          label="Business Name"
+          label={t("businessName")}
           name="companyName"
           type="text"
-          placeholder="Company name"
+          placeholder={t("businessNamePlaceholder")}
           value={form.companyName}
           handleChange={handleChange}
         />
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <InputGroup
-            label="Phone"
+            label={tCommon("phone")}
             name="phone"
             type="text"
-            placeholder="+221 XX XXX XX XX"
+            placeholder={tCommon("phonePlaceholder")}
             value={form.phone}
             handleChange={handleChange}
           />
           <InputGroup
-            label="Email"
+            label={tCommon("email")}
             name="email"
             type="email"
-            placeholder="contact@company.sn"
+            placeholder={t("emailPlaceholder")}
             value={form.email}
             handleChange={handleChange}
           />
@@ -78,26 +82,26 @@ export function CompanyProfileForm({ settings }: Props) {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <InputGroup
-            label="Tax ID"
+            label={t("taxId")}
             name="taxId"
             type="text"
-            placeholder="Tax ID"
+            placeholder={t("taxIdPlaceholder")}
             value={form.taxId}
             handleChange={handleChange}
           />
           <InputGroup
-            label="NINEA"
+            label={t("ninea")}
             name="ninea"
             type="text"
-            placeholder="NINEA number"
+            placeholder={t("nineaPlaceholder")}
             value={form.ninea}
             handleChange={handleChange}
           />
           <InputGroup
-            label="RCCM"
+            label={t("rccm")}
             name="rccm"
             type="text"
-            placeholder="RCCM number"
+            placeholder={t("rccmPlaceholder")}
             value={form.rccm}
             handleChange={handleChange}
           />
@@ -105,47 +109,47 @@ export function CompanyProfileForm({ settings }: Props) {
 
         <div className="border-t border-stroke pt-5 dark:border-dark-3">
           <h4 className="mb-4 text-body-sm font-medium text-dark dark:text-white">
-            Address
+            {tCommon("address")}
           </h4>
           <div className="space-y-5">
             <InputGroup
-              label="Street"
+              label={tCommon("street")}
               name="street"
               type="text"
-              placeholder="Street address"
+              placeholder={tCommon("streetPlaceholder")}
               value={form.street}
               handleChange={handleChange}
             />
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               <InputGroup
-                label="City"
+                label={tCommon("city")}
                 name="city"
                 type="text"
-                placeholder="City"
+                placeholder={tCommon("cityPlaceholder")}
                 value={form.city}
                 handleChange={handleChange}
               />
               <InputGroup
-                label="State / Region"
+                label={tCommon("stateRegion")}
                 name="state"
                 type="text"
-                placeholder="State"
+                placeholder={tCommon("statePlaceholder")}
                 value={form.state}
                 handleChange={handleChange}
               />
               <InputGroup
-                label="Postal Code"
+                label={tCommon("postalCode")}
                 name="postalCode"
                 type="text"
-                placeholder="Postal code"
+                placeholder={tCommon("postalCodePlaceholder")}
                 value={form.postalCode}
                 handleChange={handleChange}
               />
               <InputGroup
-                label="Country"
+                label={tCommon("country")}
                 name="country"
                 type="text"
-                placeholder="Country"
+                placeholder={tCommon("countryPlaceholder")}
                 value={form.country}
                 handleChange={handleChange}
               />
@@ -159,11 +163,11 @@ export function CompanyProfileForm({ settings }: Props) {
             disabled={saving}
             className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? tCommon("saving") : t("saveChanges")}
           </button>
           {saved && (
             <span className="text-body-sm text-[#027A48]">
-              Changes saved successfully
+              {t("savedSuccess")}
             </span>
           )}
         </div>

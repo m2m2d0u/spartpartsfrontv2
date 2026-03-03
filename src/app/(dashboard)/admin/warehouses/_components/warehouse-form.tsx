@@ -117,7 +117,6 @@ export function WarehouseForm({ warehouse, stores, defaultStoreId }: Props) {
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           error={fieldError("storeId")}
-          required
           placeholder={t("selectStore")}
         />
 
@@ -131,7 +130,6 @@ export function WarehouseForm({ warehouse, stores, defaultStoreId }: Props) {
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={fieldError("name")}
-            required
           />
           <InputGroup
             label={t("warehouseCode")}
@@ -142,7 +140,6 @@ export function WarehouseForm({ warehouse, stores, defaultStoreId }: Props) {
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={fieldError("code")}
-            required
           />
         </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getPartById } from "@/services/parts.server";
@@ -19,13 +20,17 @@ export default async function PartDetailPage({ params }: Props) {
 
   if (!part) notFound();
 
+  const t = await getTranslations("parts");
+  const tNav = await getTranslations("nav");
+  const tCommon = await getTranslations("common");
+
   return (
     <>
       <PageHeader
         title={part.name}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Parts", href: "/admin/parts" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("parts"), href: "/admin/parts" },
           { label: part.name },
         ]}
         actions={
@@ -33,7 +38,7 @@ export default async function PartDetailPage({ params }: Props) {
             href={`/admin/parts/${part.id}/edit`}
             className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
           >
-            Edit Part
+            {t("editPart")}
           </Link>
         }
       />
@@ -44,46 +49,46 @@ export default async function PartDetailPage({ params }: Props) {
           <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
             <div className="mb-4 flex items-center gap-3">
               <h3 className="text-lg font-semibold text-dark dark:text-white">
-                Part Information
+                {t("partInfo")}
               </h3>
               <StatusBadge variant={part.published ? "success" : "neutral"}>
-                {part.published ? "Published" : "Draft"}
+                {part.published ? tCommon("published") : tCommon("draft")}
               </StatusBadge>
             </div>
 
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <dt className="text-body-sm text-dark-6">Part Number</dt>
+                <dt className="text-body-sm text-dark-6">{t("partNumber")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
                   {part.partNumber}
                 </dd>
               </div>
               <div>
-                <dt className="text-body-sm text-dark-6">Category</dt>
+                <dt className="text-body-sm text-dark-6">{t("category")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
                   {part.categoryName || "—"}
                 </dd>
               </div>
               <div>
-                <dt className="text-body-sm text-dark-6">Selling Price</dt>
+                <dt className="text-body-sm text-dark-6">{t("sellingPrice")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
                   {part.sellingPrice.toLocaleString("fr-FR")} FCFA
                 </dd>
               </div>
               <div>
-                <dt className="text-body-sm text-dark-6">Purchase Price</dt>
+                <dt className="text-body-sm text-dark-6">{t("purchasePrice")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
                   {part.purchasePrice.toLocaleString("fr-FR")} FCFA
                 </dd>
               </div>
               <div>
-                <dt className="text-body-sm text-dark-6">Min Stock Level</dt>
+                <dt className="text-body-sm text-dark-6">{t("minStockLevel")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
                   {part.minStockLevel}
                 </dd>
               </div>
               <div>
-                <dt className="text-body-sm text-dark-6">Created</dt>
+                <dt className="text-body-sm text-dark-6">{t("created")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
                   {new Date(part.createdAt).toLocaleDateString("fr-FR", {
                     day: "2-digit",
@@ -95,7 +100,7 @@ export default async function PartDetailPage({ params }: Props) {
               {part.shortDescription && (
                 <div className="sm:col-span-2">
                   <dt className="text-body-sm text-dark-6">
-                    Short Description
+                    {t("shortDescription")}
                   </dt>
                   <dd className="font-medium text-dark dark:text-white">
                     {part.shortDescription}
@@ -104,7 +109,7 @@ export default async function PartDetailPage({ params }: Props) {
               )}
               {part.description && (
                 <div className="sm:col-span-2">
-                  <dt className="text-body-sm text-dark-6">Description</dt>
+                  <dt className="text-body-sm text-dark-6">{t("description")}</dt>
                   <dd className="whitespace-pre-wrap text-sm text-dark dark:text-white">
                     {part.description}
                   </dd>
@@ -115,7 +120,7 @@ export default async function PartDetailPage({ params }: Props) {
             {part.notes && (
               <div className="mt-5 border-t border-stroke pt-5 dark:border-dark-3">
                 <h4 className="mb-3 text-body-sm font-medium text-dark dark:text-white">
-                  Internal Notes
+                  {t("internalNotes")}
                 </h4>
                 <p className="whitespace-pre-wrap text-sm text-dark-6">
                   {part.notes}
@@ -130,24 +135,24 @@ export default async function PartDetailPage({ params }: Props) {
           {/* Pricing Summary */}
           <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
             <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-              Pricing
+              {t("pricing")}
             </h3>
             <dl className="space-y-3">
               <div className="flex items-center justify-between">
-                <dt className="text-body-sm text-dark-6">Selling Price</dt>
+                <dt className="text-body-sm text-dark-6">{t("sellingPrice")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
                   {part.sellingPrice.toLocaleString("fr-FR")} FCFA
                 </dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-body-sm text-dark-6">Purchase Price</dt>
+                <dt className="text-body-sm text-dark-6">{t("purchasePrice")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
                   {part.purchasePrice.toLocaleString("fr-FR")} FCFA
                 </dd>
               </div>
               <div className="flex items-center justify-between border-t border-stroke pt-3 dark:border-dark-3">
                 <dt className="text-body-sm font-medium text-dark dark:text-white">
-                  Margin
+                  {t("margin")}
                 </dt>
                 <dd className="font-medium text-green-light-1">
                   {(part.sellingPrice - part.purchasePrice).toLocaleString(
@@ -162,7 +167,7 @@ export default async function PartDetailPage({ params }: Props) {
           {/* Images */}
           <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
             <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-              Images
+              {t("images")}
             </h3>
             {part.images && part.images.length > 0 ? (
               <div className="grid grid-cols-2 gap-3">
@@ -180,7 +185,7 @@ export default async function PartDetailPage({ params }: Props) {
                 ))}
               </div>
             ) : (
-              <p className="text-body-sm text-dark-6">No images uploaded.</p>
+              <p className="text-body-sm text-dark-6">{t("noImages")}</p>
             )}
           </div>
         </div>

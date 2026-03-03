@@ -129,7 +129,6 @@ export function PartForm({ part, categories }: Props) {
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={fieldError("partNumber")}
-            required
           />
           <InputGroup
             label={t("partName")}
@@ -140,7 +139,6 @@ export function PartForm({ part, categories }: Props) {
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={fieldError("name")}
-            required
           />
         </div>
 
@@ -195,7 +193,6 @@ export function PartForm({ part, categories }: Props) {
               handleChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={fieldError("sellingPrice")}
-              required
             />
             <InputGroup
               label={t("purchasePrice")}
@@ -206,7 +203,6 @@ export function PartForm({ part, categories }: Props) {
               handleChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={fieldError("purchasePrice")}
-              required
             />
             <InputGroup
               label={t("minStockLevel")}

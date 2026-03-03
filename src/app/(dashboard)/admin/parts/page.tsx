@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTableSkeleton } from "@/components/DataTable/skeleton";
 import { getParts } from "@/services/parts.server";
@@ -15,21 +16,24 @@ async function PartsData() {
   return <PartsTable parts={paged.content} />;
 }
 
-export default function PartsPage() {
+export default async function PartsPage() {
+  const t = await getTranslations("parts");
+  const tNav = await getTranslations("nav");
+
   return (
     <>
       <PageHeader
-        title="All Parts"
+        title={t("title")}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Parts" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("parts") },
         ]}
         actions={
           <Link
             href="/admin/parts/new"
             className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
           >
-            Add Part
+            {t("addPart")}
           </Link>
         }
       />

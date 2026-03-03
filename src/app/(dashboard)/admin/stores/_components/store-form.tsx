@@ -91,7 +91,6 @@ export function StoreForm({ store }: Props) {
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={fieldError("name")}
-            required
           />
           <InputGroup
             label={t("storeCode")}
@@ -102,7 +101,6 @@ export function StoreForm({ store }: Props) {
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={fieldError("code")}
-            required
           />
         </div>
 
