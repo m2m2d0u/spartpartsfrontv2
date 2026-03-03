@@ -6,88 +6,83 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
-import { Select } from "@/components/FormElements/select";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
-import type { Store, Warehouse } from "@/types";
+import type { Customer } from "@/types";
 
 type Props = {
-  warehouse?: Warehouse;
-  stores: Store[];
-  defaultStoreId?: string;
+  customer?: Customer;
 };
 
-export function WarehouseForm({ warehouse, stores, defaultStoreId }: Props) {
+export function CustomerForm({ customer }: Props) {
   const router = useRouter();
-  const isEditing = !!warehouse;
+  const isEditing = !!customer;
   const [serverError, setServerError] = useState("");
-  const t = useTranslations("warehouses");
+  const t = useTranslations("customers");
   const tCommon = useTranslations("common");
   const tVal = useTranslations("validation");
 
-  const warehouseSchema = Yup.object({
-    storeId: Yup.string().required(tVal("storeRequired")),
-    name: Yup.string().trim().required(tVal("warehouseNameRequired")),
-    code: Yup.string().trim().required(tVal("warehouseCodeRequired")),
-    location: Yup.string(),
+  const customerSchema = Yup.object({
+    name: Yup.string().trim().required(tVal("nameRequired")),
+    company: Yup.string(),
+    email: Yup.string().email(tVal("emailInvalid")),
+    phone: Yup.string(),
     street: Yup.string(),
     city: Yup.string(),
     state: Yup.string(),
     postalCode: Yup.string(),
     country: Yup.string(),
-    contactPerson: Yup.string(),
-    phone: Yup.string(),
+    taxId: Yup.string(),
     notes: Yup.string(),
-    isActive: Yup.boolean(),
+    portalAccess: Yup.boolean(),
   });
 
   const formik = useFormik({
     initialValues: {
-      storeId: warehouse?.storeId || defaultStoreId || "",
-      name: warehouse?.name || "",
-      code: warehouse?.code || "",
-      location: warehouse?.location || "",
-      street: warehouse?.street || "",
-      city: warehouse?.city || "",
-      state: warehouse?.state || "",
-      postalCode: warehouse?.postalCode || "",
-      country: warehouse?.country || "Sénégal",
-      contactPerson: warehouse?.contactPerson || "",
-      phone: warehouse?.phone || "",
-      notes: warehouse?.notes || "",
-      isActive: warehouse?.isActive ?? true,
+      name: customer?.name || "",
+      company: customer?.company || "",
+      email: customer?.email || "",
+      phone: customer?.phone || "",
+      street: customer?.street || "",
+      city: customer?.city || "",
+      state: customer?.state || "",
+      postalCode: customer?.postalCode || "",
+      country: customer?.country || "Sénégal",
+      taxId: customer?.taxId || "",
+      notes: customer?.notes || "",
+      portalAccess: customer?.portalAccess ?? false,
     },
-    validationSchema: warehouseSchema,
+    validationSchema: customerSchema,
     onSubmit: async (values) => {
       setServerError("");
       const payload = {
-        storeId: values.storeId,
         name: values.name,
-        code: values.code,
-        location: values.location || undefined,
+        company: values.company || undefined,
+        email: values.email || undefined,
+        phone: values.phone || undefined,
         street: values.street || undefined,
         city: values.city || undefined,
         state: values.state || undefined,
         postalCode: values.postalCode || undefined,
         country: values.country || undefined,
-        contactPerson: values.contactPerson || undefined,
-        phone: values.phone || undefined,
+        taxId: values.taxId || undefined,
         notes: values.notes || undefined,
+        portalAccess: values.portalAccess,
       };
 
       try {
         if (isEditing) {
-          const { updateWarehouse } = await import(
-            "@/services/warehouses.service"
+          const { updateCustomer } = await import(
+            "@/services/customers.service"
           );
-          await updateWarehouse(warehouse.id, { ...payload, isActive: values.isActive });
-          router.push(`/admin/warehouses/${warehouse.id}`);
+          await updateCustomer(customer.id, payload);
+          router.push(`/admin/customers/${customer.id}`);
         } else {
-          const { createWarehouse } = await import(
-            "@/services/warehouses.service"
+          const { createCustomer } = await import(
+            "@/services/customers.service"
           );
-          const created = await createWarehouse(payload);
-          router.push(`/admin/warehouses/${created.id}`);
+          const created = await createCustomer(payload);
+          router.push(`/admin/customers/${created.id}`);
         }
         router.refresh();
       } catch {
@@ -101,7 +96,9 @@ export function WarehouseForm({ warehouse, stores, defaultStoreId }: Props) {
   }
 
   return (
-    <FormSection title={isEditing ? t("editWarehouse") : t("newWarehouse")}>
+    <FormSection
+      title={isEditing ? t("editCustomer") : t("newCustomer")}
+    >
       <form onSubmit={formik.handleSubmit} className="space-y-5">
         {serverError && (
           <div className="rounded-lg bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318] dark:bg-[#B42318]/10 dark:text-[#FDA29B]">
@@ -109,46 +106,56 @@ export function WarehouseForm({ warehouse, stores, defaultStoreId }: Props) {
           </div>
         )}
 
-        <Select
-          label={t("store")}
-          name="storeId"
-          items={stores.map((s) => ({ value: s.id, label: s.name }))}
-          value={formik.values.storeId}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={fieldError("storeId")}
-          placeholder={t("selectStore")}
-        />
-
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <InputGroup
-            label={t("warehouseName")}
+            label={t("name")}
             name="name"
             type="text"
-            placeholder={t("warehouseNamePlaceholder")}
+            placeholder={t("namePlaceholder")}
             value={formik.values.name}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={fieldError("name")}
           />
           <InputGroup
-            label={t("warehouseCode")}
-            name="code"
+            label={t("company")}
+            name="company"
             type="text"
-            placeholder={t("warehouseCodePlaceholder")}
-            value={formik.values.code}
+            placeholder={t("companyPlaceholder")}
+            value={formik.values.company}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={fieldError("code")}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <InputGroup
+            label={tCommon("email")}
+            name="email"
+            type="email"
+            placeholder={t("emailPlaceholder")}
+            value={formik.values.email}
+            handleChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={fieldError("email")}
+          />
+          <InputGroup
+            label={tCommon("phone")}
+            name="phone"
+            type="text"
+            placeholder={tCommon("phonePlaceholder")}
+            value={formik.values.phone}
+            handleChange={formik.handleChange}
+            onBlur={formik.handleBlur}
           />
         </div>
 
         <InputGroup
-          label={t("location")}
-          name="location"
+          label={t("taxId")}
+          name="taxId"
           type="text"
-          placeholder={t("locationPlaceholder")}
-          value={formik.values.location}
+          placeholder={t("taxIdPlaceholder")}
+          value={formik.values.taxId}
           handleChange={formik.handleChange}
           onBlur={formik.handleBlur}
         />
@@ -208,27 +215,6 @@ export function WarehouseForm({ warehouse, stores, defaultStoreId }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <InputGroup
-            label={t("contactPerson")}
-            name="contactPerson"
-            type="text"
-            placeholder={t("contactPersonPlaceholder")}
-            value={formik.values.contactPerson}
-            handleChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          <InputGroup
-            label={tCommon("phone")}
-            name="phone"
-            type="text"
-            placeholder={tCommon("phonePlaceholder")}
-            value={formik.values.phone}
-            handleChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-        </div>
-
         <div>
           <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
             {t("notes")}
@@ -245,9 +231,9 @@ export function WarehouseForm({ warehouse, stores, defaultStoreId }: Props) {
         </div>
 
         <Switch
-          label={t("warehouseIsActive")}
-          checked={formik.values.isActive}
-          onChange={(checked) => formik.setFieldValue("isActive", checked)}
+          label={t("portalAccessLabel")}
+          checked={formik.values.portalAccess}
+          onChange={(checked) => formik.setFieldValue("portalAccess", checked)}
         />
 
         <div className="flex items-center gap-3 pt-2">
@@ -259,8 +245,8 @@ export function WarehouseForm({ warehouse, stores, defaultStoreId }: Props) {
             {formik.isSubmitting
               ? tCommon("saving")
               : isEditing
-                ? t("updateWarehouse")
-                : t("createWarehouse")}
+                ? t("updateCustomer")
+                : t("createCustomer")}
           </button>
           <button
             type="button"

@@ -26,3 +26,25 @@ export type User = {
   updatedAt: string;
   warehouseAssignments: UserWarehouseAssignment[];
 };
+
+/** Mirrors backend CreateUserRequest */
+export type CreateUserRequest = {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+};
+
+/** Mirrors backend UpdateUserRequest */
+export type UpdateUserRequest = {
+  name: string;
+  email: string;
+  role: UserRole;
+  isActive: boolean;
+};
+
+/** Mirrors backend UserWarehouseAssignmentRequest */
+export type UserWarehouseAssignmentRequest = {
+  warehouseId: string;
+  permissions: WarehousePermission[];
+};

@@ -105,6 +105,23 @@ export function getStockTransferStatusVariant(
   }
 }
 
+export function getUserStatusVariant(isActive: boolean): BadgeVariant {
+  return isActive ? "success" : "neutral";
+}
+
+export function getUserRoleVariant(role: string): BadgeVariant {
+  switch (role) {
+    case "ADMIN":
+      return "error";
+    case "STORE_MANAGER":
+      return "info";
+    case "WAREHOUSE_OPERATOR":
+      return "warning";
+    default:
+      return "neutral";
+  }
+}
+
 export function getStockMovementTypeVariant(
   type: string,
 ): BadgeVariant {

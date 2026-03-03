@@ -36,7 +36,9 @@ export type CreateWarehouseRequest = {
 };
 
 /** Mirrors backend UpdateWarehouseRequest */
-export type UpdateWarehouseRequest = CreateWarehouseRequest;
+export type UpdateWarehouseRequest = CreateWarehouseRequest & {
+  isActive?: boolean;
+};
 
 /** Mirrors backend WarehouseStockResponse */
 export type WarehouseStock = {
