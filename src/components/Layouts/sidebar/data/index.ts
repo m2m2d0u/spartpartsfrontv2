@@ -2,103 +2,102 @@ import * as Icons from "../icons";
 
 export const NAV_DATA = [
   {
-    label: "MAIN MENU",
+    label: "SPARE PARTS",
     items: [
       {
         title: "Dashboard",
+        url: "/admin",
         icon: Icons.HomeIcon,
+        items: [],
+      },
+      {
+        title: "Parts",
+        icon: Icons.BoxIcon,
         items: [
           {
-            title: "eCommerce",
-            url: "/",
+            title: "All Parts",
+            url: "/admin/parts",
+          },
+          {
+            title: "Categories",
+            url: "/admin/parts/categories",
           },
         ],
       },
       {
-        title: "Calendar",
-        url: "/calendar",
-        icon: Icons.Calendar,
-        items: [],
+        title: "Sales",
+        icon: Icons.InvoiceIcon,
+        items: [
+          {
+            title: "Invoices",
+            url: "/admin/invoices",
+          },
+          {
+            title: "Payments",
+            url: "/admin/payments",
+          },
+          {
+            title: "Returns",
+            url: "/admin/returns",
+          },
+        ],
       },
       {
-        title: "Profile",
-        url: "/profile",
+        title: "Procurement",
+        icon: Icons.TruckIcon,
+        items: [
+          {
+            title: "Purchase Orders",
+            url: "/admin/purchase-orders",
+          },
+          {
+            title: "Suppliers",
+            url: "/admin/suppliers",
+          },
+        ],
+      },
+      {
+        title: "Customers",
+        url: "/admin/customers",
         icon: Icons.User,
         items: [],
       },
       {
-        title: "Forms",
-        icon: Icons.Alphabet,
-        items: [
-          {
-            title: "Form Elements",
-            url: "/forms/form-elements",
-          },
-          {
-            title: "Form Layout",
-            url: "/forms/form-layout",
-          },
-        ],
+        title: "Orders",
+        url: "/admin/orders",
+        icon: Icons.ShoppingCartIcon,
+        items: [],
       },
       {
-        title: "Tables",
-        url: "/tables",
-        icon: Icons.Table,
+        title: "Locations",
+        icon: Icons.BuildingIcon,
         items: [
           {
-            title: "Tables",
-            url: "/tables",
+            title: "Stores",
+            url: "/admin/stores",
           },
-        ],
-      },
-      {
-        title: "Pages",
-        icon: Icons.Alphabet,
-        items: [
           {
-            title: "Settings",
-            url: "/pages/settings",
+            title: "Warehouses",
+            url: "/admin/warehouses",
           },
         ],
       },
     ],
   },
   {
-    label: "OTHERS",
+    label: "CONFIGURATION",
     items: [
       {
-        title: "Charts",
-        icon: Icons.PieChart,
-        items: [
-          {
-            title: "Basic Chart",
-            url: "/charts/basic-chart",
-          },
-        ],
+        title: "Settings",
+        url: "/admin/settings",
+        icon: Icons.SettingsIcon,
+        items: [],
       },
       {
-        title: "UI Elements",
-        icon: Icons.FourCircle,
-        items: [
-          {
-            title: "Alerts",
-            url: "/ui-elements/alerts",
-          },
-          {
-            title: "Buttons",
-            url: "/ui-elements/buttons",
-          },
-        ],
-      },
-      {
-        title: "Authentication",
+        title: "Users",
+        url: "/admin/users",
         icon: Icons.Authentication,
-        items: [
-          {
-            title: "Sign In",
-            url: "/auth/sign-in",
-          },
-        ],
+        items: [],
       },
     ],
   },
