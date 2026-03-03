@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getStoreById } from "@/services/stores.server";
 import { StoreForm } from "../../_components/store-form";
@@ -18,15 +19,18 @@ export default async function EditStorePage({ params }: Props) {
 
   if (!store) notFound();
 
+  const tNav = await getTranslations("nav");
+  const tCommon = await getTranslations("common");
+
   return (
     <>
       <PageHeader
-        title={`Edit — ${store.name}`}
+        title={`${tCommon("edit")} — ${store.name}`}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Stores", href: "/admin/stores" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("stores"), href: "/admin/stores" },
           { label: store.name, href: `/admin/stores/${store.id}` },
-          { label: "Edit" },
+          { label: tCommon("edit") },
         ]}
       />
 

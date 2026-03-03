@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getStoreById } from "@/services/stores.server";
 import { getCompanySettings } from "@/services/company-settings.server";
@@ -22,15 +23,17 @@ export default async function StoreSettingsPage({ params }: Props) {
 
   if (!store) notFound();
 
+  const tNav = await getTranslations("nav");
+
   return (
     <>
       <PageHeader
-        title={`Settings — ${store.name}`}
+        title={`${tNav("settings")} — ${store.name}`}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Stores", href: "/admin/stores" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("stores"), href: "/admin/stores" },
           { label: store.name, href: `/admin/stores/${store.id}` },
-          { label: "Settings" },
+          { label: tNav("settings") },
         ]}
       />
 

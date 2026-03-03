@@ -37,7 +37,8 @@
     "toggleSidebar": "Basculer la barre latérale",
     "failed": "L'enregistrement a échoué. Veuillez réessayer.",
     "confirmDeleteTitle": "Confirmer la suppression",
-    "confirmDeleteCancel": "Cette action est irréversible."
+    "confirmDeleteCancel": "Cette action est irréversible.",
+    "status": "Statut"
   },
   "nav": {
     "spareParts": "PIÈCES DÉTACHÉES",
@@ -159,7 +160,14 @@
     "code": "Code",
     "status": "Statut",
     "settings": "Paramètres",
-    "failedSave": "L'enregistrement du magasin a échoué. Veuillez réessayer."
+    "failedSave": "L'enregistrement du magasin a échoué. Veuillez réessayer.",
+    "storeSettings": "Paramètres du magasin",
+    "storeInformation": "Informations sur le magasin",
+    "customOverrides": "Paramètres personnalisés",
+    "summary": "Résumé",
+    "totalCustomers": "Total clients",
+    "monthlyRevenue": "Chiffre d'affaires mensuel",
+    "noWarehousesAssigned": "Aucun entrepôt assigné pour l'instant."
   },
   "warehouses": {
     "title": "Entrepôts",
@@ -191,7 +199,12 @@
     "code": "Code",
     "contact": "Contact",
     "status": "Statut",
-    "failedSave": "L'enregistrement de l'entrepôt a échoué. Veuillez réessayer."
+    "failedSave": "L'enregistrement de l'entrepôt a échoué. Veuillez réessayer.",
+    "warehouseInformation": "Informations sur l'entrepôt",
+    "stockSummary": "Résumé du stock",
+    "totalParts": "Total des pièces",
+    "lowStockItems": "Articles en stock bas",
+    "stockValue": "Valeur du stock"
   },
   "storeOverrides": {
     "title": "Paramètres du magasin — {storeName}",

@@ -37,7 +37,8 @@
     "toggleSidebar": "Toggle Sidebar",
     "failed": "Failed to save. Please try again.",
     "confirmDeleteTitle": "Confirm Deletion",
-    "confirmDeleteCancel": "This action cannot be undone."
+    "confirmDeleteCancel": "This action cannot be undone.",
+    "status": "Status"
   },
   "nav": {
     "spareParts": "SPARE PARTS",
@@ -159,7 +160,14 @@
     "code": "Code",
     "status": "Status",
     "settings": "Settings",
-    "failedSave": "Failed to save store. Please try again."
+    "failedSave": "Failed to save store. Please try again.",
+    "storeSettings": "Store Settings",
+    "storeInformation": "Store Information",
+    "customOverrides": "Custom Overrides",
+    "summary": "Summary",
+    "totalCustomers": "Total Customers",
+    "monthlyRevenue": "Monthly Revenue",
+    "noWarehousesAssigned": "No warehouses assigned yet."
   },
   "warehouses": {
     "title": "Warehouses",
@@ -191,7 +199,12 @@
     "code": "Code",
     "contact": "Contact",
     "status": "Status",
-    "failedSave": "Failed to save warehouse. Please try again."
+    "failedSave": "Failed to save warehouse. Please try again.",
+    "warehouseInformation": "Warehouse Information",
+    "stockSummary": "Stock Summary",
+    "totalParts": "Total Parts",
+    "lowStockItems": "Low Stock Items",
+    "stockValue": "Stock Value"
   },
   "storeOverrides": {
     "title": "Store Overrides — {storeName}",

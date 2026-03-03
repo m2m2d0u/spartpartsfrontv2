@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getCompanySettings } from "@/services/company-settings.server";
 import { getTaxRates } from "@/services/tax-rates.server";
@@ -18,13 +19,16 @@ export default async function SettingsPage() {
     getTaxRates(),
   ]);
 
+  const t = await getTranslations("settings");
+  const tNav = await getTranslations("nav");
+
   return (
     <>
       <PageHeader
-        title="Company Settings"
+        title={t("title")}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Settings" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("settings") },
         ]}
       />
 

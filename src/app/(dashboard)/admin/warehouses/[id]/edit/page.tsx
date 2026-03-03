@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getWarehouseById } from "@/services/warehouses.server";
 import { getStores } from "@/services/stores.server";
@@ -22,18 +23,21 @@ export default async function EditWarehousePage({ params }: Props) {
 
   if (!warehouse) notFound();
 
+  const tNav = await getTranslations("nav");
+  const tCommon = await getTranslations("common");
+
   return (
     <>
       <PageHeader
-        title={`Edit — ${warehouse.name}`}
+        title={`${tCommon("edit")} — ${warehouse.name}`}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Warehouses", href: "/admin/warehouses" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("warehouses"), href: "/admin/warehouses" },
           {
             label: warehouse.name,
             href: `/admin/warehouses/${warehouse.id}`,
           },
-          { label: "Edit" },
+          { label: tCommon("edit") },
         ]}
       />
 

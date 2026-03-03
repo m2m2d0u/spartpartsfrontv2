@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getCategoryById } from "@/services/categories.server";
 import { CategoryForm } from "../../_components/category-form";
@@ -18,16 +19,19 @@ export default async function EditCategoryPage({ params }: Props) {
 
   if (!category) notFound();
 
+  const tNav = await getTranslations("nav");
+  const tCommon = await getTranslations("common");
+
   return (
     <>
       <PageHeader
-        title={`Edit — ${category.name}`}
+        title={`${tCommon("edit")} — ${category.name}`}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Parts", href: "/admin/parts" },
-          { label: "Categories", href: "/admin/parts/categories" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("parts"), href: "/admin/parts" },
+          { label: tNav("categories"), href: "/admin/parts/categories" },
           { label: category.name },
-          { label: "Edit" },
+          { label: tCommon("edit") },
         ]}
       />
 

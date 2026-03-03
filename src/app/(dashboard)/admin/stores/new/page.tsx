@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { StoreForm } from "../_components/store-form";
 
@@ -6,15 +7,18 @@ export const metadata: Metadata = {
   title: "New Store",
 };
 
-export default function NewStorePage() {
+export default async function NewStorePage() {
+  const t = await getTranslations("stores");
+  const tNav = await getTranslations("nav");
+
   return (
     <>
       <PageHeader
-        title="New Store"
+        title={t("newStore")}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Stores", href: "/admin/stores" },
-          { label: "New Store" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("stores"), href: "/admin/stores" },
+          { label: t("newStore") },
         ]}
       />
 

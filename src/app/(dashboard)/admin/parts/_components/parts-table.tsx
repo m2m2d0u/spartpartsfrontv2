@@ -82,7 +82,7 @@ export function PartsTable({ parts: initialParts }: Props) {
     },
     {
       key: "published",
-      header: tCommon("active").replace(/.+/, "Status"),
+      header: tCommon("status"),
       render: (row) => (
         <StatusBadge variant={row.published ? "success" : "neutral"}>
           {row.published ? tCommon("published") : tCommon("draft")}

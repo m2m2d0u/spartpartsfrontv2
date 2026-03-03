@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getStores } from "@/services/stores.server";
 import { WarehouseForm } from "../_components/warehouse-form";
@@ -14,15 +15,17 @@ type Props = {
 export default async function NewWarehousePage({ searchParams }: Props) {
   const { storeId } = await searchParams;
   const storesPage = await getStores();
+  const t = await getTranslations("warehouses");
+  const tNav = await getTranslations("nav");
 
   return (
     <>
       <PageHeader
-        title="New Warehouse"
+        title={t("newWarehouse")}
         breadcrumbs={[
-          { label: "Dashboard", href: "/admin" },
-          { label: "Warehouses", href: "/admin/warehouses" },
-          { label: "New Warehouse" },
+          { label: tNav("dashboard"), href: "/admin" },
+          { label: tNav("warehouses"), href: "/admin/warehouses" },
+          { label: t("newWarehouse") },
         ]}
       />
 
