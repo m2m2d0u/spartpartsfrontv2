@@ -1,104 +1,118 @@
 import * as Icons from "../icons";
 
-export const NAV_DATA = [
-  {
-    label: "SPARE PARTS",
-    items: [
-      {
-        title: "Dashboard",
-        url: "/admin",
-        icon: Icons.HomeIcon,
-        items: [],
-      },
-      {
-        title: "Parts",
-        icon: Icons.BoxIcon,
-        items: [
-          {
-            title: "All Parts",
-            url: "/admin/parts",
-          },
-          {
-            title: "Categories",
-            url: "/admin/parts/categories",
-          },
-        ],
-      },
-      {
-        title: "Sales",
-        icon: Icons.InvoiceIcon,
-        items: [
-          {
-            title: "Invoices",
-            url: "/admin/invoices",
-          },
-          {
-            title: "Payments",
-            url: "/admin/payments",
-          },
-          {
-            title: "Returns",
-            url: "/admin/returns",
-          },
-        ],
-      },
-      {
-        title: "Procurement",
-        icon: Icons.TruckIcon,
-        items: [
-          {
-            title: "Purchase Orders",
-            url: "/admin/purchase-orders",
-          },
-          {
-            title: "Suppliers",
-            url: "/admin/suppliers",
-          },
-        ],
-      },
-      {
-        title: "Customers",
-        url: "/admin/customers",
-        icon: Icons.User,
-        items: [],
-      },
-      {
-        title: "Orders",
-        url: "/admin/orders",
-        icon: Icons.ShoppingCartIcon,
-        items: [],
-      },
-      {
-        title: "Locations",
-        icon: Icons.BuildingIcon,
-        items: [
-          {
-            title: "Stores",
-            url: "/admin/stores",
-          },
-          {
-            title: "Warehouses",
-            url: "/admin/warehouses",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: "CONFIGURATION",
-    items: [
-      {
-        title: "Settings",
-        url: "/admin/settings",
-        icon: Icons.SettingsIcon,
-        items: [],
-      },
-      {
-        title: "Users",
-        url: "/admin/users",
-        icon: Icons.Authentication,
-        items: [],
-      },
-    ],
-  },
-];
+type NavItem = {
+  title: string;
+  url?: string;
+  icon: typeof Icons.HomeIcon;
+  items: { title: string; url: string }[];
+};
+
+type NavSection = {
+  label: string;
+  items: NavItem[];
+};
+
+export function getNavData(t: (key: string) => string): NavSection[] {
+  return [
+    {
+      label: t("spareParts"),
+      items: [
+        {
+          title: t("dashboard"),
+          url: "/admin",
+          icon: Icons.HomeIcon,
+          items: [],
+        },
+        {
+          title: t("parts"),
+          icon: Icons.BoxIcon,
+          items: [
+            {
+              title: t("allParts"),
+              url: "/admin/parts",
+            },
+            {
+              title: t("categories"),
+              url: "/admin/parts/categories",
+            },
+          ],
+        },
+        {
+          title: t("sales"),
+          icon: Icons.InvoiceIcon,
+          items: [
+            {
+              title: t("invoices"),
+              url: "/admin/invoices",
+            },
+            {
+              title: t("payments"),
+              url: "/admin/payments",
+            },
+            {
+              title: t("returns"),
+              url: "/admin/returns",
+            },
+          ],
+        },
+        {
+          title: t("procurement"),
+          icon: Icons.TruckIcon,
+          items: [
+            {
+              title: t("purchaseOrders"),
+              url: "/admin/purchase-orders",
+            },
+            {
+              title: t("suppliers"),
+              url: "/admin/suppliers",
+            },
+          ],
+        },
+        {
+          title: t("customers"),
+          url: "/admin/customers",
+          icon: Icons.User,
+          items: [],
+        },
+        {
+          title: t("orders"),
+          url: "/admin/orders",
+          icon: Icons.ShoppingCartIcon,
+          items: [],
+        },
+        {
+          title: t("locations"),
+          icon: Icons.BuildingIcon,
+          items: [
+            {
+              title: t("stores"),
+              url: "/admin/stores",
+            },
+            {
+              title: t("warehouses"),
+              url: "/admin/warehouses",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: t("configuration"),
+      items: [
+        {
+          title: t("settings"),
+          url: "/admin/settings",
+          icon: Icons.SettingsIcon,
+          items: [],
+        },
+        {
+          title: t("users"),
+          url: "/admin/users",
+          icon: Icons.Authentication,
+          items: [],
+        },
+      ],
+    },
+  ];
+}

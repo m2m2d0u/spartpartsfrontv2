@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -17,6 +18,8 @@ export function StoresTable({ stores: initialStores }: Props) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
+  const t = useTranslations("stores");
+  const tCommon = useTranslations("common");
 
   const filtered = stores.filter(
     (s) =>
@@ -38,7 +41,7 @@ export function StoresTable({ stores: initialStores }: Props) {
   const columns: Column<Store>[] = [
     {
       key: "name",
-      header: "Name",
+      header: t("name"),
       render: (row) => (
         <Link
           href={`/admin/stores/${row.id}`}
@@ -50,22 +53,22 @@ export function StoresTable({ stores: initialStores }: Props) {
     },
     {
       key: "code",
-      header: "Code",
+      header: t("code"),
       render: (row) => (
         <span className="text-body-sm text-dark-6">{row.code}</span>
       ),
     },
     {
       key: "city",
-      header: "City",
+      header: tCommon("city"),
       render: (row) => row.city,
     },
     {
       key: "status",
-      header: "Status",
+      header: t("status"),
       render: (row) => (
         <StatusBadge variant={getStoreStatusVariant(row.isActive)}>
-          {row.isActive ? "Active" : "Inactive"}
+          {row.isActive ? tCommon("active") : tCommon("inactive")}
         </StatusBadge>
       ),
     },
@@ -78,20 +81,20 @@ export function StoresTable({ stores: initialStores }: Props) {
             href={`/admin/stores/${row.id}/edit`}
             className="text-body-sm text-primary hover:underline"
           >
-            Edit
+            {tCommon("edit")}
           </Link>
           <Link
             href={`/admin/stores/${row.id}/settings`}
             className="text-body-sm text-dark-5 hover:underline dark:text-dark-6"
           >
-            Settings
+            {t("settings")}
           </Link>
           <button
             type="button"
             onClick={() => setDeleteId(row.id)}
             className="text-body-sm text-red hover:underline"
           >
-            Delete
+            {tCommon("delete")}
           </button>
         </div>
       ),
@@ -105,19 +108,19 @@ export function StoresTable({ stores: initialStores }: Props) {
         columns={columns}
         data={filtered}
         onSearch={setSearch}
-        searchPlaceholder="Search stores..."
+        searchPlaceholder={t("searchStores")}
         rowKey={(row) => row.id}
-        emptyMessage="No stores found"
-        emptyDescription="Create your first store to get started"
+        emptyMessage={t("noStores")}
+        emptyDescription={t("noStoresDescription")}
       />
 
       <ConfirmDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
-        title="Delete Store"
-        description="Are you sure you want to delete this store? This action cannot be undone."
-        confirmLabel="Delete"
+        title={t("deleteStoreTitle")}
+        description={t("deleteStoreDescription")}
+        confirmLabel={tCommon("delete")}
         variant="danger"
         loading={deleting}
       />

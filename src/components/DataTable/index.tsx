@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import {
   Table,
   TableBody,
@@ -39,12 +40,13 @@ export function DataTable<T>({
   rowKey,
   pageSize = 10,
   onSearch,
-  searchPlaceholder = "Search...",
+  searchPlaceholder,
   filterSlot,
-  emptyMessage = "No data found",
+  emptyMessage,
   emptyDescription,
   title,
 }: DataTableProps<T>) {
+  const t = useTranslations("common");
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
 
@@ -83,7 +85,7 @@ export function DataTable<T>({
           <div className="relative">
             <input
               type="text"
-              placeholder={searchPlaceholder}
+              placeholder={searchPlaceholder || t("search")}
               value={searchQuery}
               onChange={handleSearch}
               className="w-full rounded-lg border border-stroke bg-transparent py-2 pl-10 pr-4 text-sm text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary sm:w-64"
@@ -114,7 +116,7 @@ export function DataTable<T>({
       {/* Table */}
       {data.length === 0 ? (
         <EmptyState
-          title={emptyMessage}
+          title={emptyMessage || t("noData")}
           description={emptyDescription}
           className="py-16"
         />
@@ -147,9 +149,11 @@ export function DataTable<T>({
           <div className="border-t border-stroke px-4 py-4 dark:border-dark-3 sm:px-6">
             <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
               <p className="text-body-sm text-dark-6">
-                Showing {(safePage - 1) * pageSize + 1} to{" "}
-                {Math.min(safePage * pageSize, totalItems)} of {totalItems}{" "}
-                entries
+                {t("showing", {
+                  start: (safePage - 1) * pageSize + 1,
+                  end: Math.min(safePage * pageSize, totalItems),
+                  total: totalItems,
+                })}
               </p>
               <Pagination
                 page={safePage}

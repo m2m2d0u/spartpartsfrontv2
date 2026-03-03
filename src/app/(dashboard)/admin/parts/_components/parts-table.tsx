@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -16,6 +17,8 @@ export function PartsTable({ parts: initialParts }: Props) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
+  const t = useTranslations("parts");
+  const tCommon = useTranslations("common");
 
   const filtered = parts.filter(
     (p) =>
@@ -37,7 +40,7 @@ export function PartsTable({ parts: initialParts }: Props) {
   const columns: Column<Part>[] = [
     {
       key: "partNumber",
-      header: "Part #",
+      header: t("partNumber"),
       render: (row) => (
         <Link
           href={`/admin/parts/${row.id}`}
@@ -49,7 +52,7 @@ export function PartsTable({ parts: initialParts }: Props) {
     },
     {
       key: "name",
-      header: "Name",
+      header: t("partName"),
       render: (row) => (
         <Link
           href={`/admin/parts/${row.id}`}
@@ -61,7 +64,7 @@ export function PartsTable({ parts: initialParts }: Props) {
     },
     {
       key: "category",
-      header: "Category",
+      header: t("category"),
       render: (row) => (
         <span className="text-body-sm text-dark-6">
           {row.categoryName || "—"}
@@ -70,7 +73,7 @@ export function PartsTable({ parts: initialParts }: Props) {
     },
     {
       key: "sellingPrice",
-      header: "Selling Price",
+      header: t("sellingPrice"),
       render: (row) => (
         <span className="font-medium text-dark dark:text-white">
           {row.sellingPrice.toLocaleString("fr-FR")} FCFA
@@ -79,10 +82,10 @@ export function PartsTable({ parts: initialParts }: Props) {
     },
     {
       key: "published",
-      header: "Status",
+      header: tCommon("active").replace(/.+/, "Status"),
       render: (row) => (
         <StatusBadge variant={row.published ? "success" : "neutral"}>
-          {row.published ? "Published" : "Draft"}
+          {row.published ? tCommon("published") : tCommon("draft")}
         </StatusBadge>
       ),
     },
@@ -95,20 +98,20 @@ export function PartsTable({ parts: initialParts }: Props) {
             href={`/admin/parts/${row.id}`}
             className="text-body-sm text-dark-5 hover:underline dark:text-dark-6"
           >
-            View
+            {tCommon("view")}
           </Link>
           <Link
             href={`/admin/parts/${row.id}/edit`}
             className="text-body-sm text-primary hover:underline"
           >
-            Edit
+            {tCommon("edit")}
           </Link>
           <button
             type="button"
             onClick={() => setDeleteId(row.id)}
             className="text-body-sm text-red hover:underline"
           >
-            Delete
+            {tCommon("delete")}
           </button>
         </div>
       ),
@@ -122,19 +125,19 @@ export function PartsTable({ parts: initialParts }: Props) {
         columns={columns}
         data={filtered}
         onSearch={setSearch}
-        searchPlaceholder="Search parts..."
+        searchPlaceholder={t("searchParts")}
         rowKey={(row) => row.id}
-        emptyMessage="No parts found"
-        emptyDescription="Create your first part to get started"
+        emptyMessage={t("noParts")}
+        emptyDescription={t("noPartsDescription")}
       />
 
       <ConfirmDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
-        title="Delete Part"
-        description="Are you sure you want to delete this part? This action cannot be undone."
-        confirmLabel="Delete"
+        title={t("deletePartTitle")}
+        description={t("deletePartDescription")}
+        confirmLabel={tCommon("delete")}
         variant="danger"
         loading={deleting}
       />

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { Category } from "@/types";
@@ -15,6 +16,8 @@ export function CategoriesTable({ categories: initialCategories }: Props) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
+  const t = useTranslations("categories");
+  const tCommon = useTranslations("common");
 
   const filtered = categories.filter(
     (c) =>
@@ -37,7 +40,7 @@ export function CategoriesTable({ categories: initialCategories }: Props) {
   const columns: Column<Category>[] = [
     {
       key: "name",
-      header: "Name",
+      header: t("name"),
       render: (row) => (
         <Link
           href={`/admin/parts/categories/${row.id}/edit`}
@@ -49,7 +52,7 @@ export function CategoriesTable({ categories: initialCategories }: Props) {
     },
     {
       key: "description",
-      header: "Description",
+      header: t("description"),
       render: (row) => (
         <span className="line-clamp-1 text-body-sm text-dark-6">
           {row.description || "—"}
@@ -58,7 +61,7 @@ export function CategoriesTable({ categories: initialCategories }: Props) {
     },
     {
       key: "createdAt",
-      header: "Created",
+      header: t("created"),
       render: (row) =>
         new Date(row.createdAt).toLocaleDateString("fr-FR", {
           day: "2-digit",
@@ -75,14 +78,14 @@ export function CategoriesTable({ categories: initialCategories }: Props) {
             href={`/admin/parts/categories/${row.id}/edit`}
             className="text-body-sm text-primary hover:underline"
           >
-            Edit
+            {tCommon("edit")}
           </Link>
           <button
             type="button"
             onClick={() => setDeleteId(row.id)}
             className="text-body-sm text-red hover:underline"
           >
-            Delete
+            {tCommon("delete")}
           </button>
         </div>
       ),
@@ -96,19 +99,19 @@ export function CategoriesTable({ categories: initialCategories }: Props) {
         columns={columns}
         data={filtered}
         onSearch={setSearch}
-        searchPlaceholder="Search categories..."
+        searchPlaceholder={t("searchCategories")}
         rowKey={(row) => row.id}
-        emptyMessage="No categories found"
-        emptyDescription="Create your first category to organise parts"
+        emptyMessage={t("noCategories")}
+        emptyDescription={t("noCategoriesDescription")}
       />
 
       <ConfirmDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
-        title="Delete Category"
-        description="Are you sure you want to delete this category? This action cannot be undone."
-        confirmLabel="Delete"
+        title={t("deleteCategoryTitle")}
+        description={t("deleteCategoryDescription")}
+        confirmLabel={tCommon("delete")}
         variant="danger"
         loading={deleting}
       />

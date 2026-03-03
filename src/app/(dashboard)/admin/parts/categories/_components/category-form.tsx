@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { FormSection } from "@/components/FormSection";
 import type { Category } from "@/types";
@@ -12,22 +13,25 @@ type Props = {
   category?: Category;
 };
 
-const categorySchema = Yup.object({
-  name: Yup.string()
-    .trim()
-    .max(100, "Name must be at most 100 characters")
-    .required("Category name is required"),
-  description: Yup.string(),
-  imageUrl: Yup.string()
-    .max(500, "URL must be at most 500 characters")
-    .url("Must be a valid URL")
-    .nullable(),
-});
-
 export function CategoryForm({ category }: Props) {
   const router = useRouter();
   const isEditing = !!category;
   const [serverError, setServerError] = useState("");
+  const t = useTranslations("categories");
+  const tCommon = useTranslations("common");
+  const tVal = useTranslations("validation");
+
+  const categorySchema = Yup.object({
+    name: Yup.string()
+      .trim()
+      .max(100, tVal("nameMaxLength", { max: 100 }))
+      .required(tVal("categoryNameRequired")),
+    description: Yup.string(),
+    imageUrl: Yup.string()
+      .max(500, tVal("urlMaxLength", { max: 500 }))
+      .url(tVal("validUrl"))
+      .nullable(),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -54,13 +58,13 @@ export function CategoryForm({ category }: Props) {
         }
         router.refresh();
       } catch {
-        setServerError("Failed to save category. Please try again.");
+        setServerError(t("failedSave"));
       }
     },
   });
 
   return (
-    <FormSection title={isEditing ? "Edit Category" : "New Category"}>
+    <FormSection title={isEditing ? t("editCategory") : t("newCategory")}>
       <form onSubmit={formik.handleSubmit} className="space-y-5">
         {serverError && (
           <div className="rounded-lg bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318] dark:bg-[#B42318]/10 dark:text-[#FDA29B]">
@@ -69,10 +73,10 @@ export function CategoryForm({ category }: Props) {
         )}
 
         <InputGroup
-          label="Category Name"
+          label={t("categoryName")}
           name="name"
           type="text"
-          placeholder="e.g. Engine Parts"
+          placeholder={t("categoryNamePlaceholder")}
           value={formik.values.name}
           handleChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -81,12 +85,12 @@ export function CategoryForm({ category }: Props) {
 
         <div>
           <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            Description
+            {t("description")}
           </label>
           <textarea
             name="description"
             rows={4}
-            placeholder="Optional description for this category"
+            placeholder={t("descriptionPlaceholder")}
             value={formik.values.description}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -95,10 +99,10 @@ export function CategoryForm({ category }: Props) {
         </div>
 
         <InputGroup
-          label="Image URL"
+          label={t("imageUrl")}
           name="imageUrl"
           type="text"
-          placeholder="https://example.com/image.png"
+          placeholder={t("imageUrlPlaceholder")}
           value={formik.values.imageUrl}
           handleChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -112,17 +116,17 @@ export function CategoryForm({ category }: Props) {
             className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
             {formik.isSubmitting
-              ? "Saving..."
+              ? tCommon("saving")
               : isEditing
-                ? "Update Category"
-                : "Create Category"}
+                ? t("updateCategory")
+                : t("createCategory")}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
             className="rounded-lg border border-stroke px-6 py-2.5 text-sm font-medium text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white dark:hover:bg-dark-2"
           >
-            Cancel
+            {tCommon("cancel")}
           </button>
         </div>
       </form>

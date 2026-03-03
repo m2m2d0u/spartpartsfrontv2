@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { FormSection } from "@/components/FormSection";
 import type { CompanySettings, Store } from "@/types";
@@ -12,30 +13,33 @@ type Props = {
   companySettings: CompanySettings;
 };
 
-const overridesSchema = Yup.object({
-  ninea: Yup.string(),
-  rccm: Yup.string(),
-  taxId: Yup.string(),
-  invoicePrefix: Yup.string(),
-  proformaPrefix: Yup.string(),
-  depositPrefix: Yup.string(),
-  creditNotePrefix: Yup.string(),
-  orderPrefix: Yup.string(),
-  defaultPaymentTerms: Yup.number()
-    .typeError("Must be a number")
-    .min(0, "Cannot be negative")
-    .integer("Must be a whole number")
-    .nullable(),
-  defaultProformaValidity: Yup.number()
-    .typeError("Must be a number")
-    .min(0, "Cannot be negative")
-    .integer("Must be a whole number")
-    .nullable(),
-  defaultInvoiceNotes: Yup.string(),
-});
-
 export function StoreOverridesForm({ store, companySettings }: Props) {
   const [saved, setSaved] = useState(false);
+  const t = useTranslations("storeOverrides");
+  const tCommon = useTranslations("common");
+  const tVal = useTranslations("validation");
+
+  const overridesSchema = Yup.object({
+    ninea: Yup.string(),
+    rccm: Yup.string(),
+    taxId: Yup.string(),
+    invoicePrefix: Yup.string(),
+    proformaPrefix: Yup.string(),
+    depositPrefix: Yup.string(),
+    creditNotePrefix: Yup.string(),
+    orderPrefix: Yup.string(),
+    defaultPaymentTerms: Yup.number()
+      .typeError(tVal("mustBeNumber"))
+      .min(0, tVal("cannotBeNegative"))
+      .integer(tVal("mustBeWholeNumber"))
+      .nullable(),
+    defaultProformaValidity: Yup.number()
+      .typeError(tVal("mustBeNumber"))
+      .min(0, tVal("cannotBeNegative"))
+      .integer(tVal("mustBeWholeNumber"))
+      .nullable(),
+    defaultInvoiceNotes: Yup.string(),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -91,34 +95,34 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
 
   return (
     <FormSection
-      title={`Store Overrides — ${store.name}`}
-      description="Leave fields empty to use company defaults. Current company defaults are shown as placeholders."
+      title={t("title", { storeName: store.name })}
+      description={t("description")}
     >
       <form onSubmit={formik.handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <InputGroup
-            label="NINEA"
+            label={t("ninea")}
             name="ninea"
             type="text"
-            placeholder={companySettings.ninea || "Company NINEA"}
+            placeholder={companySettings.ninea || t("nineaPlaceholder")}
             value={formik.values.ninea}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
           />
           <InputGroup
-            label="RCCM"
+            label={t("rccm")}
             name="rccm"
             type="text"
-            placeholder={companySettings.rccm || "Company RCCM"}
+            placeholder={companySettings.rccm || t("rccmPlaceholder")}
             value={formik.values.rccm}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
           />
           <InputGroup
-            label="Tax ID"
+            label={t("taxId")}
             name="taxId"
             type="text"
-            placeholder={companySettings.taxId || "Company Tax ID"}
+            placeholder={companySettings.taxId || t("taxIdPlaceholder")}
             value={formik.values.taxId}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -127,11 +131,11 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
 
         <div className="border-t border-stroke pt-5 dark:border-dark-3">
           <h4 className="mb-4 text-body-sm font-medium text-dark dark:text-white">
-            Invoice Prefixes
+            {t("invoicePrefixes")}
           </h4>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
             <InputGroup
-              label="Proforma"
+              label={t("proforma")}
               name="proformaPrefix"
               type="text"
               placeholder={companySettings.proformaPrefix}
@@ -140,7 +144,7 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
               onBlur={formik.handleBlur}
             />
             <InputGroup
-              label="Invoice"
+              label={t("invoice")}
               name="invoicePrefix"
               type="text"
               placeholder={companySettings.invoicePrefix}
@@ -149,7 +153,7 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
               onBlur={formik.handleBlur}
             />
             <InputGroup
-              label="Deposit"
+              label={t("deposit")}
               name="depositPrefix"
               type="text"
               placeholder={companySettings.depositPrefix}
@@ -158,7 +162,7 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
               onBlur={formik.handleBlur}
             />
             <InputGroup
-              label="Credit Note"
+              label={t("creditNote")}
               name="creditNotePrefix"
               type="text"
               placeholder={companySettings.creditNotePrefix}
@@ -167,7 +171,7 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
               onBlur={formik.handleBlur}
             />
             <InputGroup
-              label="Order"
+              label={t("order")}
               name="orderPrefix"
               type="text"
               placeholder={companySettings.orderPrefix}
@@ -180,7 +184,7 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <InputGroup
-            label="Payment Terms (days)"
+            label={t("paymentTerms")}
             name="defaultPaymentTerms"
             type="number"
             placeholder={String(companySettings.defaultPaymentTerms)}
@@ -190,7 +194,7 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
             error={fieldError("defaultPaymentTerms")}
           />
           <InputGroup
-            label="Proforma Validity (days)"
+            label={t("proformaValidity")}
             name="defaultProformaValidity"
             type="number"
             placeholder={String(companySettings.defaultProformaValidity)}
@@ -203,7 +207,7 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
 
         <div>
           <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            Default Invoice Notes
+            {t("defaultInvoiceNotes")}
           </label>
           <textarea
             name="defaultInvoiceNotes"
@@ -225,11 +229,11 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
             disabled={formik.isSubmitting}
             className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
-            {formik.isSubmitting ? "Saving..." : "Save Overrides"}
+            {formik.isSubmitting ? tCommon("saving") : t("saveOverrides")}
           </button>
           {saved && (
             <span className="text-body-sm text-[#027A48]">
-              Store overrides saved successfully
+              {t("savedSuccess")}
             </span>
           )}
         </div>

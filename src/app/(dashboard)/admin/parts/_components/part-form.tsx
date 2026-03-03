@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { Switch } from "@/components/FormElements/switch";
@@ -15,41 +16,44 @@ type Props = {
   categories: Category[];
 };
 
-const partSchema = Yup.object({
-  partNumber: Yup.string()
-    .trim()
-    .max(50, "Part number must be at most 50 characters")
-    .required("Part number is required"),
-  name: Yup.string()
-    .trim()
-    .max(200, "Name must be at most 200 characters")
-    .required("Part name is required"),
-  shortDescription: Yup.string().max(
-    500,
-    "Short description must be at most 500 characters",
-  ),
-  description: Yup.string(),
-  categoryId: Yup.string(),
-  sellingPrice: Yup.number()
-    .typeError("Selling price must be a number")
-    .min(0, "Selling price cannot be negative")
-    .required("Selling price is required"),
-  purchasePrice: Yup.number()
-    .typeError("Purchase price must be a number")
-    .min(0, "Purchase price cannot be negative")
-    .required("Purchase price is required"),
-  minStockLevel: Yup.number()
-    .typeError("Min stock level must be a number")
-    .min(0, "Min stock level cannot be negative")
-    .integer("Min stock level must be a whole number"),
-  published: Yup.boolean(),
-  notes: Yup.string(),
-});
-
 export function PartForm({ part, categories }: Props) {
   const router = useRouter();
   const isEditing = !!part;
   const [serverError, setServerError] = useState("");
+  const t = useTranslations("parts");
+  const tCommon = useTranslations("common");
+  const tVal = useTranslations("validation");
+
+  const partSchema = Yup.object({
+    partNumber: Yup.string()
+      .trim()
+      .max(50, tVal("partNumberMaxLength", { max: 50 }))
+      .required(tVal("partNumberRequired")),
+    name: Yup.string()
+      .trim()
+      .max(200, tVal("partNameMaxLength", { max: 200 }))
+      .required(tVal("partNameRequired")),
+    shortDescription: Yup.string().max(
+      500,
+      tVal("shortDescriptionMaxLength", { max: 500 }),
+    ),
+    description: Yup.string(),
+    categoryId: Yup.string(),
+    sellingPrice: Yup.number()
+      .typeError(tVal("mustBeNumber"))
+      .min(0, tVal("cannotBeNegative"))
+      .required(tVal("sellingPriceRequired")),
+    purchasePrice: Yup.number()
+      .typeError(tVal("mustBeNumber"))
+      .min(0, tVal("cannotBeNegative"))
+      .required(tVal("purchasePriceRequired")),
+    minStockLevel: Yup.number()
+      .typeError(tVal("mustBeNumber"))
+      .min(0, tVal("cannotBeNegative"))
+      .integer(tVal("mustBeWholeNumber")),
+    published: Yup.boolean(),
+    notes: Yup.string(),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -92,7 +96,7 @@ export function PartForm({ part, categories }: Props) {
         }
         router.refresh();
       } catch {
-        setServerError("Failed to save part. Please try again.");
+        setServerError(t("failedSave"));
       }
     },
   });
@@ -107,7 +111,7 @@ export function PartForm({ part, categories }: Props) {
   }
 
   return (
-    <FormSection title={isEditing ? "Edit Part" : "New Part"}>
+    <FormSection title={isEditing ? t("editPart") : t("newPart")}>
       <form onSubmit={formik.handleSubmit} className="space-y-5">
         {serverError && (
           <div className="rounded-lg bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318] dark:bg-[#B42318]/10 dark:text-[#FDA29B]">
@@ -117,10 +121,10 @@ export function PartForm({ part, categories }: Props) {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <InputGroup
-            label="Part Number"
+            label={t("partNumber")}
             name="partNumber"
             type="text"
-            placeholder="e.g. ENG-001"
+            placeholder={t("partNumberPlaceholder")}
             value={formik.values.partNumber}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -128,10 +132,10 @@ export function PartForm({ part, categories }: Props) {
             required
           />
           <InputGroup
-            label="Part Name"
+            label={t("partName")}
             name="name"
             type="text"
-            placeholder="e.g. Oil Filter"
+            placeholder={t("partNamePlaceholder")}
             value={formik.values.name}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -141,10 +145,10 @@ export function PartForm({ part, categories }: Props) {
         </div>
 
         <InputGroup
-          label="Short Description"
+          label={t("shortDescription")}
           name="shortDescription"
           type="text"
-          placeholder="Brief description (max 500 chars)"
+          placeholder={t("shortDescriptionPlaceholder")}
           value={formik.values.shortDescription}
           handleChange={formik.handleChange}
           onBlur={formik.handleBlur}
@@ -153,12 +157,12 @@ export function PartForm({ part, categories }: Props) {
 
         <div>
           <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            Description
+            {t("description")}
           </label>
           <textarea
             name="description"
             rows={4}
-            placeholder="Detailed part description"
+            placeholder={t("descriptionPlaceholder")}
             value={formik.values.description}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -167,9 +171,9 @@ export function PartForm({ part, categories }: Props) {
         </div>
 
         <Select
-          label="Category"
+          label={t("category")}
           name="categoryId"
-          placeholder="Select a category"
+          placeholder={t("selectCategory")}
           items={categoryItems}
           value={formik.values.categoryId}
           onChange={formik.handleChange}
@@ -179,11 +183,11 @@ export function PartForm({ part, categories }: Props) {
 
         <div className="border-t border-stroke pt-5 dark:border-dark-3">
           <h4 className="mb-4 text-body-sm font-medium text-dark dark:text-white">
-            Pricing
+            {t("pricing")}
           </h4>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <InputGroup
-              label="Selling Price (FCFA)"
+              label={t("sellingPrice")}
               name="sellingPrice"
               type="number"
               placeholder="0"
@@ -194,7 +198,7 @@ export function PartForm({ part, categories }: Props) {
               required
             />
             <InputGroup
-              label="Purchase Price (FCFA)"
+              label={t("purchasePrice")}
               name="purchasePrice"
               type="number"
               placeholder="0"
@@ -205,7 +209,7 @@ export function PartForm({ part, categories }: Props) {
               required
             />
             <InputGroup
-              label="Min Stock Level"
+              label={t("minStockLevel")}
               name="minStockLevel"
               type="number"
               placeholder="0"
@@ -219,12 +223,12 @@ export function PartForm({ part, categories }: Props) {
 
         <div>
           <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            Internal Notes
+            {t("internalNotes")}
           </label>
           <textarea
             name="notes"
             rows={3}
-            placeholder="Optional internal notes"
+            placeholder={t("internalNotesPlaceholder")}
             value={formik.values.notes}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -233,7 +237,7 @@ export function PartForm({ part, categories }: Props) {
         </div>
 
         <Switch
-          label="Published"
+          label={t("publishedLabel")}
           checked={formik.values.published}
           onChange={(checked) => formik.setFieldValue("published", checked)}
         />
@@ -245,17 +249,17 @@ export function PartForm({ part, categories }: Props) {
             className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
             {formik.isSubmitting
-              ? "Saving..."
+              ? tCommon("saving")
               : isEditing
-                ? "Update Part"
-                : "Create Part"}
+                ? t("updatePart")
+                : t("createPart")}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
             className="rounded-lg border border-stroke px-6 py-2.5 text-sm font-medium text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white dark:hover:bg-dark-2"
           >
-            Cancel
+            {tCommon("cancel")}
           </button>
         </div>
       </form>

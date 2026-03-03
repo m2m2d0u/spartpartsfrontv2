@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
@@ -13,23 +14,26 @@ type Props = {
   store?: Store;
 };
 
-const storeSchema = Yup.object({
-  name: Yup.string().trim().required("Store name is required"),
-  code: Yup.string().trim().required("Store code is required"),
-  phone: Yup.string(),
-  email: Yup.string().email("Must be a valid email"),
-  isActive: Yup.boolean(),
-  street: Yup.string(),
-  city: Yup.string(),
-  state: Yup.string(),
-  postalCode: Yup.string(),
-  country: Yup.string(),
-});
-
 export function StoreForm({ store }: Props) {
   const router = useRouter();
   const isEditing = !!store;
   const [serverError, setServerError] = useState("");
+  const t = useTranslations("stores");
+  const tCommon = useTranslations("common");
+  const tVal = useTranslations("validation");
+
+  const storeSchema = Yup.object({
+    name: Yup.string().trim().required(tVal("storeNameRequired")),
+    code: Yup.string().trim().required(tVal("storeCodeRequired")),
+    phone: Yup.string(),
+    email: Yup.string().email(tVal("validEmail")),
+    isActive: Yup.boolean(),
+    street: Yup.string(),
+    city: Yup.string(),
+    state: Yup.string(),
+    postalCode: Yup.string(),
+    country: Yup.string(),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -59,7 +63,7 @@ export function StoreForm({ store }: Props) {
         }
         router.refresh();
       } catch {
-        setServerError("Failed to save store. Please try again.");
+        setServerError(t("failedSave"));
       }
     },
   });
@@ -69,7 +73,7 @@ export function StoreForm({ store }: Props) {
   }
 
   return (
-    <FormSection title={isEditing ? "Edit Store" : "New Store"}>
+    <FormSection title={isEditing ? t("editStore") : t("newStore")}>
       <form onSubmit={formik.handleSubmit} className="space-y-5">
         {serverError && (
           <div className="rounded-lg bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318] dark:bg-[#B42318]/10 dark:text-[#FDA29B]">
@@ -79,10 +83,10 @@ export function StoreForm({ store }: Props) {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <InputGroup
-            label="Store Name"
+            label={t("storeName")}
             name="name"
             type="text"
-            placeholder="e.g. SenParts Dakar"
+            placeholder={t("storeNamePlaceholder")}
             value={formik.values.name}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -90,10 +94,10 @@ export function StoreForm({ store }: Props) {
             required
           />
           <InputGroup
-            label="Store Code"
+            label={t("storeCode")}
             name="code"
             type="text"
-            placeholder="e.g. STR-DK"
+            placeholder={t("storeCodePlaceholder")}
             value={formik.values.code}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -104,19 +108,19 @@ export function StoreForm({ store }: Props) {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <InputGroup
-            label="Phone"
+            label={tCommon("phone")}
             name="phone"
             type="text"
-            placeholder="+221 XX XXX XX XX"
+            placeholder={tCommon("phonePlaceholder")}
             value={formik.values.phone}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
           />
           <InputGroup
-            label="Email"
+            label={tCommon("email")}
             name="email"
             type="email"
-            placeholder="store@company.sn"
+            placeholder={t("emailPlaceholder")}
             value={formik.values.email}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -126,51 +130,51 @@ export function StoreForm({ store }: Props) {
 
         <div className="border-t border-stroke pt-5 dark:border-dark-3">
           <h4 className="mb-4 text-body-sm font-medium text-dark dark:text-white">
-            Address
+            {tCommon("address")}
           </h4>
           <div className="space-y-5">
             <InputGroup
-              label="Street"
+              label={tCommon("street")}
               name="street"
               type="text"
-              placeholder="Street address"
+              placeholder={tCommon("streetPlaceholder")}
               value={formik.values.street}
               handleChange={formik.handleChange}
               onBlur={formik.handleBlur}
             />
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               <InputGroup
-                label="City"
+                label={tCommon("city")}
                 name="city"
                 type="text"
-                placeholder="City"
+                placeholder={tCommon("cityPlaceholder")}
                 value={formik.values.city}
                 handleChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
               <InputGroup
-                label="State / Region"
+                label={tCommon("stateRegion")}
                 name="state"
                 type="text"
-                placeholder="State"
+                placeholder={tCommon("statePlaceholder")}
                 value={formik.values.state}
                 handleChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
               <InputGroup
-                label="Postal Code"
+                label={tCommon("postalCode")}
                 name="postalCode"
                 type="text"
-                placeholder="Postal code"
+                placeholder={tCommon("postalCodePlaceholder")}
                 value={formik.values.postalCode}
                 handleChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
               <InputGroup
-                label="Country"
+                label={tCommon("country")}
                 name="country"
                 type="text"
-                placeholder="Country"
+                placeholder={tCommon("countryPlaceholder")}
                 value={formik.values.country}
                 handleChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -180,7 +184,7 @@ export function StoreForm({ store }: Props) {
         </div>
 
         <Switch
-          label="Store is Active"
+          label={t("storeIsActive")}
           checked={formik.values.isActive}
           onChange={(checked) => formik.setFieldValue("isActive", checked)}
         />
@@ -192,17 +196,17 @@ export function StoreForm({ store }: Props) {
             className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
             {formik.isSubmitting
-              ? "Saving..."
+              ? tCommon("saving")
               : isEditing
-                ? "Update Store"
-                : "Create Store"}
+                ? t("updateStore")
+                : t("createStore")}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
             className="rounded-lg border border-stroke px-6 py-2.5 text-sm font-medium text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white dark:hover:bg-dark-2"
           >
-            Cancel
+            {tCommon("cancel")}
           </button>
         </div>
       </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 type PaginationProps = {
   page: number;
@@ -9,6 +10,8 @@ type PaginationProps = {
 };
 
 export function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
+  const t = useTranslations("common");
+
   if (totalPages <= 1) return null;
 
   const pages = getVisiblePages(page, totalPages);
@@ -21,7 +24,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
         disabled={page <= 1}
         className="inline-flex h-9 items-center justify-center rounded-lg border border-stroke px-3 text-sm font-medium text-dark-5 transition hover:bg-gray-2 disabled:cursor-default disabled:opacity-40 dark:border-dark-3 dark:text-dark-6 dark:hover:bg-dark-2"
       >
-        Prev
+        {t("prev")}
       </button>
 
       {pages.map((p, idx) =>
@@ -52,7 +55,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
         disabled={page >= totalPages}
         className="inline-flex h-9 items-center justify-center rounded-lg border border-stroke px-3 text-sm font-medium text-dark-5 transition hover:bg-gray-2 disabled:cursor-default disabled:opacity-40 dark:border-dark-3 dark:text-dark-6 dark:hover:bg-dark-2"
       >
-        Next
+        {t("next")}
       </button>
     </div>
   );

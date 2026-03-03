@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -22,6 +23,8 @@ export function WarehousesTable({
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const [storeFilter, setStoreFilter] = useState("");
+  const t = useTranslations("warehouses");
+  const tCommon = useTranslations("common");
 
   const filtered = warehouses.filter((w) => {
     const matchesSearch =
@@ -47,7 +50,7 @@ export function WarehousesTable({
   const columns: Column<Warehouse>[] = [
     {
       key: "name",
-      header: "Name",
+      header: t("name"),
       render: (row) => (
         <Link
           href={`/admin/warehouses/${row.id}`}
@@ -59,32 +62,32 @@ export function WarehousesTable({
     },
     {
       key: "code",
-      header: "Code",
+      header: t("code"),
       render: (row) => (
         <span className="text-body-sm text-dark-6">{row.code}</span>
       ),
     },
     {
       key: "store",
-      header: "Store",
+      header: t("store"),
       render: (row) => row.storeName,
     },
     {
       key: "city",
-      header: "City",
+      header: tCommon("city"),
       render: (row) => row.city,
     },
     {
       key: "contact",
-      header: "Contact",
+      header: t("contact"),
       render: (row) => row.contactPerson,
     },
     {
       key: "status",
-      header: "Status",
+      header: t("status"),
       render: (row) => (
         <StatusBadge variant={getWarehouseStatusVariant(row.isActive)}>
-          {row.isActive ? "Active" : "Inactive"}
+          {row.isActive ? tCommon("active") : tCommon("inactive")}
         </StatusBadge>
       ),
     },
@@ -97,14 +100,14 @@ export function WarehousesTable({
             href={`/admin/warehouses/${row.id}/edit`}
             className="text-body-sm text-primary hover:underline"
           >
-            Edit
+            {tCommon("edit")}
           </Link>
           <button
             type="button"
             onClick={() => setDeleteId(row.id)}
             className="text-body-sm text-red hover:underline"
           >
-            Delete
+            {tCommon("delete")}
           </button>
         </div>
       ),
@@ -118,14 +121,14 @@ export function WarehousesTable({
         columns={columns}
         data={filtered}
         onSearch={setSearch}
-        searchPlaceholder="Search warehouses..."
+        searchPlaceholder={t("searchWarehouses")}
         filterSlot={
           <select
             value={storeFilter}
             onChange={(e) => setStoreFilter(e.target.value)}
             className="rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
           >
-            <option value="">All Stores</option>
+            <option value="">{t("allStores")}</option>
             {stores.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -134,17 +137,17 @@ export function WarehousesTable({
           </select>
         }
         rowKey={(row) => row.id}
-        emptyMessage="No warehouses found"
-        emptyDescription="Create your first warehouse to get started"
+        emptyMessage={t("noWarehouses")}
+        emptyDescription={t("noWarehousesDescription")}
       />
 
       <ConfirmDialog
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
-        title="Delete Warehouse"
-        description="Are you sure you want to delete this warehouse? This action cannot be undone. Make sure no stock is held in this warehouse."
-        confirmLabel="Delete"
+        title={t("deleteWarehouseTitle")}
+        description={t("deleteWarehouseDescription")}
+        confirmLabel={tCommon("delete")}
         variant="danger"
         loading={deleting}
       />
