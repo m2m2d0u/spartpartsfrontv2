@@ -1,20 +1,18 @@
-import type { Auditable } from "./common";
-
 export type PaymentMethod =
-  | "cash"
-  | "bank_transfer"
-  | "check"
-  | "mobile_money"
-  | "card"
-  | "other";
+  | "CASH"
+  | "BANK_TRANSFER"
+  | "CHECK"
+  | "CREDIT_CARD"
+  | "OTHER";
 
-export type Payment = Auditable & {
+/** Mirrors backend PaymentResponse */
+export type Payment = {
   id: string;
   invoiceId: string;
-  invoiceNumber: string;
   amount: number;
-  method: PaymentMethod;
-  reference: string;
+  paymentMethod: PaymentMethod;
   paymentDate: string;
+  reference: string;
   notes: string;
+  createdAt: string;
 };

@@ -1,52 +1,66 @@
-import type { Address, Auditable } from "./common";
-
-export type TaxRate = {
+/** Mirrors backend CompanySettingsResponse — flat structure */
+export type CompanySettings = {
   id: string;
-  label: string;
-  rate: number;
-  isDefault: boolean;
-};
-
-export type CurrencySettings = {
-  symbol: string;
-  position: "before" | "after";
-  decimalPlaces: 0 | 2 | 3;
-};
-
-export type InvoiceDefaults = {
+  companyName: string;
+  logoUrl: string | null;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  taxId: string;
+  ninea: string;
+  rccm: string;
+  phone: string;
+  email: string;
+  defaultTaxRate: number;
   proformaPrefix: string;
   invoicePrefix: string;
   depositPrefix: string;
   creditNotePrefix: string;
   orderPrefix: string;
+  poPrefix: string;
+  transferPrefix: string;
+  returnPrefix: string;
   defaultPaymentTerms: number;
   defaultProformaValidity: number;
   defaultInvoiceNotes: string;
-  sequentialReset: "yearly" | "continuous";
-  defaultInvoiceTemplate: string;
-};
-
-export type ClientPortalSettings = {
+  defaultTemplateId: string | null;
+  sequentialResetYearly: boolean;
+  currencySymbol: string;
+  currencyPosition: string;
+  currencyDecimals: number;
+  defaultWarehouseId: string | null;
+  portalWarehouseId: string | null;
   portalEnabled: boolean;
-  minimumOrderAmount: number | null;
-  shippingOption: "flat_rate" | "free_above_threshold" | "custom";
-  shippingFlatRate?: number;
-  shippingFreeThreshold?: number;
-  termsAndConditions: string;
+  portalMinOrderAmount: number | null;
+  portalShippingFlatRate: number | null;
+  portalFreeShippingAbove: number | null;
+  portalTermsText: string;
+  updatedAt: string;
 };
 
-export type CompanySettings = Auditable & {
+/** Mirrors backend UpdateCompanySettingsRequest */
+export type UpdateCompanySettingsRequest = Partial<
+  Omit<CompanySettings, "id" | "updatedAt">
+>;
+
+/** Mirrors backend TaxRateResponse */
+export type TaxRate = {
   id: string;
-  businessName: string;
-  logoUrl: string | null;
-  address: Address;
-  phone: string;
-  email: string;
-  taxId: string;
-  ninea: string;
-  rccm: string;
-  taxRates: TaxRate[];
-  currency: CurrencySettings;
-  invoiceDefaults: InvoiceDefaults;
-  clientPortal: ClientPortalSettings;
+  label: string;
+  rate: number;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
+
+/** Mirrors backend CreateTaxRateRequest */
+export type CreateTaxRateRequest = {
+  label: string;
+  rate: number;
+  isDefault?: boolean;
+};
+
+/** Mirrors backend UpdateTaxRateRequest */
+export type UpdateTaxRateRequest = CreateTaxRateRequest;

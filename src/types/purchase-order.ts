@@ -1,39 +1,35 @@
-import type { Auditable } from "./common";
-
 export type PurchaseOrderStatus =
-  | "draft"
-  | "sent"
-  | "partially_received"
-  | "received"
-  | "cancelled";
+  | "DRAFT"
+  | "SENT"
+  | "PARTIALLY_RECEIVED"
+  | "RECEIVED"
+  | "CANCELLED";
 
+/** Mirrors backend PurchaseOrderItemResponse */
 export type PurchaseOrderItem = {
   id: string;
   partId: string;
   partName: string;
   partNumber: string;
   quantity: number;
+  unitPrice: number;
   receivedQuantity: number;
-  unitCost: number;
-  lineTotal: number;
 };
 
-export type PurchaseOrder = Auditable & {
+/** Mirrors backend PurchaseOrderResponse */
+export type PurchaseOrder = {
   id: string;
-  orderNumber: string;
-  status: PurchaseOrderStatus;
-  storeId: string;
-  storeName: string;
-  warehouseId: string;
-  warehouseName: string;
+  poNumber: string;
   supplierId: string;
   supplierName: string;
-  items: PurchaseOrderItem[];
-  subtotal: number;
-  taxAmount: number;
-  total: number;
+  status: PurchaseOrderStatus;
+  totalAmount: number;
   orderDate: string;
-  expectedDate: string;
-  receivedDate: string | null;
+  expectedDeliveryDate: string | null;
+  destinationWarehouseId: string | null;
+  destinationWarehouseName: string | null;
   notes: string;
+  items: PurchaseOrderItem[];
+  createdAt: string;
+  updatedAt: string;
 };

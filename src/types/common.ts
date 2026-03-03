@@ -10,25 +10,22 @@ export type FilterState = {
   value: string | string[];
 };
 
-export type PaginatedResponse<T> = {
-  data: T[];
-  total: number;
-  page: number;
+/** Mirrors backend PagedResponse<T> */
+export type PagedResponse<T> = {
+  content: T[];
+  pageNumber: number;
   pageSize: number;
+  totalElements: number;
   totalPages: number;
+  first: boolean;
+  last: boolean;
 };
 
-export type Address = {
-  street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-};
-
-export type Auditable = {
-  createdAt: string;
-  updatedAt: string;
-  createdBy?: string;
-  updatedBy?: string;
+/** Mirrors backend ApiResponse<T> */
+export type ApiResponse<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+  errors: Record<string, string> | null;
+  timestamp: string;
 };

@@ -1,44 +1,45 @@
-import type { Auditable } from "./common";
-
 export type ReturnStatus =
-  | "pending"
-  | "approved"
-  | "received"
-  | "refunded"
-  | "rejected";
+  | "REQUESTED"
+  | "APPROVED"
+  | "RECEIVED"
+  | "REFUNDED"
+  | "CLOSED"
+  | "REJECTED";
 
 export type ReturnReason =
-  | "defective"
-  | "wrong_item"
-  | "damaged"
-  | "not_needed"
-  | "other";
+  | "DEFECTIVE"
+  | "WRONG_PART"
+  | "CHANGED_MIND"
+  | "DAMAGED_IN_TRANSIT"
+  | "OTHER";
 
+export type RestockAction = "RETURN_TO_STOCK" | "WRITE_OFF";
+
+/** Mirrors backend ReturnItemResponse */
 export type ReturnItem = {
   id: string;
   partId: string;
   partName: string;
   partNumber: string;
   quantity: number;
-  unitPrice: number;
   reason: ReturnReason;
-  notes: string;
+  restockAction: RestockAction | null;
+  warehouseId: string | null;
+  warehouseName: string | null;
 };
 
-export type Return = Auditable & {
+/** Mirrors backend ReturnResponse */
+export type Return = {
   id: string;
   returnNumber: string;
-  status: ReturnStatus;
-  storeId: string;
-  storeName: string;
+  invoiceId: string | null;
+  orderId: string | null;
   customerId: string;
   customerName: string;
-  invoiceId: string | null;
-  invoiceNumber: string | null;
-  orderId: string | null;
-  orderNumber: string | null;
-  items: ReturnItem[];
-  totalRefund: number;
+  status: ReturnStatus;
   returnDate: string;
   notes: string;
+  items: ReturnItem[];
+  createdAt: string;
+  updatedAt: string;
 };

@@ -1,12 +1,16 @@
-import type { Address, Auditable } from "./common";
-
-export type Supplier = Auditable & {
+/** Mirrors backend SupplierResponse */
+export type Supplier = {
   id: string;
   name: string;
   contactPerson: string;
   email: string;
   phone: string;
-  address: Address;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
   notes: string;
-  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 };

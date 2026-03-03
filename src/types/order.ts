@@ -1,14 +1,13 @@
-import type { Address, Auditable } from "./common";
-
 export type OrderStatus =
-  | "pending"
-  | "confirmed"
-  | "processing"
-  | "shipped"
-  | "delivered"
-  | "completed"
-  | "cancelled";
+  | "PENDING"
+  | "CONFIRMED"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "COMPLETED"
+  | "CANCELLED";
 
+/** Mirrors backend OrderItemResponse */
 export type OrderItem = {
   id: string;
   partId: string;
@@ -16,25 +15,32 @@ export type OrderItem = {
   partNumber: string;
   quantity: number;
   unitPrice: number;
-  lineTotal: number;
+  totalPrice: number;
 };
 
-export type ClientOrder = Auditable & {
+/** Mirrors backend ClientOrderResponse */
+export type ClientOrder = {
   id: string;
   orderNumber: string;
-  status: OrderStatus;
-  storeId: string;
-  storeName: string;
   customerId: string;
   customerName: string;
-  items: OrderItem[];
+  status: OrderStatus;
   subtotal: number;
   taxAmount: number;
-  discount: number;
-  shippingCost: number;
-  total: number;
-  shippingAddress: Address;
-  trackingNumber: string | null;
-  orderDate: string;
+  discountAmount: number;
+  shippingAmount: number;
+  totalAmount: number;
+  shippingStreet: string;
+  shippingCity: string;
+  shippingState: string;
+  shippingPostal: string;
+  shippingCountry: string;
   notes: string;
+  trackingNumber: string | null;
+  warehouseId: string | null;
+  warehouseName: string | null;
+  orderDate: string;
+  items: OrderItem[];
+  createdAt: string;
+  updatedAt: string;
 };

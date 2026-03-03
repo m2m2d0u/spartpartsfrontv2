@@ -1,47 +1,52 @@
-import type { Auditable } from "./common";
-
-export type StockStatus = "in_stock" | "low_stock" | "out_of_stock";
-
+/** Mirrors backend PartImageResponse */
 export type PartImage = {
   id: string;
   url: string;
-  alt: string;
-  order: number;
+  sortOrder: number;
 };
 
-export type WarehouseStock = {
-  warehouseId: string;
-  warehouseName: string;
-  storeId: string;
-  storeName: string;
-  quantity: number;
-  minStock: number;
-  status: StockStatus;
+/** Mirrors backend PartResponse */
+export type Part = {
+  id: string;
+  partNumber: string;
+  name: string;
+  description: string;
+  shortDescription: string;
+  categoryId: string | null;
+  categoryName: string | null;
+  sellingPrice: number;
+  purchasePrice: number;
+  minStockLevel: number;
+  published: boolean;
+  notes: string;
+  images: PartImage[];
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type Category = Auditable & {
+/** Mirrors backend CreatePartRequest */
+export type CreatePartRequest = {
+  partNumber: string;
+  name: string;
+  description?: string;
+  shortDescription?: string;
+  categoryId?: string;
+  sellingPrice: number;
+  purchasePrice: number;
+  minStockLevel?: number;
+  published?: boolean;
+  notes?: string;
+};
+
+/** Mirrors backend UpdatePartRequest */
+export type UpdatePartRequest = CreatePartRequest;
+
+/** Mirrors backend CategoryResponse */
+export type Category = {
   id: string;
   name: string;
   description: string;
   imageUrl: string | null;
-  partCount: number;
-};
-
-export type Part = Auditable & {
-  id: string;
-  name: string;
-  partNumber: string;
-  categoryId: string;
-  categoryName: string;
-  description: string;
-  shortDescription: string;
-  sellingPrice: number;
-  purchasePrice: number;
-  minStock: number;
-  totalStock: number;
-  stockStatus: StockStatus;
-  images: PartImage[];
-  notes: string;
-  isPublished: boolean;
-  warehouseStocks: WarehouseStock[];
+  createdAt: string;
+  updatedAt: string;
 };

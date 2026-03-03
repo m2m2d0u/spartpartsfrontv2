@@ -1,17 +1,37 @@
-import type { Address, Auditable } from "./common";
-
-export type Customer = Auditable & {
+/** Mirrors backend CustomerResponse */
+export type Customer = {
   id: string;
-  storeId: string;
-  storeName: string;
-  firstName: string;
-  lastName: string;
+  name: string;
+  company: string;
   email: string;
   phone: string;
-  company: string;
-  address: Address;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  taxId: string;
   notes: string;
-  totalOrders: number;
-  totalSpent: number;
-  isActive: boolean;
+  portalAccess: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
+
+/** Mirrors backend CreateCustomerRequest */
+export type CreateCustomerRequest = {
+  name: string;
+  company?: string;
+  email?: string;
+  phone?: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  taxId?: string;
+  notes?: string;
+  portalAccess?: boolean;
+};
+
+/** Mirrors backend UpdateCustomerRequest */
+export type UpdateCustomerRequest = CreateCustomerRequest;
