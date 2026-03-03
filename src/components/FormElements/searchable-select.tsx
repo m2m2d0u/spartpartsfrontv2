@@ -20,6 +20,8 @@ type Props = {
   disabled?: boolean;
   error?: string;
   className?: string;
+  onCreateNew?: (searchTerm: string) => void;
+  createNewLabel?: (searchTerm: string) => string;
 };
 
 export function SearchableSelect({
@@ -35,6 +37,8 @@ export function SearchableSelect({
   disabled,
   error,
   className,
+  onCreateNew,
+  createNewLabel = (term: string) => `Create "${term}"`,
 }: Props) {
   const id = useId();
   const [open, setOpen] = useState(false);
@@ -164,27 +168,55 @@ export function SearchableSelect({
 
             {/* Options list */}
             <ul className="max-h-60 overflow-y-auto py-1">
-              {filtered.length === 0 ? (
+              {filtered.length === 0 && (
                 <li className="px-4 py-3 text-center text-body-sm text-dark-5 dark:text-dark-6">
                   No results found
                 </li>
-              ) : (
-                filtered.map((item) => (
-                  <li key={item.value}>
-                    <button
-                      type="button"
-                      onClick={() => handleSelect(item)}
-                      className={cn(
-                        "flex w-full items-center px-4 py-2.5 text-left text-sm transition hover:bg-primary/5 dark:hover:bg-primary/10",
-                        item.value === value
-                          ? "bg-primary/5 font-medium text-primary dark:bg-primary/10"
-                          : "text-dark dark:text-white",
-                      )}
+              )}
+              {filtered.map((item) => (
+                <li key={item.value}>
+                  <button
+                    type="button"
+                    onClick={() => handleSelect(item)}
+                    className={cn(
+                      "flex w-full items-center px-4 py-2.5 text-left text-sm transition hover:bg-primary/5 dark:hover:bg-primary/10",
+                      item.value === value
+                        ? "bg-primary/5 font-medium text-primary dark:bg-primary/10"
+                        : "text-dark dark:text-white",
+                    )}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+              {onCreateNew && search.trim() && (
+                <li className="border-t border-stroke dark:border-dark-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onCreateNew(search.trim());
+                      setOpen(false);
+                      setSearch("");
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-primary transition hover:bg-primary/5 dark:hover:bg-primary/10"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      className="shrink-0"
                     >
-                      {item.label}
-                    </button>
-                  </li>
-                ))
+                      <path
+                        d="M8 3v10M3 8h10"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    {createNewLabel(search.trim())}
+                  </button>
+                </li>
               )}
             </ul>
           </div>

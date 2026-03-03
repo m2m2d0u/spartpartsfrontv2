@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getCategories } from "@/services/categories.server";
-import { getTags } from "@/services/tags.server";
 import { PartForm } from "../_components/part-form";
 
 export const metadata: Metadata = {
@@ -10,10 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewPartPage() {
-  const [categoriesPage, tagsPage] = await Promise.all([
-    getCategories(),
-    getTags(),
-  ]);
+  const categoriesPage = await getCategories();
   const t = await getTranslations("parts");
   const tNav = await getTranslations("nav");
 
@@ -28,10 +24,7 @@ export default async function NewPartPage() {
         ]}
       />
 
-      <PartForm
-        categories={categoriesPage.content}
-        tags={tagsPage.content}
-      />
+      <PartForm categories={categoriesPage.content} />
     </>
   );
 }

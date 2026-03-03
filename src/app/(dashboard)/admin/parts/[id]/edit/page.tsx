@@ -4,7 +4,6 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getPartById } from "@/services/parts.server";
 import { getCategories } from "@/services/categories.server";
-import { getTags } from "@/services/tags.server";
 import { PartForm } from "../../_components/part-form";
 
 export const metadata: Metadata = {
@@ -17,10 +16,9 @@ type Props = {
 
 export default async function EditPartPage({ params }: Props) {
   const { id } = await params;
-  const [part, categoriesPage, tagsPage] = await Promise.all([
+  const [part, categoriesPage] = await Promise.all([
     getPartById(id),
     getCategories(),
-    getTags(),
   ]);
 
   if (!part) notFound();
@@ -41,11 +39,7 @@ export default async function EditPartPage({ params }: Props) {
         ]}
       />
 
-      <PartForm
-        part={part}
-        categories={categoriesPage.content}
-        tags={tagsPage.content}
-      />
+      <PartForm part={part} categories={categoriesPage.content} />
     </>
   );
 }
