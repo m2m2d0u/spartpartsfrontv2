@@ -35,6 +35,18 @@ export function getNavData(t: (key: string) => string): NavSection[] {
               title: t("categories"),
               url: "/admin/parts/categories",
             },
+            {
+              title: t("carBrands"),
+              url: "/admin/parts/car-brands",
+            },
+            {
+              title: t("carModels"),
+              url: "/admin/parts/car-models",
+            },
+            {
+              title: t("tags"),
+              url: "/admin/parts/tags",
+            },
           ],
         },
         {
