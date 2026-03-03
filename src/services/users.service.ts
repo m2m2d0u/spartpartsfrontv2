@@ -3,6 +3,7 @@ import type {
   CreateUserRequest,
   UpdateUserRequest,
   UserWarehouseAssignmentRequest,
+  UpdateUserStoresRequest,
 } from "@/types";
 import { apiPost, apiPut, apiDelete } from "./api-client";
 
@@ -26,4 +27,11 @@ export async function updateUserWarehouses(
   assignments: UserWarehouseAssignmentRequest[],
 ): Promise<User> {
   return apiPut<User>(`/users/${id}/warehouses`, assignments);
+}
+
+export async function updateUserStores(
+  id: string,
+  data: UpdateUserStoresRequest,
+): Promise<User> {
+  return apiPut<User>(`/users/${id}/stores`, data);
 }

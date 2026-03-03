@@ -88,6 +88,12 @@ export function UsersTable({ users: initialUsers }: Props) {
       render: (row) => (
         <div className="flex items-center justify-end gap-2">
           <Link
+            href={`/admin/users/${row.id}`}
+            className="text-body-sm text-primary hover:underline"
+          >
+            {tCommon("view")}
+          </Link>
+          <Link
             href={`/admin/users/${row.id}/edit`}
             className="text-body-sm text-primary hover:underline"
           >

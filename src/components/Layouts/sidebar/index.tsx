@@ -10,6 +10,7 @@ import { getNavData } from "./data";
 import { ArrowLeftIcon, ChevronUp } from "./icons";
 import { MenuItem } from "./menu-item";
 import { useSidebarContext } from "./sidebar-context";
+import { useAuth } from "@/context/auth-context";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -17,8 +18,9 @@ export function Sidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const t = useTranslations("nav");
   const tCommon = useTranslations("common");
+  const { user } = useAuth();
 
-  const navData = useMemo(() => getNavData(t), [t]);
+  const navData = useMemo(() => getNavData(t, user?.role), [t, user?.role]);
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => (prev.includes(title) ? [] : [title]));

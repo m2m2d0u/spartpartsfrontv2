@@ -94,6 +94,55 @@ export async function refreshAccessToken(): Promise<AuthTokens | null> {
   }
 }
 
+export async function fetchMe(): Promise<MeResponse> {
+  const token = getAccessToken();
+  const res = await fetch(`${API_BASE_URL}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || "Failed to fetch user profile");
+  }
+  return json.data;
+}
+
+export type MeResponse = {
+  id: string;
+  name: string;
+  email: string;
+  role: "ADMIN" | "STORE_MANAGER" | "WAREHOUSE_OPERATOR";
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  accessibleStores: MeStore[];
+  accessibleWarehouses: MeWarehouse[];
+  warehouseAssignments: MeWarehouseAssignment[];
+};
+
+export type MeStore = {
+  id: string;
+  code: string;
+  name: string;
+  isActive: boolean;
+};
+
+export type MeWarehouse = {
+  id: string;
+  code: string;
+  name: string;
+  location: string;
+  storeId: string;
+  storeName: string;
+  isActive: boolean;
+};
+
+export type MeWarehouseAssignment = {
+  warehouseId: string;
+  warehouseName: string;
+  warehouseCode: string;
+  permissions: string[];
+};
+
 export function logout(): void {
   clearTokens();
   if (typeof window !== "undefined") {

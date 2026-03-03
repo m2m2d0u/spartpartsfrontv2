@@ -9,16 +9,11 @@ import type {
   Warehouse,
   UserWarehouseAssignment,
   WarehousePermission,
+  PermissionCategory,
 } from "@/types";
+import { PERMISSIONS_BY_CATEGORY } from "@/types";
 
-const ALL_PERMISSIONS: WarehousePermission[] = [
-  "STOCK_MANAGE",
-  "ORDER_MANAGE",
-  "INVOICE_MANAGE",
-  "PROCUREMENT_MANAGE",
-  "TRANSFER_MANAGE",
-  "RETURN_MANAGE",
-];
+const CATEGORIES = Object.keys(PERMISSIONS_BY_CATEGORY) as PermissionCategory[];
 
 type Props = {
   userId: string;
@@ -61,9 +56,7 @@ export function WarehouseAssignments({
     .filter((w) => !assignedWarehouseIds.has(w.id))
     .map((w) => ({ value: w.id, label: `${w.code} — ${w.name}` }));
 
-  async function saveAssignments(
-    updated: UserWarehouseAssignment[],
-  ) {
+  async function saveAssignments(updated: UserWarehouseAssignment[]) {
     setSaving(true);
     setError("");
     try {
@@ -141,38 +134,102 @@ export function WarehouseAssignments({
     }
   }
 
+  function toggleCategory(
+    category: PermissionCategory,
+    list: WarehousePermission[],
+    setList: (v: WarehousePermission[]) => void,
+  ) {
+    const perms = PERMISSIONS_BY_CATEGORY[category];
+    const allSelected = perms.every((p) => list.includes(p));
+    if (allSelected) {
+      setList(list.filter((p) => !perms.includes(p)));
+    } else {
+      const merged = new Set([...list, ...perms]);
+      setList([...merged]);
+    }
+  }
+
   function PermissionCheckboxes({
     permissions,
     onChange,
+    onToggleCategory,
   }: {
     permissions: WarehousePermission[];
     onChange: (perm: WarehousePermission) => void;
+    onToggleCategory: (cat: PermissionCategory) => void;
   }) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
         <label className="block text-body-sm font-medium text-dark dark:text-white">
           {t("permissions")}
         </label>
-        <div className="grid grid-cols-2 gap-2">
-          {ALL_PERMISSIONS.map((perm) => (
-            <label
-              key={perm}
-              className="flex cursor-pointer items-center gap-2 rounded-lg border border-stroke px-3 py-2 text-sm transition hover:border-primary dark:border-dark-3 dark:hover:border-primary"
+        {CATEGORIES.map((cat) => {
+          const perms = PERMISSIONS_BY_CATEGORY[cat];
+          const selectedCount = perms.filter((p) =>
+            permissions.includes(p),
+          ).length;
+          const allSelected = selectedCount === perms.length;
+
+          return (
+            <div
+              key={cat}
+              className="rounded-lg border border-stroke p-3 dark:border-dark-3"
             >
-              <input
-                type="checkbox"
-                checked={permissions.includes(perm)}
-                onChange={() => onChange(perm)}
-                className="h-4 w-4 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
-              />
-              <span className="text-dark dark:text-white">
-                {t(`perm_${perm}`)}
-              </span>
-            </label>
-          ))}
-        </div>
+              <label className="flex cursor-pointer items-center gap-2 mb-2">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  ref={(el) => {
+                    if (el) el.indeterminate = selectedCount > 0 && !allSelected;
+                  }}
+                  onChange={() => onToggleCategory(cat)}
+                  className="h-4 w-4 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
+                />
+                <span className="text-sm font-semibold text-dark dark:text-white">
+                  {t(`cat_${cat}`)}
+                </span>
+                <span className="ml-auto text-xs text-dark-6">
+                  {selectedCount}/{perms.length}
+                </span>
+              </label>
+              <div className="grid grid-cols-2 gap-1.5 pl-6">
+                {perms.map((perm) => (
+                  <label
+                    key={perm}
+                    className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm transition hover:bg-gray-2 dark:hover:bg-dark-3"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={permissions.includes(perm)}
+                      onChange={() => onChange(perm)}
+                      className="h-3.5 w-3.5 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
+                    />
+                    <span className="text-dark dark:text-white">
+                      {t(`perm_${perm}`)}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
+  }
+
+  /** Group displayed permissions by category */
+  function groupPermissions(perms: WarehousePermission[]) {
+    const grouped: Partial<Record<PermissionCategory, WarehousePermission[]>> = {};
+    for (const perm of perms) {
+      for (const cat of CATEGORIES) {
+        if (PERMISSIONS_BY_CATEGORY[cat].includes(perm)) {
+          if (!grouped[cat]) grouped[cat] = [];
+          grouped[cat]!.push(perm);
+          break;
+        }
+      }
+    }
+    return grouped;
   }
 
   return (
@@ -217,47 +274,59 @@ export function WarehouseAssignments({
         </p>
       ) : (
         <div className="space-y-3">
-          {assignments.map((assignment, index) => (
-            <div
-              key={assignment.warehouseId}
-              className="flex items-start justify-between rounded-lg border border-stroke p-4 dark:border-dark-3"
-            >
-              <div>
-                <div className="font-medium text-dark dark:text-white">
-                  {assignment.warehouseName}
-                  <span className="ml-2 text-body-sm text-dark-6">
-                    ({assignment.warehouseCode})
-                  </span>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {assignment.permissions.map((perm) => (
-                    <span
-                      key={perm}
-                      className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
-                    >
-                      {t(`perm_${perm}`)}
+          {assignments.map((assignment, index) => {
+            const grouped = groupPermissions(assignment.permissions);
+            return (
+              <div
+                key={assignment.warehouseId}
+                className="rounded-lg border border-stroke p-4 dark:border-dark-3"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="font-medium text-dark dark:text-white">
+                    {assignment.warehouseName}
+                    <span className="ml-2 text-body-sm text-dark-6">
+                      ({assignment.warehouseCode})
                     </span>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEdit(index)}
+                      className="text-body-sm text-primary hover:underline"
+                    >
+                      {tCommon("edit")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRemoveIndex(index)}
+                      className="text-body-sm text-red hover:underline"
+                    >
+                      {tCommon("remove")}
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {Object.entries(grouped).map(([cat, perms]) => (
+                    <div key={cat}>
+                      <span className="text-xs font-semibold uppercase text-dark-6">
+                        {t(`cat_${cat}`)}
+                      </span>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {perms!.map((perm) => (
+                          <span
+                            key={perm}
+                            className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                          >
+                            {t(`perm_${perm}`)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleOpenEdit(index)}
-                  className="text-body-sm text-primary hover:underline"
-                >
-                  {tCommon("edit")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRemoveIndex(index)}
-                  className="text-body-sm text-red hover:underline"
-                >
-                  {tCommon("remove")}
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -285,6 +354,9 @@ export function WarehouseAssignments({
           onChange={(perm) =>
             togglePermission(perm, selectedPermissions, setSelectedPermissions)
           }
+          onToggleCategory={(cat) =>
+            toggleCategory(cat, selectedPermissions, setSelectedPermissions)
+          }
         />
       </FormDialog>
 
@@ -308,6 +380,9 @@ export function WarehouseAssignments({
               permissions={editPermissions}
               onChange={(perm) =>
                 togglePermission(perm, editPermissions, setEditPermissions)
+              }
+              onToggleCategory={(cat) =>
+                toggleCategory(cat, editPermissions, setEditPermissions)
               }
             />
           </>

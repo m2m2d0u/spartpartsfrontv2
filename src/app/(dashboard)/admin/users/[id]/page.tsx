@@ -7,7 +7,9 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { getUserStatusVariant, getUserRoleVariant } from "@/lib/status-variants";
 import { getUserById } from "@/services/users.server";
 import { WarehouseAssignments } from "../_components/warehouse-assignments";
+import { StoreAssignments } from "../_components/store-assignments";
 import { getWarehouses } from "@/services/warehouses.server";
+import { getStores } from "@/services/stores.server";
 
 export const metadata: Metadata = {
   title: "User Detail",
@@ -27,7 +29,13 @@ export default async function UserDetailPage({ params }: Props) {
   const tNav = await getTranslations("nav");
   const tCommon = await getTranslations("common");
 
-  const warehousesPage = await getWarehouses(0, 200, true);
+  const showStores = user.role === "STORE_MANAGER";
+  const showWarehouses = user.role === "WAREHOUSE_OPERATOR";
+
+  const [warehousesPage, storesPage] = await Promise.all([
+    showWarehouses ? getWarehouses(0, 200, true) : Promise.resolve(null),
+    showStores ? getStores(0, 200, true) : Promise.resolve(null),
+  ]);
 
   return (
     <>
@@ -86,13 +94,31 @@ export default async function UserDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Warehouse assignments */}
-        <div className="xl:col-span-2">
-          <WarehouseAssignments
-            userId={user.id}
-            assignments={user.warehouseAssignments || []}
-            warehouses={warehousesPage.content}
-          />
+        {/* Assignments based on role */}
+        <div className="space-y-6 xl:col-span-2">
+          {showStores && storesPage && (
+            <StoreAssignments
+              userId={user.id}
+              assignments={user.stores || []}
+              stores={storesPage.content}
+            />
+          )}
+
+          {showWarehouses && warehousesPage && (
+            <WarehouseAssignments
+              userId={user.id}
+              assignments={user.warehouseAssignments || []}
+              warehouses={warehousesPage.content}
+            />
+          )}
+
+          {user.role === "ADMIN" && (
+            <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
+              <p className="py-4 text-center text-body-sm text-dark-6">
+                {t("adminFullAccess")}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </>

@@ -11,16 +11,13 @@ import {
   isAuthenticated as checkAuth,
   login as authLogin,
   logout as authLogout,
-  getAccessToken,
+  fetchMe,
   type LoginRequest,
+  type MeResponse,
 } from "@/services/auth.service";
 
-type AuthUser = {
-  email: string;
-};
-
 type AuthState = {
-  user: AuthUser | null;
+  user: MeResponse | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (request: LoginRequest) => Promise<void>;
@@ -29,33 +26,30 @@ type AuthState = {
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
-/** Decode the payload of a JWT without verifying the signature. */
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-    const payload = atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(payload);
-  } catch {
-    return null;
-  }
-}
-
-function userFromToken(token: string | null): AuthUser | null {
-  if (!token) return null;
-  const payload = decodeJwtPayload(token);
-  if (!payload || typeof payload.sub !== "string") return null;
-  return { email: payload.sub };
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<MeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
 
-  const loadUser = useCallback(() => {
-    const token = getAccessToken();
-    setUser(userFromToken(token));
-    setIsLoading(false);
+  const loadUser = useCallback(async () => {
+    const hasToken = checkAuth();
+    setAuthenticated(hasToken);
+
+    if (!hasToken) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const me = await fetchMe();
+      setUser(me);
+    } catch {
+      // Token exists but /me failed — still authenticated, just no profile
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -65,7 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(
     async (request: LoginRequest) => {
       await authLogin(request);
-      loadUser();
+      setAuthenticated(true);
+      await loadUser();
     },
     [loadUser],
   );
@@ -73,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     authLogout();
     setUser(null);
+    setAuthenticated(false);
   }, []);
 
   return (
@@ -80,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         isLoading,
-        isAuthenticated: checkAuth(),
+        isAuthenticated: authenticated,
         login,
         logout,
       }}
