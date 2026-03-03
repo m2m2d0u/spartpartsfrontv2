@@ -7,22 +7,27 @@ import * as Yup from "yup";
 import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
+import { SearchableSelect } from "@/components/FormElements/searchable-select";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
-import type { Part, Category } from "@/types";
+import { useLookup } from "@/stores/lookup-store";
+import type { Part, Category, Tag } from "@/types";
 
 type Props = {
   part?: Part;
   categories: Category[];
+  tags: Tag[];
 };
 
-export function PartForm({ part, categories }: Props) {
+export function PartForm({ part, categories, tags }: Props) {
   const router = useRouter();
   const isEditing = !!part;
   const [serverError, setServerError] = useState("");
   const t = useTranslations("parts");
   const tCommon = useTranslations("common");
   const tVal = useTranslations("validation");
+
+  const { brands, getModelsByBrand } = useLookup();
 
   const partSchema = Yup.object({
     partNumber: Yup.string()
@@ -39,6 +44,8 @@ export function PartForm({ part, categories }: Props) {
     ),
     description: Yup.string(),
     categoryId: Yup.string(),
+    carBrandId: Yup.string(),
+    carModelId: Yup.string(),
     sellingPrice: Yup.number()
       .typeError(tVal("mustBeNumber"))
       .min(0, tVal("cannotBeNegative"))
@@ -62,6 +69,9 @@ export function PartForm({ part, categories }: Props) {
       description: part?.description || "",
       shortDescription: part?.shortDescription || "",
       categoryId: part?.categoryId || "",
+      carBrandId: part?.carBrandId || "",
+      carModelId: part?.carModelId || "",
+      tagIds: part?.tags?.map((t) => t.id) || ([] as string[]),
       sellingPrice: part?.sellingPrice?.toString() || "",
       purchasePrice: part?.purchasePrice?.toString() || "",
       minStockLevel: part?.minStockLevel?.toString() || "0",
@@ -77,6 +87,9 @@ export function PartForm({ part, categories }: Props) {
         description: values.description || undefined,
         shortDescription: values.shortDescription || undefined,
         categoryId: values.categoryId || undefined,
+        carBrandId: values.carBrandId || undefined,
+        carModelId: values.carModelId || undefined,
+        tagIds: values.tagIds.length > 0 ? values.tagIds : undefined,
         sellingPrice: parseFloat(values.sellingPrice as string),
         purchasePrice: parseFloat(values.purchasePrice as string),
         minStockLevel: parseInt(values.minStockLevel as string) || 0,
@@ -106,8 +119,34 @@ export function PartForm({ part, categories }: Props) {
     label: c.name,
   }));
 
+  const brandItems = brands.map((b) => ({
+    value: b.id,
+    label: b.name,
+  }));
+
+  const modelItems = formik.values.carBrandId
+    ? getModelsByBrand(formik.values.carBrandId).map((m) => ({
+        value: m.id,
+        label: m.name,
+      }))
+    : [];
+
   function fieldError(name: keyof typeof formik.values) {
     return formik.touched[name] ? (formik.errors[name] as string) : undefined;
+  }
+
+  function handleBrandChange(value: string) {
+    formik.setFieldValue("carBrandId", value);
+    // Reset model when brand changes
+    formik.setFieldValue("carModelId", "");
+  }
+
+  function handleTagToggle(tagId: string) {
+    const current = formik.values.tagIds;
+    const next = current.includes(tagId)
+      ? current.filter((id) => id !== tagId)
+      : [...current, tagId];
+    formik.setFieldValue("tagIds", next);
   }
 
   return (
@@ -178,6 +217,58 @@ export function PartForm({ part, categories }: Props) {
           onBlur={formik.handleBlur}
           error={fieldError("categoryId")}
         />
+
+        {/* Car Brand & Model */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <SearchableSelect
+            label={t("carBrand")}
+            name="carBrandId"
+            placeholder={t("selectCarBrand")}
+            items={brandItems}
+            value={formik.values.carBrandId}
+            onChange={handleBrandChange}
+            onBlur={() => formik.setFieldTouched("carBrandId", true)}
+            error={fieldError("carBrandId")}
+          />
+          <SearchableSelect
+            label={t("carModel")}
+            name="carModelId"
+            placeholder={t("selectCarModel")}
+            items={modelItems}
+            value={formik.values.carModelId}
+            onChange={(val) => formik.setFieldValue("carModelId", val)}
+            onBlur={() => formik.setFieldTouched("carModelId", true)}
+            error={fieldError("carModelId")}
+          />
+        </div>
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div>
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+              {t("tagsLabel")}
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag) => {
+                const selected = formik.values.tagIds.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => handleTagToggle(tag.id)}
+                    className={`rounded-full border px-3.5 py-1.5 text-body-sm transition ${
+                      selected
+                        ? "border-primary bg-primary/10 text-primary dark:bg-primary/20"
+                        : "border-stroke text-dark-6 hover:border-primary hover:text-primary dark:border-dark-3"
+                    }`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="border-t border-stroke pt-5 dark:border-dark-3">
           <h4 className="mb-4 text-body-sm font-medium text-dark dark:text-white">

@@ -117,7 +117,12 @@
     "images": "Images",
     "noImages": "Aucune image téléchargée.",
     "created": "Créé le",
-    "failedSave": "L'enregistrement de la pièce a échoué. Veuillez réessayer."
+    "failedSave": "L'enregistrement de la pièce a échoué. Veuillez réessayer.",
+    "carBrand": "Marque de voiture",
+    "selectCarBrand": "Sélectionner une marque",
+    "carModel": "Modèle de voiture",
+    "selectCarModel": "Sélectionner un modèle",
+    "tagsLabel": "Tags"
   },
   "categories": {
     "title": "Catégories",

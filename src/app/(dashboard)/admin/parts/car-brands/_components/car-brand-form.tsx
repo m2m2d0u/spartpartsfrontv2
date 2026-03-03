@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { FormSection } from "@/components/FormSection";
+import { useLookup } from "@/stores/lookup-store";
 import type { CarBrand } from "@/types";
 
 type Props = {
@@ -20,6 +21,7 @@ export function CarBrandForm({ carBrand }: Props) {
   const t = useTranslations("carBrands");
   const tCommon = useTranslations("common");
   const tVal = useTranslations("validation");
+  const { invalidateBrands } = useLookup();
 
   const schema = Yup.object({
     name: Yup.string()
@@ -54,6 +56,7 @@ export function CarBrandForm({ carBrand }: Props) {
           await createCarBrand(values);
           router.push("/admin/parts/car-brands");
         }
+        invalidateBrands();
         router.refresh();
       } catch {
         setServerError(t("failedSave"));

@@ -6,7 +6,9 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
+import { SearchableSelect } from "@/components/FormElements/searchable-select";
 import { FormSection } from "@/components/FormSection";
+import { useLookup } from "@/stores/lookup-store";
 import type { CarModel, CarBrand } from "@/types";
 
 type Props = {
@@ -18,6 +20,7 @@ export function CarModelForm({ carModel, brands }: Props) {
   const router = useRouter();
   const isEditing = !!carModel;
   const [serverError, setServerError] = useState("");
+  const { invalidateModels } = useLookup();
   const t = useTranslations("carModels");
   const tCommon = useTranslations("common");
   const tVal = useTranslations("validation");
@@ -62,12 +65,14 @@ export function CarModelForm({ carModel, brands }: Props) {
             "@/services/car-models.service"
           );
           await updateCarModel(carModel.id, payload);
+          invalidateModels();
           router.push("/admin/parts/car-models");
         } else {
           const { createCarModel } = await import(
             "@/services/car-models.service"
           );
           await createCarModel(payload);
+          invalidateModels();
           router.push("/admin/parts/car-models");
         }
         router.refresh();
@@ -97,28 +102,16 @@ export function CarModelForm({ carModel, brands }: Props) {
           error={formik.touched.name ? formik.errors.name : undefined}
         />
 
-        <div>
-          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            {t("brand")}
-          </label>
-          <select
-            name="brandId"
-            value={formik.values.brandId}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-          >
-            <option value="">{t("selectBrand")}</option>
-            {brands.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name}
-              </option>
-            ))}
-          </select>
-          {formik.touched.brandId && formik.errors.brandId && (
-            <p className="mt-1 text-sm text-red">{formik.errors.brandId}</p>
-          )}
-        </div>
+        <SearchableSelect
+          label={t("brand")}
+          name="brandId"
+          placeholder={t("selectBrand")}
+          items={brands.map((b) => ({ value: b.id, label: b.name }))}
+          value={formik.values.brandId}
+          onChange={(val) => formik.setFieldValue("brandId", val)}
+          onBlur={() => formik.setFieldTouched("brandId", true)}
+          error={formik.touched.brandId ? formik.errors.brandId : undefined}
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <InputGroup

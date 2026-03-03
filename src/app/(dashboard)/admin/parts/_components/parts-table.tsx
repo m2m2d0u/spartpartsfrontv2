@@ -24,7 +24,9 @@ export function PartsTable({ parts: initialParts }: Props) {
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.partNumber.toLowerCase().includes(search.toLowerCase()) ||
-      (p.categoryName ?? "").toLowerCase().includes(search.toLowerCase()),
+      (p.categoryName ?? "").toLowerCase().includes(search.toLowerCase()) ||
+      (p.carBrandName ?? "").toLowerCase().includes(search.toLowerCase()) ||
+      (p.carModelName ?? "").toLowerCase().includes(search.toLowerCase()),
   );
 
   async function handleDelete() {
@@ -68,6 +70,15 @@ export function PartsTable({ parts: initialParts }: Props) {
       render: (row) => (
         <span className="text-body-sm text-dark-6">
           {row.categoryName || "—"}
+        </span>
+      ),
+    },
+    {
+      key: "carBrand",
+      header: t("carBrand"),
+      render: (row) => (
+        <span className="text-body-sm text-dark-6">
+          {row.carBrandName || "—"}
         </span>
       ),
     },

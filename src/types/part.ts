@@ -14,12 +14,17 @@ export type Part = {
   shortDescription: string;
   categoryId: string | null;
   categoryName: string | null;
+  carBrandId: string | null;
+  carBrandName: string | null;
+  carModelId: string | null;
+  carModelName: string | null;
   sellingPrice: number;
   purchasePrice: number;
   minStockLevel: number;
   published: boolean;
   notes: string;
   images: PartImage[];
+  tags: { id: string; name: string }[];
   createdAt: string;
   updatedAt: string;
 };
@@ -31,6 +36,9 @@ export type CreatePartRequest = {
   description?: string;
   shortDescription?: string;
   categoryId?: string;
+  carBrandId?: string;
+  carModelId?: string;
+  tagIds?: string[];
   sellingPrice: number;
   purchasePrice: number;
   minStockLevel?: number;

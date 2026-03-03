@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/Layouts/sidebar";
 import { Header } from "@/components/Layouts/header";
 import { AuthGuard } from "@/components/auth-guard";
+import { LookupProvider } from "@/stores/lookup-store";
 
 export default function DashboardLayout({
   children,
@@ -9,17 +10,19 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard>
-      <div className="flex min-h-screen">
-        <Sidebar />
+      <LookupProvider>
+        <div className="flex min-h-screen">
+          <Sidebar />
 
-        <div className="w-full bg-gray-2 dark:bg-[#020d1a]">
-          <Header />
+          <div className="w-full bg-gray-2 dark:bg-[#020d1a]">
+            <Header />
 
-          <main className="isolate mx-auto w-full max-w-screen-2xl overflow-hidden p-4 md:p-6 2xl:p-10">
-            {children}
-          </main>
+            <main className="isolate mx-auto w-full max-w-screen-2xl overflow-hidden p-4 md:p-6 2xl:p-10">
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
+      </LookupProvider>
     </AuthGuard>
   );
 }

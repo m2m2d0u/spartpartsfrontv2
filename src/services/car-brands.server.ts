@@ -13,3 +13,7 @@ export async function getCarBrands(
 export async function getCarBrandById(id: string): Promise<CarBrand> {
   return serverGet<CarBrand>(`/car-brands/${id}`);
 }
+
+export async function getCarBrandsList(): Promise<CarBrand[]> {
+  return serverGet<CarBrand[]>("/car-brands/list");
+}

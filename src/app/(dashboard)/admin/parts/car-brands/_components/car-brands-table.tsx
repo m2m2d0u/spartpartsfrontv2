@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useLookup } from "@/stores/lookup-store";
 import type { CarBrand } from "@/types";
 
 type Props = {
@@ -18,6 +19,7 @@ export function CarBrandsTable({ carBrands: initialCarBrands }: Props) {
   const [search, setSearch] = useState("");
   const t = useTranslations("carBrands");
   const tCommon = useTranslations("common");
+  const { invalidateBrands } = useLookup();
 
   const filtered = carBrands.filter((b) =>
     b.name.toLowerCase().includes(search.toLowerCase()),
@@ -30,6 +32,7 @@ export function CarBrandsTable({ carBrands: initialCarBrands }: Props) {
       "@/services/car-brands.service"
     );
     await deleteCarBrand(deleteId);
+    invalidateBrands();
     setCarBrands((prev) => prev.filter((b) => b.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);

@@ -117,7 +117,12 @@
     "images": "Images",
     "noImages": "No images uploaded.",
     "created": "Created",
-    "failedSave": "Failed to save part. Please try again."
+    "failedSave": "Failed to save part. Please try again.",
+    "carBrand": "Car Brand",
+    "selectCarBrand": "Select a car brand",
+    "carModel": "Car Model",
+    "selectCarModel": "Select a car model",
+    "tagsLabel": "Tags"
   },
   "categories": {
     "title": "Categories",

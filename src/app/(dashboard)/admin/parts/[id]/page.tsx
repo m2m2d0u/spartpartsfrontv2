@@ -70,6 +70,18 @@ export default async function PartDetailPage({ params }: Props) {
                 </dd>
               </div>
               <div>
+                <dt className="text-body-sm text-dark-6">{t("carBrand")}</dt>
+                <dd className="font-medium text-dark dark:text-white">
+                  {part.carBrandName || "—"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-body-sm text-dark-6">{t("carModel")}</dt>
+                <dd className="font-medium text-dark dark:text-white">
+                  {part.carModelName || "—"}
+                </dd>
+              </div>
+              <div>
                 <dt className="text-body-sm text-dark-6">{t("sellingPrice")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
                   {part.sellingPrice.toLocaleString("fr-FR")} FCFA
@@ -116,6 +128,24 @@ export default async function PartDetailPage({ params }: Props) {
                 </div>
               )}
             </dl>
+
+            {part.tags && part.tags.length > 0 && (
+              <div className="mt-5 border-t border-stroke pt-5 dark:border-dark-3">
+                <h4 className="mb-3 text-body-sm font-medium text-dark dark:text-white">
+                  {t("tagsLabel")}
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {part.tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="rounded-full border border-primary bg-primary/10 px-3 py-1 text-body-sm text-primary dark:bg-primary/20"
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {part.notes && (
               <div className="mt-5 border-t border-stroke pt-5 dark:border-dark-3">

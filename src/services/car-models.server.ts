@@ -16,3 +16,8 @@ export async function getCarModels(
 export async function getCarModelById(id: string): Promise<CarModel> {
   return serverGet<CarModel>(`/car-models/${id}`);
 }
+
+export async function getCarModelsList(brandId?: string): Promise<CarModel[]> {
+  const params = brandId ? `?brandId=${brandId}` : "";
+  return serverGet<CarModel[]>(`/car-models/list${params}`);
+}
