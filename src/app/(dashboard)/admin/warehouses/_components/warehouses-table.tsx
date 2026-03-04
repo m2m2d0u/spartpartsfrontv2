@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getWarehouseStatusVariant } from "@/lib/status-variants";
 import { PermissionGate } from "@/components/PermissionGate";
+import { usePermissions } from "@/hooks/use-permissions";
 import { Permission } from "@/types";
 import type { Warehouse, Store } from "@/types";
 
@@ -27,6 +28,7 @@ export function WarehousesTable({
   const [storeFilter, setStoreFilter] = useState("");
   const t = useTranslations("warehouses");
   const tCommon = useTranslations("common");
+  const { hasPermission } = usePermissions();
 
   const filtered = warehouses.filter((w) => {
     const matchesSearch =
@@ -55,7 +57,11 @@ export function WarehousesTable({
       header: t("name"),
       render: (row) => (
         <Link
-          href={`/admin/warehouses/${row.id}`}
+          href={
+            hasPermission(Permission.WAREHOUSE_UPDATE)
+              ? `/admin/warehouses/${row.id}/edit`
+              : `/admin/warehouses`
+          }
           className="font-medium text-dark hover:text-primary dark:text-white"
         >
           {row.name}

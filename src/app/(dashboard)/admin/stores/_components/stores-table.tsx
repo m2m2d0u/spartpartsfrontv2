@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getStoreStatusVariant } from "@/lib/status-variants";
 import { PermissionGate } from "@/components/PermissionGate";
+import { usePermissions } from "@/hooks/use-permissions";
 import { Permission } from "@/types";
 import type { Store } from "@/types";
 
@@ -22,6 +23,7 @@ export function StoresTable({ stores: initialStores }: Props) {
   const [search, setSearch] = useState("");
   const t = useTranslations("stores");
   const tCommon = useTranslations("common");
+  const { hasPermission } = usePermissions();
 
   const filtered = stores.filter(
     (s) =>
@@ -46,7 +48,11 @@ export function StoresTable({ stores: initialStores }: Props) {
       header: t("name"),
       render: (row) => (
         <Link
-          href={`/admin/stores/${row.id}`}
+          href={
+            hasPermission(Permission.STORE_UPDATE)
+              ? `/admin/stores/${row.id}/edit`
+              : `/admin/stores`
+          }
           className="font-medium text-dark hover:text-primary dark:text-white"
         >
           {row.name}
