@@ -5,7 +5,21 @@ export type InvoiceDesign =
   | "COMPACT"
   | "PROFESSIONAL";
 
+export enum InvoiceDesignCode {
+  CLASSIC = "CLASSIC",
+  MODERN = "MODERN",
+  ELEGANT = "ELEGANT",
+  COMPACT = "COMPACT",
+  PROFESSIONAL = "PROFESSIONAL",
+}
+
 export type InvoiceType = "PROFORMA" | "STANDARD" | "DEPOSIT";
+
+export enum InvoiceTypeCode {
+  PROFORMA = "PROFORMA",
+  STANDARD = "STANDARD",
+  DEPOSIT = "DEPOSIT",
+}
 
 export type InvoiceStatus =
   | "DRAFT"
@@ -16,6 +30,17 @@ export type InvoiceStatus =
   | "CANCELLED"
   | "ACCEPTED"
   | "EXPIRED";
+
+export enum InvoiceStatusCode {
+  DRAFT = "DRAFT",
+  SENT = "SENT",
+  PAID = "PAID",
+  PARTIALLY_PAID = "PARTIALLY_PAID",
+  OVERDUE = "OVERDUE",
+  CANCELLED = "CANCELLED",
+  ACCEPTED = "ACCEPTED",
+  EXPIRED = "EXPIRED",
+}
 
 /** Mirrors backend InvoiceItemResponse */
 export type InvoiceItem = {
@@ -154,6 +179,7 @@ export type CreateInvoiceRequest = {
   proformaId?: string;
   depositId?: string;
   templateId?: string;
+  status?: InvoiceStatus;
   issuedDate: string;
   dueDate?: string;
   validityDate?: string;

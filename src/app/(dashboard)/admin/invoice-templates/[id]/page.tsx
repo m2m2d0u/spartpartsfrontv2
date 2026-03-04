@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import { getInvoiceTemplateById } from "@/services/invoice-templates.server";
+import { TemplateImageThumbnail } from "../_components/template-image-thumbnail";
 
 export const metadata: Metadata = {
   title: "Invoice Template Details",
@@ -26,7 +27,7 @@ export default async function InvoiceTemplateDetailPage({ params }: Props) {
   const t = await getTranslations("invoiceTemplates");
   const tNav = await getTranslations("nav");
   const tCommon = await getTranslations("common");
-
+  
   return (
     <>
       <PageHeader
@@ -135,30 +136,23 @@ export default async function InvoiceTemplateDetailPage({ params }: Props) {
         {/* Images */}
         <FormSection title={t("images")}>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              { label: t("logoUrl"), value: template.logoUrl },
-              { label: t("headerImageUrl"), value: template.headerImageUrl },
-              { label: t("footerImageUrl"), value: template.footerImageUrl },
-              { label: t("stampImageUrl"), value: template.stampImageUrl },
-              {
-                label: t("signatureImageUrl"),
-                value: template.signatureImageUrl,
-              },
-              {
-                label: t("watermarkImageUrl"),
-                value: template.watermarkImageUrl,
-              },
-            ].map(({ label, value }) => (
-              <div key={label}>
-                <p className="text-body-sm text-dark-6">{label}</p>
-                {value ? (
-                  <p className="mt-1 truncate text-dark dark:text-white">
-                    {value}
-                  </p>
-                ) : (
-                  <p className="mt-1 text-dark-6">—</p>
-                )}
-              </div>
+            {(
+              [
+                { label: t("logo"), urlField: template.logoUrl, endpoint: "logo" as const },
+                { label: t("headerImage"), urlField: template.headerImageUrl, endpoint: "header-image" as const },
+                { label: t("footerImage"), urlField: template.footerImageUrl, endpoint: "footer-image" as const },
+                { label: t("stamp"), urlField: template.stampImageUrl, endpoint: "stamp" as const },
+                { label: t("signature"), urlField: template.signatureImageUrl, endpoint: "signature" as const },
+                { label: t("watermark"), urlField: template.watermarkImageUrl, endpoint: "watermark" as const },
+              ] as const
+            ).map((img) => (
+              <TemplateImageThumbnail
+                key={img.endpoint}
+                templateId={template.id}
+                label={img.label}
+                hasImage={!!img.urlField}
+                imageType={img.endpoint}
+              />
             ))}
           </div>
         </FormSection>

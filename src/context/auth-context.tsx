@@ -22,6 +22,7 @@ type AuthState = {
   isAuthenticated: boolean;
   login: (request: LoginRequest) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -71,6 +72,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthenticated(false);
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    try {
+      const me = await fetchMe();
+      setUser(me);
+    } catch {
+      // Silently fail — user stays as-is
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -79,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: authenticated,
         login,
         logout,
+        refreshUser,
       }}
     >
       {children}

@@ -5,7 +5,12 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getStoreStatusVariant } from "@/lib/status-variants";
-import { getStoreById, getStoreUsers } from "@/services/stores.server";
+import {
+  getStoreById,
+  getStoreUsers,
+  getStoreLogoServer,
+  getStoreStampServer,
+} from "@/services/stores.server";
 import { getWarehousesByStore } from "@/services/warehouses.server";
 import { PermissionGate } from "@/components/PermissionGate";
 import { UserAssignments } from "@/components/user-assignments";
@@ -30,6 +35,12 @@ export default async function StoreDetailPage({ params }: Props) {
   if (!store) notFound();
 
   const warehouses = warehousesPage.content;
+
+  // Fetch images as base64 in parallel (only if URLs exist)
+  const [logoData, stampData] = await Promise.all([
+    store.logoUrl ? getStoreLogoServer(id).catch(() => null) : null,
+    store.stampImageUrl ? getStoreStampServer(id).catch(() => null) : null,
+  ]);
 
   const t = await getTranslations("stores");
   const tNav = await getTranslations("nav");
@@ -77,6 +88,38 @@ export default async function StoreDetailPage({ params }: Props) {
                 {store.isActive ? tCommon("active") : tCommon("inactive")}
               </StatusBadge>
             </div>
+
+            {/* Logo & Stamp */}
+            {(logoData?.base64 || stampData?.base64) && (
+              <div className="mb-5 flex flex-wrap items-start gap-6 border-b border-stroke pb-5 dark:border-dark-3">
+                {logoData?.base64 && (
+                  <div>
+                    <p className="mb-2 text-body-sm text-dark-6">
+                      {t("logo")}
+                    </p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`data:image/png;base64,${logoData.base64}`}
+                      alt={t("logo")}
+                      className="h-24 w-auto rounded-lg border border-stroke object-contain p-1 dark:border-dark-3"
+                    />
+                  </div>
+                )}
+                {stampData?.base64 && (
+                  <div>
+                    <p className="mb-2 text-body-sm text-dark-6">
+                      {t("stamp")}
+                    </p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`data:image/png;base64,${stampData.base64}`}
+                      alt={t("stamp")}
+                      className="h-24 w-auto rounded-lg border border-stroke object-contain p-1 dark:border-dark-3"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>

@@ -70,7 +70,6 @@ export function Select({
           {...(isControlled ? { value } : { defaultValue: defaultValue || "" })}
           onChange={handleChange}
           onBlur={onBlur}
-          required={required}
           disabled={disabled}
           className={cn(
             "w-full appearance-none rounded-lg border bg-transparent px-5.5 py-3 outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:bg-dark-2 dark:focus:border-primary dark:disabled:bg-dark [&>option]:text-dark-5 dark:[&>option]:text-dark-6",

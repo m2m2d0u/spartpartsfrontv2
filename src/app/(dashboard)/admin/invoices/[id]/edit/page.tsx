@@ -6,6 +6,7 @@ import { getInvoiceById } from "@/services/invoices.server";
 import { getCustomers } from "@/services/customers.server";
 import { getInvoiceTemplates } from "@/services/invoice-templates.server";
 import { InvoiceForm } from "../../_components/invoice-form";
+import { InvoiceStatusCode, InvoiceTypeCode } from "@/types";
 
 export const metadata: Metadata = {
   title: "Edit Invoice",
@@ -24,7 +25,7 @@ export default async function EditInvoicePage({ params }: Props) {
     getInvoiceTemplates(0, 100),
   ]);
 
-  if (!invoice || invoice.status !== "DRAFT") notFound();
+  if (!invoice || invoice.status !== InvoiceStatusCode.DRAFT) notFound();
 
   const t = await getTranslations("invoices");
   const tNav = await getTranslations("nav");

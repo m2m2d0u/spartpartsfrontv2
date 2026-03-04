@@ -1,4 +1,4 @@
-import type { Store, User, PagedResponse } from "@/types";
+import type { Store, User, PagedResponse, ImageResponse } from "@/types";
 import { serverGet } from "./server-api";
 
 export async function getStores(
@@ -17,4 +17,16 @@ export async function getStoreById(id: string): Promise<Store> {
 
 export async function getStoreUsers(storeId: string): Promise<User[]> {
   return serverGet<User[]>(`/stores/${storeId}/users`);
+}
+
+export async function getStoreLogoServer(
+  storeId: string,
+): Promise<ImageResponse | null> {
+  return serverGet<ImageResponse | null>(`/stores/${storeId}/logo`);
+}
+
+export async function getStoreStampServer(
+  storeId: string,
+): Promise<ImageResponse | null> {
+  return serverGet<ImageResponse | null>(`/stores/${storeId}/stamp`);
 }

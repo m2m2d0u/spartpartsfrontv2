@@ -14,6 +14,7 @@ import { standardFormat } from "@/lib/format-number";
 import type {
   Invoice,
   InvoiceTemplate,
+  InvoiceStatus,
   Customer,
   Warehouse,
 } from "@/types";
@@ -173,6 +174,7 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
   const formik = useFormik({
     initialValues: {
       invoiceType: invoice?.invoiceType || "STANDARD",
+      status: (invoice?.status as string) || "DRAFT",
       customerId: invoice?.customerId || "",
       templateId: invoice?.templateId || "",
       issuedDate: invoice?.issuedDate
@@ -233,6 +235,7 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
           );
           await createInvoice({
             invoiceType: values.invoiceType as "PROFORMA" | "STANDARD" | "DEPOSIT",
+            status: values.status as InvoiceStatus,
             customerId: values.customerId,
             templateId: values.templateId,
             issuedDate: values.issuedDate,
@@ -321,6 +324,26 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
               value={formik.values.invoiceType}
               onChange={(e) =>
                 formik.setFieldValue("invoiceType", e.target.value)
+              }
+              required
+            />
+          )}
+          {!isEditing && (
+            <Select
+              label={t("invoiceStatus")}
+              items={[
+                { value: "DRAFT", label: t("status_DRAFT") },
+                { value: "SENT", label: t("status_SENT") },
+                { value: "PAID", label: t("status_PAID") },
+                { value: "PARTIALLY_PAID", label: t("status_PARTIALLY_PAID") },
+                { value: "OVERDUE", label: t("status_OVERDUE") },
+                { value: "CANCELLED", label: t("status_CANCELLED") },
+                { value: "ACCEPTED", label: t("status_ACCEPTED") },
+                { value: "EXPIRED", label: t("status_EXPIRED") },
+              ]}
+              value={formik.values.status}
+              onChange={(e) =>
+                formik.setFieldValue("status", e.target.value)
               }
               required
             />

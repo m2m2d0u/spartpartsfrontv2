@@ -69,6 +69,9 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
         name: store.name,
         code: store.code,
         isActive: store.isActive,
+        // Preserve existing image URLs
+        logoUrl: store.logoUrl ?? undefined,
+        stampImageUrl: store.stampImageUrl ?? undefined,
         ninea: values.ninea || undefined,
         rccm: values.rccm || undefined,
         taxId: values.taxId || undefined,

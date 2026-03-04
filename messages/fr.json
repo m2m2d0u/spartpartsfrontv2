@@ -273,7 +273,11 @@
     "summary": "Résumé",
     "totalCustomers": "Total clients",
     "monthlyRevenue": "Chiffre d'affaires mensuel",
-    "noWarehousesAssigned": "Aucun entrepôt assigné pour l'instant."
+    "noWarehousesAssigned": "Aucun entrepôt assigné pour l'instant.",
+    "branding": "Image de marque",
+    "logo": "Logo",
+    "stamp": "Cachet",
+    "imageHint": "PNG, JPG ou JPEG (max 800x800px)"
   },
   "warehouses": {
     "title": "Entrepôts",
@@ -716,7 +720,15 @@
     "deleteTemplateTitle": "Supprimer le modèle",
     "deleteTemplateDescription": "Êtes-vous sûr de vouloir supprimer ce modèle ? Cette action est irréversible.",
     "failedSave": "Échec de l'enregistrement du modèle. Veuillez réessayer.",
-    "noTemplate": "Aucun modèle"
+    "noTemplate": "Aucun modèle",
+    "logo": "Logo",
+    "stamp": "Cachet",
+    "headerImage": "Image d'en-tête",
+    "footerImage": "Image de pied de page",
+    "signature": "Signature",
+    "watermark": "Filigrane",
+    "clickToView": "Cliquer pour voir",
+    "loadingImage": "Chargement..."
   },
   "invoices": {
     "title": "Factures",
@@ -725,6 +737,7 @@
     "updateInvoice": "Mettre à jour la facture",
     "invoiceNumber": "N° de facture",
     "invoiceType": "Type",
+    "invoiceStatus": "Statut",
     "invoiceDetails": "Détails de la facture",
     "invoiceDetailsDesc": "Remplissez les détails de la facture",
     "customer": "Client",
@@ -811,5 +824,34 @@
     "type_PROFORMA": "Proforma",
     "type_STANDARD": "Standard",
     "type_DEPOSIT": "Acompte"
+  },
+  "profile": {
+    "title": "Profil",
+    "settingsTitle": "Paramètres du compte",
+    "editProfile": "Modifier le profil",
+    "personalInfo": "Informations personnelles",
+    "fullName": "Nom complet",
+    "fullNamePlaceholder": "Votre nom complet",
+    "emailPlaceholder": "votre@email.com",
+    "role": "Rôle",
+    "memberSince": "Membre depuis",
+    "lastUpdated": "Dernière mise à jour",
+    "permissions": "Permissions",
+    "permissionsCount": "{count} permissions attribuées",
+    "accessibleStores": "Magasins accessibles",
+    "accessibleWarehouses": "Entrepôts accessibles",
+    "noStores": "Aucun magasin attribué",
+    "noWarehouses": "Aucun entrepôt attribué",
+    "nameRequired": "Le nom est requis",
+    "emailRequired": "L'email est requis",
+    "emailInvalid": "Adresse email invalide",
+    "savedSuccess": "Profil mis à jour avec succès",
+    "updateFailed": "Échec de la mise à jour du profil",
+    "notAuthenticated": "Vous n'êtes pas authentifié",
+    "myAccount": "Mon compte",
+    "userInformation": "Informations utilisateur",
+    "viewProfile": "Voir le profil",
+    "accountSettings": "Paramètres du compte",
+    "logOut": "Déconnexion"
   }
 }

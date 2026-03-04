@@ -12,10 +12,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { LogOutIcon, SettingsIcon, UserIcon } from "./icons";
 import { useAuth } from "@/context/auth-context";
+import { useTranslations } from "next-intl";
 
 export function UserInfo() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
+  const t = useTranslations("profile");
 
   const USER = {
     name: user?.name ?? "User",
@@ -26,7 +28,7 @@ export function UserInfo() {
   return (
     <Dropdown isOpen={isOpen} setIsOpen={setIsOpen}>
       <DropdownTrigger className="rounded align-middle outline-none ring-primary ring-offset-2 focus-visible:ring-1 dark:ring-offset-gray-dark">
-        <span className="sr-only">My Account</span>
+        <span className="sr-only">{t("myAccount")}</span>
 
         <figure className="flex items-center gap-3">
           <Image
@@ -56,7 +58,7 @@ export function UserInfo() {
         className="border border-stroke bg-white shadow-md dark:border-dark-3 dark:bg-gray-dark min-[230px]:min-w-[17.5rem]"
         align="end"
       >
-        <h2 className="sr-only">User information</h2>
+        <h2 className="sr-only">{t("userInformation")}</h2>
 
         <figure className="flex items-center gap-2.5 px-5 py-3.5">
           <Image
@@ -87,7 +89,9 @@ export function UserInfo() {
           >
             <UserIcon />
 
-            <span className="mr-auto text-base font-medium">View profile</span>
+            <span className="mr-auto text-base font-medium">
+              {t("viewProfile")}
+            </span>
           </Link>
 
           <Link
@@ -98,7 +102,7 @@ export function UserInfo() {
             <SettingsIcon />
 
             <span className="mr-auto text-base font-medium">
-              Account Settings
+              {t("accountSettings")}
             </span>
           </Link>
         </div>
@@ -115,7 +119,7 @@ export function UserInfo() {
           >
             <LogOutIcon />
 
-            <span className="text-base font-medium">Log out</span>
+            <span className="text-base font-medium">{t("logOut")}</span>
           </button>
         </div>
       </DropdownContent>

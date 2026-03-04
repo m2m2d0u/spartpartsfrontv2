@@ -67,8 +67,10 @@ async function fetchWithAuth(
   options: RequestInit = {},
 ): Promise<Response> {
   const token = getAccessToken();
+  const isFormData = options.body instanceof FormData;
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    // Let the browser set Content-Type (with boundary) for FormData
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...(options.headers as Record<string, string>),
   };
 
@@ -136,6 +138,30 @@ export async function apiPut<T>(path: string, body?: unknown): Promise<T> {
 export async function apiDelete<T = void>(path: string): Promise<T> {
   const res = await fetchWithAuth(`${API_BASE_URL}${path}`, {
     method: "DELETE",
+  });
+  return parseResponse<T>(res);
+}
+
+/** POST multipart/form-data (file uploads) */
+export async function apiPostFormData<T>(
+  path: string,
+  formData: FormData,
+): Promise<T> {
+  const res = await fetchWithAuth(`${API_BASE_URL}${path}`, {
+    method: "POST",
+    body: formData,
+  });
+  return parseResponse<T>(res);
+}
+
+/** PUT multipart/form-data (file uploads) */
+export async function apiPutFormData<T>(
+  path: string,
+  formData: FormData,
+): Promise<T> {
+  const res = await fetchWithAuth(`${API_BASE_URL}${path}`, {
+    method: "PUT",
+    body: formData,
   });
   return parseResponse<T>(res);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useFormik } from "formik";
@@ -9,6 +9,7 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
+import { UploadIcon } from "@/assets/icons";
 import type { InvoiceTemplate, InvoiceDesign } from "@/types";
 
 type Props = {
@@ -38,6 +39,132 @@ const HEADER_LAYOUT_OPTIONS = [
   { value: "LOGO_RIGHT", label: "Logo Right" },
 ];
 
+/** Image field definition for the 6 template images */
+type ImageField = {
+  key: string;
+  urlField: keyof InvoiceTemplate;
+  /** backend endpoint path segment for base64 retrieval */
+  endpoint:
+    | "logo"
+    | "stamp"
+    | "header-image"
+    | "footer-image"
+    | "signature"
+    | "watermark";
+};
+
+const IMAGE_FIELDS: ImageField[] = [
+  { key: "logo", urlField: "logoUrl", endpoint: "logo" },
+  { key: "stamp", urlField: "stampImageUrl", endpoint: "stamp" },
+  {
+    key: "headerImage",
+    urlField: "headerImageUrl",
+    endpoint: "header-image",
+  },
+  {
+    key: "footerImage",
+    urlField: "footerImageUrl",
+    endpoint: "footer-image",
+  },
+  { key: "signature", urlField: "signatureImageUrl", endpoint: "signature" },
+  { key: "watermark", urlField: "watermarkImageUrl", endpoint: "watermark" },
+];
+
+/** Reusable drag-and-drop file upload zone */
+function ImageUploadZone({
+  label,
+  previewUrl,
+  onFileChange,
+  onRemove,
+  accept = "image/png, image/jpg, image/jpeg",
+  hint,
+}: {
+  label: string;
+  previewUrl: string | null;
+  onFileChange: (file: File) => void;
+  onRemove: () => void;
+  accept?: string;
+  hint?: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragActive, setDragActive] = useState(false);
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragActive(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) onFileChange(file);
+  }
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) onFileChange(file);
+    e.target.value = "";
+  }
+
+  return (
+    <div>
+      <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+        {label}
+      </label>
+
+      {previewUrl ? (
+        <div className="relative inline-block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={previewUrl}
+            alt={label}
+            className="h-32 max-w-[200px] rounded-lg border border-stroke object-contain dark:border-dark-3"
+          />
+          <button
+            type="button"
+            onClick={onRemove}
+            className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-red text-xs text-white hover:bg-red/80"
+          >
+            &times;
+          </button>
+        </div>
+      ) : (
+        <div
+          className={`relative rounded-xl border border-dashed ${
+            dragActive
+              ? "border-primary bg-primary/5"
+              : "border-gray-4 bg-gray-2 hover:border-primary dark:border-dark-3 dark:bg-dark-2 dark:hover:border-primary"
+          }`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragActive(true);
+          }}
+          onDragLeave={() => setDragActive(false)}
+          onDrop={handleDrop}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept={accept}
+            onChange={handleInputChange}
+            hidden
+          />
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="flex w-full cursor-pointer flex-col items-center justify-center p-4 sm:py-7.5"
+          >
+            <div className="flex size-13.5 items-center justify-center rounded-full border border-stroke bg-white dark:border-dark-3 dark:bg-gray-dark">
+              <UploadIcon />
+            </div>
+            <p className="mt-2.5 text-body-sm font-medium">
+              <span className="text-primary">Click to upload</span> or drag and
+              drop
+            </p>
+            {hint && <p className="mt-1 text-body-xs">{hint}</p>}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function InvoiceTemplateForm({ template }: Props) {
   const router = useRouter();
   const isEditing = !!template;
@@ -47,6 +174,48 @@ export function InvoiceTemplateForm({ template }: Props) {
   const t = useTranslations("invoiceTemplates");
   const tCommon = useTranslations("common");
   const tValidation = useTranslations("validation");
+
+  // ── File state for the 6 image fields ──
+  const [files, setFiles] = useState<Record<string, File | null>>({});
+  const [previews, setPreviews] = useState<Record<string, string | null>>({});
+  const [removed, setRemoved] = useState<Record<string, boolean>>({});
+
+  // Load existing images as base64 previews when editing
+  useEffect(() => {
+    if (!template) return;
+    let cancelled = false;
+    const templateId = template.id;
+
+    // Determine which images exist
+    const fieldsToLoad = IMAGE_FIELDS.filter((f) => !!template[f.urlField]);
+    if (fieldsToLoad.length === 0) return;
+
+    async function loadPreviews() {
+      const { getTemplateImage } = await import(
+        "@/services/invoice-templates.service"
+      );
+      const results = await Promise.all(
+        fieldsToLoad.map((f) =>
+          getTemplateImage(templateId, f.endpoint).catch(() => null),
+        ),
+      );
+      if (cancelled) return;
+
+      const newPreviews: Record<string, string | null> = {};
+      fieldsToLoad.forEach((f, i) => {
+        const img = results[i];
+        if (img?.base64) {
+          newPreviews[f.key] = `data:image/png;base64,${img.base64}`;
+        }
+      });
+      setPreviews((prev) => ({ ...prev, ...newPreviews }));
+    }
+
+    loadPreviews();
+    return () => {
+      cancelled = true;
+    };
+  }, [template]);
 
   const formik = useFormik({
     initialValues: {
@@ -58,12 +227,6 @@ export function InvoiceTemplateForm({ template }: Props) {
       fontFamily: template?.fontFamily || "Helvetica",
       design: template?.design || "CLASSIC",
       headerLayout: template?.headerLayout || "LOGO_LEFT",
-      logoUrl: template?.logoUrl || "",
-      headerImageUrl: template?.headerImageUrl || "",
-      footerImageUrl: template?.footerImageUrl || "",
-      stampImageUrl: template?.stampImageUrl || "",
-      signatureImageUrl: template?.signatureImageUrl || "",
-      watermarkImageUrl: template?.watermarkImageUrl || "",
       showNinea: template?.showNinea ?? true,
       showRccm: template?.showRccm ?? true,
       showTaxId: template?.showTaxId ?? true,
@@ -81,6 +244,7 @@ export function InvoiceTemplateForm({ template }: Props) {
       setError("");
 
       try {
+        // Build the JSON payload, preserving existing image URLs unless removed
         const payload = {
           name: values.name,
           description: values.description || undefined,
@@ -90,12 +254,24 @@ export function InvoiceTemplateForm({ template }: Props) {
           fontFamily: values.fontFamily,
           design: values.design as InvoiceDesign,
           headerLayout: values.headerLayout,
-          logoUrl: values.logoUrl || undefined,
-          headerImageUrl: values.headerImageUrl || undefined,
-          footerImageUrl: values.footerImageUrl || undefined,
-          stampImageUrl: values.stampImageUrl || undefined,
-          signatureImageUrl: values.signatureImageUrl || undefined,
-          watermarkImageUrl: values.watermarkImageUrl || undefined,
+          logoUrl: removed.logo
+            ? undefined
+            : (template?.logoUrl ?? undefined),
+          headerImageUrl: removed.headerImage
+            ? undefined
+            : (template?.headerImageUrl ?? undefined),
+          footerImageUrl: removed.footerImage
+            ? undefined
+            : (template?.footerImageUrl ?? undefined),
+          stampImageUrl: removed.stamp
+            ? undefined
+            : (template?.stampImageUrl ?? undefined),
+          signatureImageUrl: removed.signature
+            ? undefined
+            : (template?.signatureImageUrl ?? undefined),
+          watermarkImageUrl: removed.watermark
+            ? undefined
+            : (template?.watermarkImageUrl ?? undefined),
           showNinea: values.showNinea,
           showRccm: values.showRccm,
           showTaxId: values.showTaxId,
@@ -106,16 +282,46 @@ export function InvoiceTemplateForm({ template }: Props) {
           defaultNotes: values.defaultNotes || undefined,
         };
 
+        // Collect files
+        const templateFiles = {
+          logo: files.logo || null,
+          stamp: files.stamp || null,
+          headerImage: files.headerImage || null,
+          footerImage: files.footerImage || null,
+          signature: files.signature || null,
+          watermark: files.watermark || null,
+        };
+
+        const hasFiles = Object.values(templateFiles).some(Boolean);
+
         if (isEditing) {
-          const { updateInvoiceTemplate } = await import(
-            "@/services/invoice-templates.service"
-          );
-          await updateInvoiceTemplate(template.id, payload);
+          if (hasFiles) {
+            const { updateInvoiceTemplateWithFiles } = await import(
+              "@/services/invoice-templates.service"
+            );
+            await updateInvoiceTemplateWithFiles(
+              template.id,
+              payload,
+              templateFiles,
+            );
+          } else {
+            const { updateInvoiceTemplate } = await import(
+              "@/services/invoice-templates.service"
+            );
+            await updateInvoiceTemplate(template.id, payload);
+          }
         } else {
-          const { createInvoiceTemplate } = await import(
-            "@/services/invoice-templates.service"
-          );
-          await createInvoiceTemplate(payload);
+          if (hasFiles) {
+            const { createInvoiceTemplateWithFiles } = await import(
+              "@/services/invoice-templates.service"
+            );
+            await createInvoiceTemplateWithFiles(payload, templateFiles);
+          } else {
+            const { createInvoiceTemplate } = await import(
+              "@/services/invoice-templates.service"
+            );
+            await createInvoiceTemplate(payload);
+          }
         }
 
         router.push("/admin/invoice-templates");
@@ -127,6 +333,28 @@ export function InvoiceTemplateForm({ template }: Props) {
       }
     },
   });
+
+  /** Translation key map for image labels */
+  const imageLabels: Record<string, string> = {
+    logo: t("logoUrl"),
+    stamp: t("stampImageUrl"),
+    headerImage: t("headerImageUrl"),
+    footerImage: t("footerImageUrl"),
+    signature: t("signatureImageUrl"),
+    watermark: t("watermarkImageUrl"),
+  };
+
+  function handleFileChange(key: string, file: File) {
+    setFiles((prev) => ({ ...prev, [key]: file }));
+    setPreviews((prev) => ({ ...prev, [key]: URL.createObjectURL(file) }));
+    setRemoved((prev) => ({ ...prev, [key]: false }));
+  }
+
+  function handleFileRemove(key: string) {
+    setFiles((prev) => ({ ...prev, [key]: null }));
+    setPreviews((prev) => ({ ...prev, [key]: null }));
+    setRemoved((prev) => ({ ...prev, [key]: true }));
+  }
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
@@ -216,9 +444,7 @@ export function InvoiceTemplateForm({ template }: Props) {
               label: t(`design_${d.value}`),
             }))}
             value={formik.values.design}
-            onChange={(e) =>
-              formik.setFieldValue("design", e.target.value)
-            }
+            onChange={(e) => formik.setFieldValue("design", e.target.value)}
           />
           <Select
             label={t("headerLayout")}
@@ -231,57 +457,19 @@ export function InvoiceTemplateForm({ template }: Props) {
         </div>
       </FormSection>
 
-      {/* Images */}
+      {/* Images — file upload zones */}
       <FormSection title={t("images")} description={t("imagesDesc")}>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <InputGroup
-            label={t("logoUrl")}
-            name="logoUrl"
-            type="text"
-            placeholder="https://..."
-            value={formik.values.logoUrl}
-            handleChange={formik.handleChange}
-          />
-          <InputGroup
-            label={t("headerImageUrl")}
-            name="headerImageUrl"
-            type="text"
-            placeholder="https://..."
-            value={formik.values.headerImageUrl}
-            handleChange={formik.handleChange}
-          />
-          <InputGroup
-            label={t("footerImageUrl")}
-            name="footerImageUrl"
-            type="text"
-            placeholder="https://..."
-            value={formik.values.footerImageUrl}
-            handleChange={formik.handleChange}
-          />
-          <InputGroup
-            label={t("stampImageUrl")}
-            name="stampImageUrl"
-            type="text"
-            placeholder="https://..."
-            value={formik.values.stampImageUrl}
-            handleChange={formik.handleChange}
-          />
-          <InputGroup
-            label={t("signatureImageUrl")}
-            name="signatureImageUrl"
-            type="text"
-            placeholder="https://..."
-            value={formik.values.signatureImageUrl}
-            handleChange={formik.handleChange}
-          />
-          <InputGroup
-            label={t("watermarkImageUrl")}
-            name="watermarkImageUrl"
-            type="text"
-            placeholder="https://..."
-            value={formik.values.watermarkImageUrl}
-            handleChange={formik.handleChange}
-          />
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {IMAGE_FIELDS.map((field) => (
+            <ImageUploadZone
+              key={field.key}
+              label={imageLabels[field.key]}
+              previewUrl={previews[field.key] ?? null}
+              onFileChange={(file) => handleFileChange(field.key, file)}
+              onRemove={() => handleFileRemove(field.key)}
+              hint="PNG, JPG or JPEG"
+            />
+          ))}
         </div>
       </FormSection>
 

@@ -74,7 +74,6 @@ const InputGroup: React.FC<InputGroupProps> = ({
             props.iconPosition === "left" && "pl-12.5",
             props.height === "sm" && "py-2.5",
           )}
-          required={required}
           disabled={disabled}
           data-active={active}
         />

@@ -11,6 +11,7 @@ export type Store = {
   phone: string;
   email: string;
   logoUrl: string | null;
+  stampImageUrl: string | null;
   ninea: string | null;
   rccm: string | null;
   taxId: string | null;
@@ -42,6 +43,7 @@ export type CreateStoreRequest = {
   phone?: string;
   email?: string;
   logoUrl?: string;
+  stampImageUrl?: string;
   ninea?: string;
   rccm?: string;
   taxId?: string;
@@ -61,4 +63,10 @@ export type CreateStoreRequest = {
 /** Mirrors backend UpdateStoreRequest */
 export type UpdateStoreRequest = CreateStoreRequest & {
   isActive: boolean;
+};
+
+/** Mirrors backend ImageResponse */
+export type ImageResponse = {
+  url: string;
+  base64: string;
 };
