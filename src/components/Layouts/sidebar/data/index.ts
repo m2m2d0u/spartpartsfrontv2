@@ -81,6 +81,10 @@ export function getNavData(
               url: "/admin/invoices",
             },
             {
+              title: t("invoiceTemplates"),
+              url: "/admin/invoice-templates",
+            },
+            {
               title: t("payments"),
               url: "/admin/payments",
             },

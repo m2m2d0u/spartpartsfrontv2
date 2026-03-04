@@ -1,3 +1,10 @@
+export type InvoiceDesign =
+  | "CLASSIC"
+  | "MODERN"
+  | "ELEGANT"
+  | "COMPACT"
+  | "PROFESSIONAL";
+
 export type InvoiceType = "PROFORMA" | "STANDARD" | "DEPOSIT";
 
 export type InvoiceStatus =
@@ -80,6 +87,7 @@ export type InvoiceTemplate = {
   primaryColor: string;
   accentColor: string;
   fontFamily: string;
+  design: InvoiceDesign;
   headerLayout: string;
   logoUrl: string | null;
   headerImageUrl: string | null;
@@ -97,4 +105,80 @@ export type InvoiceTemplate = {
   defaultNotes: string;
   createdAt: string;
   updatedAt: string;
+};
+
+// ─── Request Types ───────────────────────────────────────────────
+
+/** Mirrors backend CreateInvoiceTemplateRequest */
+export type CreateInvoiceTemplateRequest = {
+  name: string;
+  description?: string;
+  isDefault?: boolean;
+  primaryColor?: string;
+  accentColor?: string;
+  fontFamily?: string;
+  design?: InvoiceDesign;
+  headerLayout?: string;
+  logoUrl?: string;
+  headerImageUrl?: string;
+  footerImageUrl?: string;
+  stampImageUrl?: string;
+  signatureImageUrl?: string;
+  watermarkImageUrl?: string;
+  showNinea?: boolean;
+  showRccm?: boolean;
+  showTaxId?: boolean;
+  showWarehouseAddress?: boolean;
+  showCustomerTaxId?: boolean;
+  showPaymentTerms?: boolean;
+  showDiscountColumn?: boolean;
+  defaultNotes?: string;
+};
+
+/** Mirrors backend UpdateInvoiceTemplateRequest */
+export type UpdateInvoiceTemplateRequest = CreateInvoiceTemplateRequest;
+
+/** Mirrors backend InvoiceItemRequest */
+export type InvoiceItemRequest = {
+  partId: string;
+  quantity: number;
+  unitPrice: number;
+  discountPercent?: number;
+};
+
+/** Mirrors backend CreateInvoiceRequest */
+export type CreateInvoiceRequest = {
+  invoiceType: InvoiceType;
+  customerId: string;
+  orderId?: string;
+  proformaId?: string;
+  depositId?: string;
+  templateId?: string;
+  issuedDate: string;
+  dueDate?: string;
+  validityDate?: string;
+  sourceWarehouseId?: string;
+  notes?: string;
+  internalNotes?: string;
+  items: InvoiceItemRequest[];
+};
+
+/** Mirrors backend UpdateInvoiceRequest */
+export type UpdateInvoiceRequest = {
+  orderId?: string;
+  proformaId?: string;
+  depositId?: string;
+  templateId?: string;
+  issuedDate?: string;
+  dueDate?: string;
+  validityDate?: string;
+  sourceWarehouseId?: string;
+  notes?: string;
+  internalNotes?: string;
+  items: InvoiceItemRequest[];
+};
+
+/** Mirrors backend UpdateInvoiceStatusRequest */
+export type UpdateInvoiceStatusRequest = {
+  status: InvoiceStatus;
 };

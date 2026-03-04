@@ -139,3 +139,15 @@ export async function apiDelete<T = void>(path: string): Promise<T> {
   });
   return parseResponse<T>(res);
 }
+
+/** Fetch a binary response (PDF, images, etc.) */
+export async function apiGetBlob(path: string): Promise<Blob> {
+  const res = await fetchWithAuth(`${API_BASE_URL}${path}`);
+  if (!res.ok) {
+    throw new ApiError(
+      `Request failed with status ${res.status}`,
+      res.status,
+    );
+  }
+  return res.blob();
+}

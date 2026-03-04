@@ -12,17 +12,18 @@ export function getInvoiceStatusVariant(
   status: string,
 ): BadgeVariant {
   switch (status) {
-    case "paid":
+    case "PAID":
       return "success";
-    case "sent":
-    case "partially_paid":
+    case "SENT":
+    case "PARTIALLY_PAID":
+    case "ACCEPTED":
       return "info";
-    case "overdue":
+    case "OVERDUE":
+    case "EXPIRED":
+    case "CANCELLED":
       return "error";
-    case "draft":
+    case "DRAFT":
       return "neutral";
-    case "cancelled":
-      return "error";
     default:
       return "neutral";
   }
