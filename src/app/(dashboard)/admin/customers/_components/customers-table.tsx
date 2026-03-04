@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import type { Customer } from "@/types";
 
 type Props = {
@@ -90,19 +92,23 @@ export function CustomersTable({ customers: initialCustomers }: Props) {
       header: "",
       render: (row) => (
         <div className="flex items-center justify-end gap-2">
-          <Link
-            href={`/admin/customers/${row.id}/edit`}
-            className="text-body-sm text-primary hover:underline"
-          >
-            {tCommon("edit")}
-          </Link>
-          <button
-            type="button"
-            onClick={() => setDeleteId(row.id)}
-            className="text-body-sm text-red hover:underline"
-          >
-            {tCommon("delete")}
-          </button>
+          <PermissionGate permission={Permission.CUSTOMER_UPDATE}>
+            <Link
+              href={`/admin/customers/${row.id}/edit`}
+              className="text-body-sm text-primary hover:underline"
+            >
+              {tCommon("edit")}
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission={Permission.CUSTOMER_DELETE}>
+            <button
+              type="button"
+              onClick={() => setDeleteId(row.id)}
+              className="text-body-sm text-red hover:underline"
+            >
+              {tCommon("delete")}
+            </button>
+          </PermissionGate>
         </div>
       ),
       className: "text-right",

@@ -4,6 +4,8 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTableSkeleton } from "@/components/DataTable/skeleton";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import { getCustomers } from "@/services/customers.server";
 import { CustomersTable } from "./_components/customers-table";
 
@@ -29,12 +31,14 @@ export default async function CustomersPage() {
           { label: tNav("customers") },
         ]}
         actions={
-          <Link
-            href="/admin/customers/new"
-            className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            {t("addCustomer")}
-          </Link>
+          <PermissionGate permission={Permission.CUSTOMER_CREATE}>
+            <Link
+              href="/admin/customers/new"
+              className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              {t("addCustomer")}
+            </Link>
+          </PermissionGate>
         }
       />
 

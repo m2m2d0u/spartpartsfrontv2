@@ -11,6 +11,7 @@ import { ArrowLeftIcon, ChevronUp } from "./icons";
 import { MenuItem } from "./menu-item";
 import { useSidebarContext } from "./sidebar-context";
 import { useAuth } from "@/context/auth-context";
+import { usePermissions } from "@/hooks/use-permissions";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -19,8 +20,12 @@ export function Sidebar() {
   const t = useTranslations("nav");
   const tCommon = useTranslations("common");
   const { user } = useAuth();
+  const { hasPermission } = usePermissions();
 
-  const navData = useMemo(() => getNavData(t, user?.role), [t, user?.role]);
+  const navData = useMemo(
+    () => getNavData(t, user?.roleCode, hasPermission),
+    [t, user?.roleCode, hasPermission],
+  );
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => (prev.includes(title) ? [] : [title]));

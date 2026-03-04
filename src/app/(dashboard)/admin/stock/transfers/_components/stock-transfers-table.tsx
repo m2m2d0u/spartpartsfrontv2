@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import { getStockTransferStatusVariant } from "@/lib/status-variants";
 import type { StockTransfer, StockTransferStatus } from "@/types";
 
@@ -122,19 +124,23 @@ export function StockTransfersTable({ transfers: initialTransfers }: Props) {
           </Link>
           {row.status === "PENDING" && (
             <>
-              <Link
-                href={`/admin/stock/transfers/${row.id}/edit`}
-                className="text-body-sm text-primary hover:underline"
-              >
-                {tCommon("edit")}
-              </Link>
-              <button
-                type="button"
-                onClick={() => setDeleteId(row.id)}
-                className="text-body-sm text-red hover:underline"
-              >
-                {tCommon("delete")}
-              </button>
+              <PermissionGate permission={Permission.TRANSFER_UPDATE}>
+                <Link
+                  href={`/admin/stock/transfers/${row.id}/edit`}
+                  className="text-body-sm text-primary hover:underline"
+                >
+                  {tCommon("edit")}
+                </Link>
+              </PermissionGate>
+              <PermissionGate permission={Permission.TRANSFER_DELETE}>
+                <button
+                  type="button"
+                  onClick={() => setDeleteId(row.id)}
+                  className="text-body-sm text-red hover:underline"
+                >
+                  {tCommon("delete")}
+                </button>
+              </PermissionGate>
             </>
           )}
         </div>

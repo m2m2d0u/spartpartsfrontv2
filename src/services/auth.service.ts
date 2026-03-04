@@ -110,7 +110,8 @@ export type MeResponse = {
   id: string;
   name: string;
   email: string;
-  role: "ADMIN" | "STORE_MANAGER" | "WAREHOUSE_OPERATOR";
+  roleCode: string;
+  roleDisplayName: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -123,6 +124,8 @@ export type MeStore = {
   id: string;
   code: string;
   name: string;
+  city: string;
+  country: string;
   isActive: boolean;
 };
 

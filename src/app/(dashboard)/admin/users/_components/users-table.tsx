@@ -67,11 +67,14 @@ export function UsersTable({ users: initialUsers }: Props) {
     {
       key: "role",
       header: t("role"),
-      render: (row) => (
-        <StatusBadge variant={getUserRoleVariant(row.role)}>
-          {t(`role_${row.role}`)}
-        </StatusBadge>
-      ),
+      render: (row) =>
+        row.role ? (
+          <StatusBadge variant={getUserRoleVariant(row.role)}>
+            {t(`role_${row.role}`)}
+          </StatusBadge>
+        ) : (
+          <span className="text-body-sm text-dark-6">—</span>
+        ),
     },
     {
       key: "status",

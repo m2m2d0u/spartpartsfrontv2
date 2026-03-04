@@ -7,6 +7,8 @@ import { SearchableSelect } from "@/components/FormElements/searchable-select";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { FormDialog } from "@/components/ui/form-dialog";
 import InputGroup from "@/components/FormElements/InputGroup";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import { cn } from "@/lib/utils";
 import type { Warehouse, WarehouseStock, Part } from "@/types";
 
@@ -220,13 +222,15 @@ export function WarehouseStockTable({ warehouses }: Props) {
       header: "",
       render: (row) => (
         <div className="flex items-center justify-end">
-          <button
-            type="button"
-            onClick={() => handleEditMinStock(row)}
-            className="text-body-sm text-primary hover:underline"
-          >
-            {tCommon("edit")}
-          </button>
+          <PermissionGate permission={Permission.STOCK_UPDATE}>
+            <button
+              type="button"
+              onClick={() => handleEditMinStock(row)}
+              className="text-body-sm text-primary hover:underline"
+            >
+              {tCommon("edit")}
+            </button>
+          </PermissionGate>
         </div>
       ),
       className: "text-right",
@@ -255,28 +259,30 @@ export function WarehouseStockTable({ warehouses }: Props) {
           ))}
         </div>
 
-        <button
-          type="button"
-          onClick={handleOpenAddPart}
-          disabled={!selectedWarehouse}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            className="shrink-0"
+        <PermissionGate permission={Permission.STOCK_CREATE}>
+          <button
+            type="button"
+            onClick={handleOpenAddPart}
+            disabled={!selectedWarehouse}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
-            <path
-              d="M8 3v10M3 8h10"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-          {t("addPart")}
-        </button>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              className="shrink-0"
+            >
+              <path
+                d="M8 3v10M3 8h10"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+            {t("addPart")}
+          </button>
+        </PermissionGate>
       </div>
 
       {loading ? (

@@ -8,10 +8,10 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type {
   Warehouse,
   UserWarehouseAssignment,
-  WarehousePermission,
   PermissionCategory,
   Role,
 } from "@/types";
+import { type Permission } from "@/types";
 import { PERMISSIONS_BY_CATEGORY } from "@/types";
 
 const CATEGORIES = Object.keys(PERMISSIONS_BY_CATEGORY) as PermissionCategory[];
@@ -218,9 +218,9 @@ export function WarehouseAssignments({
   }
 
   /** Group displayed permissions by category */
-  function groupPermissions(perms: WarehousePermission[]) {
+  function groupPermissions(perms: Permission[]) {
     const grouped: Partial<
-      Record<PermissionCategory, WarehousePermission[]>
+      Record<PermissionCategory, Permission[]>
     > = {};
     for (const perm of perms) {
       for (const cat of CATEGORIES) {

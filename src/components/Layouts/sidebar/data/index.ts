@@ -1,13 +1,23 @@
 import * as Icons from "../icons";
+import { Permission } from "@/types";
 import type { UserRole } from "@/types";
+
+type NavSubItem = {
+  title: string;
+  url: string;
+  /** Permission required to see this sub-item. If omitted, inherits parent visibility. */
+  permission?: Permission;
+};
 
 type NavItem = {
   title: string;
   url?: string;
   icon: typeof Icons.HomeIcon;
-  items: { title: string; url: string }[];
+  items: NavSubItem[];
   /** Roles that can see this item. If omitted, visible to all roles. */
   roles?: UserRole[];
+  /** Permission required to see this item. If omitted, no permission check. */
+  permission?: Permission;
 };
 
 type NavSection = {
@@ -20,6 +30,7 @@ type NavSection = {
 export function getNavData(
   t: (key: string) => string,
   role?: UserRole,
+  hasPermission?: (code: Permission) => boolean,
 ): NavSection[] {
   const all: NavSection[] = [
     {
@@ -34,7 +45,7 @@ export function getNavData(
         {
           title: t("parts"),
           icon: Icons.BoxIcon,
-          roles: ["ADMIN", "STORE_MANAGER"],
+          permission: Permission.PART_VIEW,
           items: [
             {
               title: t("allParts"),
@@ -61,7 +72,7 @@ export function getNavData(
         {
           title: t("sales"),
           icon: Icons.InvoiceIcon,
-          roles: ["ADMIN", "STORE_MANAGER"],
+          permission: Permission.INVOICE_VIEW,
           items: [
             {
               title: t("invoices"),
@@ -80,7 +91,7 @@ export function getNavData(
         {
           title: t("procurement"),
           icon: Icons.TruckIcon,
-          roles: ["ADMIN", "STORE_MANAGER"],
+          permission: Permission.PROCUREMENT_VIEW,
           items: [
             {
               title: t("purchaseOrders"),
@@ -96,19 +107,20 @@ export function getNavData(
           title: t("customers"),
           url: "/admin/customers",
           icon: Icons.User,
-          roles: ["ADMIN", "STORE_MANAGER"],
+          permission: Permission.CUSTOMER_VIEW,
           items: [],
         },
         {
           title: t("orders"),
           url: "/admin/orders",
           icon: Icons.ShoppingCartIcon,
-          roles: ["ADMIN", "STORE_MANAGER"],
+          permission: Permission.ORDER_VIEW,
           items: [],
         },
         {
           title: t("stock"),
           icon: Icons.StackIcon,
+          permission: Permission.STOCK_VIEW,
           items: [
             {
               title: t("warehouseStock"),
@@ -121,6 +133,7 @@ export function getNavData(
             {
               title: t("stockTransfers"),
               url: "/admin/stock/transfers",
+              permission: Permission.TRANSFER_VIEW,
             },
           ],
         },
@@ -169,13 +182,20 @@ export function getNavData(
 
   if (!role) return all;
 
+  const checkPerm = (code?: Permission) =>
+    !code || !hasPermission || hasPermission(code);
+
   return all
     .filter((section) => !section.roles || section.roles.includes(role))
     .map((section) => ({
       ...section,
-      items: section.items.filter(
-        (item) => !item.roles || item.roles.includes(role),
-      ),
+      items: section.items
+        .filter((item) => !item.roles || item.roles.includes(role))
+        .filter((item) => checkPerm(item.permission))
+        .map((item) => ({
+          ...item,
+          items: item.items.filter((sub) => checkPerm(sub.permission)),
+        })),
     }))
     .filter((section) => section.items.length > 0);
 }

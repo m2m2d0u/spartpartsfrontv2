@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import type { Part } from "@/types";
 
 type Props = {
@@ -111,19 +113,23 @@ export function PartsTable({ parts: initialParts }: Props) {
           >
             {tCommon("view")}
           </Link>
-          <Link
-            href={`/admin/parts/${row.id}/edit`}
-            className="text-body-sm text-primary hover:underline"
-          >
-            {tCommon("edit")}
-          </Link>
-          <button
-            type="button"
-            onClick={() => setDeleteId(row.id)}
-            className="text-body-sm text-red hover:underline"
-          >
-            {tCommon("delete")}
-          </button>
+          <PermissionGate permission={Permission.PART_UPDATE}>
+            <Link
+              href={`/admin/parts/${row.id}/edit`}
+              className="text-body-sm text-primary hover:underline"
+            >
+              {tCommon("edit")}
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission={Permission.PART_DELETE}>
+            <button
+              type="button"
+              onClick={() => setDeleteId(row.id)}
+              className="text-body-sm text-red hover:underline"
+            >
+              {tCommon("delete")}
+            </button>
+          </PermissionGate>
         </div>
       ),
       className: "text-right",

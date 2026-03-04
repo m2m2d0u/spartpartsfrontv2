@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import type { Category } from "@/types";
 
 type Props = {
@@ -74,19 +76,23 @@ export function CategoriesTable({ categories: initialCategories }: Props) {
       header: "",
       render: (row) => (
         <div className="flex items-center justify-end gap-2">
-          <Link
-            href={`/admin/parts/categories/${row.id}/edit`}
-            className="text-body-sm text-primary hover:underline"
-          >
-            {tCommon("edit")}
-          </Link>
-          <button
-            type="button"
-            onClick={() => setDeleteId(row.id)}
-            className="text-body-sm text-red hover:underline"
-          >
-            {tCommon("delete")}
-          </button>
+          <PermissionGate permission={Permission.PART_UPDATE}>
+            <Link
+              href={`/admin/parts/categories/${row.id}/edit`}
+              className="text-body-sm text-primary hover:underline"
+            >
+              {tCommon("edit")}
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission={Permission.PART_DELETE}>
+            <button
+              type="button"
+              onClick={() => setDeleteId(row.id)}
+              className="text-body-sm text-red hover:underline"
+            >
+              {tCommon("delete")}
+            </button>
+          </PermissionGate>
         </div>
       ),
       className: "text-right",

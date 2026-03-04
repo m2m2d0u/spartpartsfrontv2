@@ -4,6 +4,8 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTableSkeleton } from "@/components/DataTable/skeleton";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import { getCarBrands } from "@/services/car-brands.server";
 import { CarBrandsTable } from "./_components/car-brands-table";
 
@@ -30,12 +32,14 @@ export default async function CarBrandsPage() {
           { label: tNav("carBrands") },
         ]}
         actions={
-          <Link
-            href="/admin/parts/car-brands/new"
-            className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            {t("addCarBrand")}
-          </Link>
+          <PermissionGate permission={Permission.PART_CREATE}>
+            <Link
+              href="/admin/parts/car-brands/new"
+              className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              {t("addCarBrand")}
+            </Link>
+          </PermissionGate>
         }
       />
 

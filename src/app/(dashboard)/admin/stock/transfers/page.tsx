@@ -4,6 +4,8 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTableSkeleton } from "@/components/DataTable/skeleton";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import { getStockTransfers } from "@/services/stock-transfers.server";
 import { StockTransfersTable } from "./_components/stock-transfers-table";
 
@@ -30,12 +32,14 @@ export default async function StockTransfersPage() {
           { label: tNav("stockTransfers") },
         ]}
         actions={
-          <Link
-            href="/admin/stock/transfers/new"
-            className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            {t("addTransfer")}
-          </Link>
+          <PermissionGate permission={Permission.TRANSFER_CREATE}>
+            <Link
+              href="/admin/stock/transfers/new"
+              className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              {t("addTransfer")}
+            </Link>
+          </PermissionGate>
         }
       />
 
