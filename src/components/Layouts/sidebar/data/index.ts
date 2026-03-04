@@ -157,6 +157,12 @@ export function getNavData(
           icon: Icons.Authentication,
           items: [],
         },
+        {
+          title: t("roles"),
+          url: "/admin/roles",
+          icon: Icons.ShieldIcon,
+          items: [],
+        },
       ],
     },
   ];

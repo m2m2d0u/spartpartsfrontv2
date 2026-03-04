@@ -257,6 +257,25 @@ export function StackIcon(props: PropsType) {
   );
 }
 
+export function ShieldIcon(props: PropsType) {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="currentColor"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M9 1.5C9.19 1.5 9.37.58 9.49.7L15.24 3.58C15.47 3.69 15.62 3.92 15.62 4.18V8.25C15.62 11.94 12.89 15.33 9.22 16.46C9.08 16.51 8.92 16.51 8.78 16.46C5.11 15.33 2.38 11.94 2.38 8.25V4.18C2.38 3.92 2.53 3.69 2.76 3.58L8.51.7C8.63.58 8.81 1.5 9 1.5ZM3.5 4.63V8.25C3.5 11.42 5.84 14.33 9 15.33C12.16 14.33 14.5 11.42 14.5 8.25V4.63L9 2.63L3.5 4.63Z"
+        fill=""
+      />
+    </svg>
+  );
+}
+
 export function ArrowLeftIcon(props: PropsType) {
   return (
     <svg

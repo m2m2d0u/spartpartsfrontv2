@@ -10,6 +10,7 @@ import type {
   UserWarehouseAssignment,
   WarehousePermission,
   PermissionCategory,
+  Role,
 } from "@/types";
 import { PERMISSIONS_BY_CATEGORY } from "@/types";
 
@@ -19,12 +20,14 @@ type Props = {
   userId: string;
   assignments: UserWarehouseAssignment[];
   warehouses: Warehouse[];
+  roles: Role[];
 };
 
 export function WarehouseAssignments({
   userId,
   assignments: initialAssignments,
   warehouses,
+  roles,
 }: Props) {
   const [assignments, setAssignments] =
     useState<UserWarehouseAssignment[]>(initialAssignments);
@@ -34,21 +37,25 @@ export function WarehouseAssignments({
   // Add warehouse dialog
   const [addOpen, setAddOpen] = useState(false);
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
-  const [selectedPermissions, setSelectedPermissions] = useState<
-    WarehousePermission[]
-  >([]);
+  const [selectedRoleIds, setSelectedRoleIds] = useState<Set<string>>(
+    new Set(),
+  );
 
-  // Edit permissions dialog
+  // Edit roles dialog
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [editPermissions, setEditPermissions] = useState<
-    WarehousePermission[]
-  >([]);
+  const [editRoleIds, setEditRoleIds] = useState<Set<string>>(new Set());
 
   // Remove dialog
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
   const t = useTranslations("users");
   const tCommon = useTranslations("common");
+  const tRoles = useTranslations("roles");
+
+  function translateRole(role: Role) {
+    const key = `role_${role.code}` as Parameters<typeof tRoles>[0];
+    return tRoles.has(key) ? tRoles(key) : role.displayName;
+  }
 
   // Available warehouses (not yet assigned)
   const assignedWarehouseIds = new Set(assignments.map((a) => a.warehouseId));
@@ -56,19 +63,32 @@ export function WarehouseAssignments({
     .filter((w) => !assignedWarehouseIds.has(w.id))
     .map((w) => ({ value: w.id, label: `${w.code} — ${w.name}` }));
 
-  async function saveAssignments(updated: UserWarehouseAssignment[]) {
+  async function handleAdd() {
+    if (!selectedWarehouse || selectedRoleIds.size === 0) return;
     setSaving(true);
     setError("");
     try {
-      const { updateUserWarehouses } = await import(
-        "@/services/users.service"
+      const { assignRolesToUserWarehouse } = await import(
+        "@/services/roles.service"
       );
-      const payload = updated.map((a) => ({
-        warehouseId: a.warehouseId,
-        permissions: a.permissions,
-      }));
-      await updateUserWarehouses(userId, payload);
-      setAssignments(updated);
+      await assignRolesToUserWarehouse(userId, {
+        warehouseId: selectedWarehouse,
+        roleIds: [...selectedRoleIds],
+      });
+      // Optimistic: add to local list with warehouse info
+      const warehouse = warehouses.find((w) => w.id === selectedWarehouse);
+      if (warehouse) {
+        setAssignments((prev) => [
+          ...prev,
+          {
+            warehouseId: warehouse.id,
+            warehouseName: warehouse.name,
+            warehouseCode: warehouse.code,
+            permissions: [], // Will be populated on next server fetch
+          },
+        ]);
+      }
+      setAddOpen(false);
     } catch {
       setError(t("failedSaveAssignments"));
     } finally {
@@ -78,148 +98,130 @@ export function WarehouseAssignments({
 
   function handleOpenAdd() {
     setSelectedWarehouse("");
-    setSelectedPermissions([]);
+    setSelectedRoleIds(new Set());
     setError("");
     setAddOpen(true);
   }
 
-  async function handleAdd() {
-    if (!selectedWarehouse || selectedPermissions.length === 0) return;
-    const warehouse = warehouses.find((w) => w.id === selectedWarehouse);
-    if (!warehouse) return;
-
-    const newAssignment: UserWarehouseAssignment = {
-      warehouseId: warehouse.id,
-      warehouseName: warehouse.name,
-      warehouseCode: warehouse.code,
-      permissions: selectedPermissions,
-    };
-
-    const updated = [...assignments, newAssignment];
-    await saveAssignments(updated);
-    setAddOpen(false);
-  }
-
   function handleOpenEdit(index: number) {
     setEditIndex(index);
-    setEditPermissions([...assignments[index].permissions]);
+    setEditRoleIds(new Set());
     setError("");
   }
 
   async function handleSaveEdit() {
-    if (editIndex === null || editPermissions.length === 0) return;
-    const updated = assignments.map((a, i) =>
-      i === editIndex ? { ...a, permissions: editPermissions } : a,
-    );
-    await saveAssignments(updated);
-    setEditIndex(null);
+    if (editIndex === null || editRoleIds.size === 0) return;
+    const assignment = assignments[editIndex];
+    setSaving(true);
+    setError("");
+    try {
+      const { assignRolesToUserWarehouse } = await import(
+        "@/services/roles.service"
+      );
+      await assignRolesToUserWarehouse(userId, {
+        warehouseId: assignment.warehouseId,
+        roleIds: [...editRoleIds],
+      });
+      setEditIndex(null);
+    } catch {
+      setError(t("failedSaveAssignments"));
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleRemove() {
     if (removeIndex === null) return;
-    const updated = assignments.filter((_, i) => i !== removeIndex);
-    await saveAssignments(updated);
-    setRemoveIndex(null);
-  }
-
-  function togglePermission(
-    perm: WarehousePermission,
-    list: WarehousePermission[],
-    setList: (v: WarehousePermission[]) => void,
-  ) {
-    if (list.includes(perm)) {
-      setList(list.filter((p) => p !== perm));
-    } else {
-      setList([...list, perm]);
+    const assignment = assignments[removeIndex];
+    setSaving(true);
+    setError("");
+    try {
+      const { assignRolesToUserWarehouse } = await import(
+        "@/services/roles.service"
+      );
+      // Remove by assigning empty roles
+      await assignRolesToUserWarehouse(userId, {
+        warehouseId: assignment.warehouseId,
+        roleIds: [],
+      });
+      setAssignments((prev) => prev.filter((_, i) => i !== removeIndex));
+      setRemoveIndex(null);
+    } catch {
+      setError(t("failedSaveAssignments"));
+    } finally {
+      setSaving(false);
     }
   }
 
-  function toggleCategory(
-    category: PermissionCategory,
-    list: WarehousePermission[],
-    setList: (v: WarehousePermission[]) => void,
+  function toggleRole(
+    roleId: string,
+    current: Set<string>,
+    setter: (v: Set<string>) => void,
   ) {
-    const perms = PERMISSIONS_BY_CATEGORY[category];
-    const allSelected = perms.every((p) => list.includes(p));
-    if (allSelected) {
-      setList(list.filter((p) => !perms.includes(p)));
+    const next = new Set(current);
+    if (next.has(roleId)) {
+      next.delete(roleId);
     } else {
-      const merged = new Set([...list, ...perms]);
-      setList([...merged]);
+      next.add(roleId);
     }
+    setter(next);
   }
 
-  function PermissionCheckboxes({
-    permissions,
-    onChange,
-    onToggleCategory,
+  function RoleCheckboxes({
+    selected,
+    onToggle,
   }: {
-    permissions: WarehousePermission[];
-    onChange: (perm: WarehousePermission) => void;
-    onToggleCategory: (cat: PermissionCategory) => void;
+    selected: Set<string>;
+    onToggle: (roleId: string) => void;
   }) {
     return (
-      <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+      <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
         <label className="block text-body-sm font-medium text-dark dark:text-white">
-          {t("permissions")}
+          {t("selectRoles")}
         </label>
-        {CATEGORIES.map((cat) => {
-          const perms = PERMISSIONS_BY_CATEGORY[cat];
-          const selectedCount = perms.filter((p) =>
-            permissions.includes(p),
-          ).length;
-          const allSelected = selectedCount === perms.length;
-
-          return (
-            <div
-              key={cat}
-              className="rounded-lg border border-stroke p-3 dark:border-dark-3"
-            >
-              <label className="flex cursor-pointer items-center gap-2 mb-2">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  ref={(el) => {
-                    if (el) el.indeterminate = selectedCount > 0 && !allSelected;
-                  }}
-                  onChange={() => onToggleCategory(cat)}
-                  className="h-4 w-4 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
-                />
-                <span className="text-sm font-semibold text-dark dark:text-white">
-                  {t(`cat_${cat}`)}
-                </span>
-                <span className="ml-auto text-xs text-dark-6">
-                  {selectedCount}/{perms.length}
-                </span>
-              </label>
-              <div className="grid grid-cols-2 gap-1.5 pl-6">
-                {perms.map((perm) => (
-                  <label
-                    key={perm}
-                    className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-sm transition hover:bg-gray-2 dark:hover:bg-dark-3"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={permissions.includes(perm)}
-                      onChange={() => onChange(perm)}
-                      className="h-3.5 w-3.5 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
-                    />
-                    <span className="text-dark dark:text-white">
-                      {t(`perm_${perm}`)}
-                    </span>
-                  </label>
-                ))}
-              </div>
+        {roles.map((role) => (
+          <label
+            key={role.id}
+            className="flex cursor-pointer items-center gap-3 rounded-lg border border-stroke p-3 transition hover:bg-gray-2 dark:border-dark-3 dark:hover:bg-dark-3"
+          >
+            <input
+              type="checkbox"
+              checked={selected.has(role.id)}
+              onChange={() => onToggle(role.id)}
+              className="h-4 w-4 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
+            />
+            <div className="flex-1">
+              <span className="text-sm font-medium text-dark dark:text-white">
+                {translateRole(role)}
+              </span>
+              {role.description && (
+                <p className="text-xs text-dark-6">{role.description}</p>
+              )}
+              <span className="text-xs text-dark-6">
+                {role.permissionCount} {t("permissions").toLowerCase()}
+              </span>
             </div>
-          );
-        })}
+            {role.isSystem && (
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                {t("systemRole")}
+              </span>
+            )}
+          </label>
+        ))}
+        {roles.length === 0 && (
+          <p className="py-4 text-center text-body-sm text-dark-6">
+            {t("noRolesAvailable")}
+          </p>
+        )}
       </div>
     );
   }
 
   /** Group displayed permissions by category */
   function groupPermissions(perms: WarehousePermission[]) {
-    const grouped: Partial<Record<PermissionCategory, WarehousePermission[]>> = {};
+    const grouped: Partial<
+      Record<PermissionCategory, WarehousePermission[]>
+    > = {};
     for (const perm of perms) {
       for (const cat of CATEGORIES) {
         if (PERMISSIONS_BY_CATEGORY[cat].includes(perm)) {
@@ -294,7 +296,7 @@ export function WarehouseAssignments({
                       onClick={() => handleOpenEdit(index)}
                       className="text-body-sm text-primary hover:underline"
                     >
-                      {tCommon("edit")}
+                      {t("editRoles")}
                     </button>
                     <button
                       type="button"
@@ -305,25 +307,28 @@ export function WarehouseAssignments({
                     </button>
                   </div>
                 </div>
-                <div className="mt-3 space-y-2">
-                  {Object.entries(grouped).map(([cat, perms]) => (
-                    <div key={cat}>
-                      <span className="text-xs font-semibold uppercase text-dark-6">
-                        {t(`cat_${cat}`)}
-                      </span>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {perms!.map((perm) => (
-                          <span
-                            key={perm}
-                            className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
-                          >
-                            {t(`perm_${perm}`)}
-                          </span>
-                        ))}
+                {/* Derived permissions (read-only display) */}
+                {Object.keys(grouped).length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {Object.entries(grouped).map(([cat, perms]) => (
+                      <div key={cat}>
+                        <span className="text-xs font-semibold uppercase text-dark-6">
+                          {t(`cat_${cat}`)}
+                        </span>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {perms!.map((perm) => (
+                            <span
+                              key={perm}
+                              className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                            >
+                              {t(`perm_${perm}`)}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -349,23 +354,18 @@ export function WarehouseAssignments({
           searchPlaceholder={tCommon("search")}
           required
         />
-        <PermissionCheckboxes
-          permissions={selectedPermissions}
-          onChange={(perm) =>
-            togglePermission(perm, selectedPermissions, setSelectedPermissions)
-          }
-          onToggleCategory={(cat) =>
-            toggleCategory(cat, selectedPermissions, setSelectedPermissions)
-          }
+        <RoleCheckboxes
+          selected={selectedRoleIds}
+          onToggle={(id) => toggleRole(id, selectedRoleIds, setSelectedRoleIds)}
         />
       </FormDialog>
 
-      {/* Edit permissions dialog */}
+      {/* Edit roles dialog */}
       <FormDialog
         open={editIndex !== null}
         onClose={() => setEditIndex(null)}
         onSubmit={handleSaveEdit}
-        title={t("editPermissions")}
+        title={t("editRoles")}
         submitLabel={tCommon("save")}
         cancelLabel={tCommon("cancel")}
         loading={saving}
@@ -373,17 +373,12 @@ export function WarehouseAssignments({
         {editIndex !== null && (
           <>
             <p className="text-body-sm text-dark-6">
-              {assignments[editIndex]?.warehouseName} (
+              {t("rolesForWarehouse")}: {assignments[editIndex]?.warehouseName} (
               {assignments[editIndex]?.warehouseCode})
             </p>
-            <PermissionCheckboxes
-              permissions={editPermissions}
-              onChange={(perm) =>
-                togglePermission(perm, editPermissions, setEditPermissions)
-              }
-              onToggleCategory={(cat) =>
-                toggleCategory(cat, editPermissions, setEditPermissions)
-              }
+            <RoleCheckboxes
+              selected={editRoleIds}
+              onToggle={(id) => toggleRole(id, editRoleIds, setEditRoleIds)}
             />
           </>
         )}

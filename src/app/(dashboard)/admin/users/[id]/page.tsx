@@ -10,6 +10,7 @@ import { WarehouseAssignments } from "../_components/warehouse-assignments";
 import { StoreAssignments } from "../_components/store-assignments";
 import { getWarehouses } from "@/services/warehouses.server";
 import { getStores } from "@/services/stores.server";
+import { getActiveRoles } from "@/services/roles.server";
 
 export const metadata: Metadata = {
   title: "User Detail",
@@ -32,9 +33,10 @@ export default async function UserDetailPage({ params }: Props) {
   const showStores = user.role === "STORE_MANAGER";
   const showWarehouses = user.role === "WAREHOUSE_OPERATOR";
 
-  const [warehousesPage, storesPage] = await Promise.all([
+  const [warehousesPage, storesPage, activeRoles] = await Promise.all([
     showWarehouses ? getWarehouses(0, 200, true) : Promise.resolve(null),
     showStores ? getStores(0, 200, true) : Promise.resolve(null),
+    showWarehouses ? getActiveRoles() : Promise.resolve([]),
   ]);
 
   return (
@@ -109,6 +111,7 @@ export default async function UserDetailPage({ params }: Props) {
               userId={user.id}
               assignments={user.warehouseAssignments || []}
               warehouses={warehousesPage.content}
+              roles={activeRoles}
             />
           )}
 

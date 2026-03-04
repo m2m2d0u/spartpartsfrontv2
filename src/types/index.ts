@@ -13,3 +13,4 @@ export * from "./return";
 export * from "./user";
 export * from "./car";
 export * from "./stock";
+export * from "./role";

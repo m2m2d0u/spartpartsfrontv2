@@ -1,5 +1,13 @@
 type BadgeVariant = "success" | "warning" | "error" | "info" | "neutral";
 
+export function getRoleTypeVariant(isSystem: boolean): BadgeVariant {
+  return isSystem ? "info" : "warning";
+}
+
+export function getRoleStatusVariant(isActive: boolean): BadgeVariant {
+  return isActive ? "success" : "neutral";
+}
+
 export function getInvoiceStatusVariant(
   status: string,
 ): BadgeVariant {
