@@ -5,8 +5,13 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getWarehouseStatusVariant } from "@/lib/status-variants";
-import { getWarehouseById } from "@/services/warehouses.server";
+import {
+  getWarehouseById,
+  getWarehouseUsers,
+} from "@/services/warehouses.server";
+import { getUsers } from "@/services/users.server";
 import { PermissionGate } from "@/components/PermissionGate";
+import { UserAssignments } from "@/components/user-assignments";
 import { Permission } from "@/types";
 
 export const metadata: Metadata = {
@@ -19,9 +24,15 @@ type Props = {
 
 export default async function WarehouseDetailPage({ params }: Props) {
   const { id } = await params;
-  const warehouse = await getWarehouseById(id);
+  const [warehouse, warehouseUsers, allUsersPage] = await Promise.all([
+    getWarehouseById(id),
+    getWarehouseUsers(id),
+    getUsers(0, 200),
+  ]);
 
   if (!warehouse) notFound();
+
+  const allUsers = allUsersPage.content;
 
   const fullAddress = [
     warehouse.street,
@@ -139,7 +150,7 @@ export default async function WarehouseDetailPage({ params }: Props) {
         </div>
 
         {/* Stock summary placeholder */}
-        <div>
+        <div className="space-y-6">
           <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
             <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
               {t("stockSummary")}
@@ -159,6 +170,16 @@ export default async function WarehouseDetailPage({ params }: Props) {
               </div>
             </dl>
           </div>
+
+          {/* Assigned users */}
+          <UserAssignments
+            entityId={warehouse.id}
+            entityType="warehouse"
+            assignedUsers={warehouseUsers}
+            allUsers={allUsers}
+            assignPermission={Permission.WAREHOUSE_UPDATE}
+            unassignPermission={Permission.WAREHOUSE_UPDATE}
+          />
         </div>
       </div>
     </>

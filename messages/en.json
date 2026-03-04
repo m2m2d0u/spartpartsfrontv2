@@ -39,7 +39,15 @@
     "confirmDeleteTitle": "Confirm Deletion",
     "confirmDeleteCancel": "This action cannot be undone.",
     "status": "Status",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "assignedUsers": "Assigned Users",
+    "assignUser": "Assign User",
+    "assignUserTitle": "Assign a User",
+    "selectUser": "Select a user",
+    "unassignUserTitle": "Unassign User",
+    "unassignUserDescription": "This user will lose access to this location.",
+    "noAssignedUsers": "No users assigned.",
+    "failedUserAssignment": "Failed to update user assignment."
   },
   "nav": {
     "spareParts": "SPARE PARTS",

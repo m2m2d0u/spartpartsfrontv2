@@ -21,3 +21,17 @@ export async function updateWarehouse(
 export async function deleteWarehouse(id: string): Promise<void> {
   return apiDelete(`/warehouses/${id}`);
 }
+
+export async function assignUserToWarehouse(
+  warehouseId: string,
+  userId: string,
+): Promise<void> {
+  return apiPost(`/warehouses/${warehouseId}/users/${userId}`);
+}
+
+export async function unassignUserFromWarehouse(
+  warehouseId: string,
+  userId: string,
+): Promise<void> {
+  return apiDelete(`/warehouses/${warehouseId}/users/${userId}`);
+}

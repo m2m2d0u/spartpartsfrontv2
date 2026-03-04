@@ -19,3 +19,17 @@ export async function updateStore(
 export async function deleteStore(id: string): Promise<void> {
   return apiDelete(`/stores/${id}`);
 }
+
+export async function assignUserToStore(
+  storeId: string,
+  userId: string,
+): Promise<void> {
+  return apiPost(`/stores/${storeId}/users/${userId}`);
+}
+
+export async function unassignUserFromStore(
+  storeId: string,
+  userId: string,
+): Promise<void> {
+  return apiDelete(`/stores/${storeId}/users/${userId}`);
+}

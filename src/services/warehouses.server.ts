@@ -1,4 +1,4 @@
-import type { Warehouse, PagedResponse } from "@/types";
+import type { Warehouse, User, PagedResponse } from "@/types";
 import { serverGet } from "./server-api";
 
 export async function getWarehouses(
@@ -13,6 +13,12 @@ export async function getWarehouses(
 
 export async function getWarehouseById(id: string): Promise<Warehouse> {
   return serverGet<Warehouse>(`/warehouses/${id}`);
+}
+
+export async function getWarehouseUsers(
+  warehouseId: string,
+): Promise<User[]> {
+  return serverGet<User[]>(`/warehouses/${warehouseId}/users`);
 }
 
 export async function getWarehousesByStore(

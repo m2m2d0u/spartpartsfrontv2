@@ -39,7 +39,15 @@
     "confirmDeleteTitle": "Confirmer la suppression",
     "confirmDeleteCancel": "Cette action est irréversible.",
     "status": "Statut",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "assignedUsers": "Utilisateurs affectés",
+    "assignUser": "Affecter un utilisateur",
+    "assignUserTitle": "Affecter un utilisateur",
+    "selectUser": "Sélectionner un utilisateur",
+    "unassignUserTitle": "Retirer l'utilisateur",
+    "unassignUserDescription": "Cet utilisateur perdra l'accès à cet emplacement.",
+    "noAssignedUsers": "Aucun utilisateur affecté.",
+    "failedUserAssignment": "Échec de la mise à jour de l'affectation."
   },
   "nav": {
     "spareParts": "PIÈCES DÉTACHÉES",
