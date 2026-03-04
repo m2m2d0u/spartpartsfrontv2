@@ -7,7 +7,6 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { getStoreStatusVariant } from "@/lib/status-variants";
 import { getStoreById, getStoreUsers } from "@/services/stores.server";
 import { getWarehousesByStore } from "@/services/warehouses.server";
-import { getUsers } from "@/services/users.server";
 import { PermissionGate } from "@/components/PermissionGate";
 import { UserAssignments } from "@/components/user-assignments";
 import { Permission } from "@/types";
@@ -22,17 +21,15 @@ type Props = {
 
 export default async function StoreDetailPage({ params }: Props) {
   const { id } = await params;
-  const [store, warehousesPage, storeUsers, allUsersPage] = await Promise.all([
+  const [store, warehousesPage, storeUsers] = await Promise.all([
     getStoreById(id),
     getWarehousesByStore(id),
     getStoreUsers(id),
-    getUsers(0, 200),
   ]);
 
   if (!store) notFound();
 
   const warehouses = warehousesPage.content;
-  const allUsers = allUsersPage.content;
 
   const t = await getTranslations("stores");
   const tNav = await getTranslations("nav");
@@ -231,7 +228,6 @@ export default async function StoreDetailPage({ params }: Props) {
             entityId={store.id}
             entityType="store"
             assignedUsers={storeUsers}
-            allUsers={allUsers}
             assignPermission={Permission.STORE_UPDATE}
             unassignPermission={Permission.STORE_UPDATE}
           />

@@ -4,8 +4,9 @@ import type {
   UpdateUserRequest,
   UserWarehouseAssignmentRequest,
   UpdateUserStoresRequest,
+  PagedResponse,
 } from "@/types";
-import { apiPost, apiPut, apiDelete } from "./api-client";
+import { apiGet, apiPost, apiPut, apiDelete } from "./api-client";
 
 export async function createUser(data: CreateUserRequest): Promise<User> {
   return apiPost<User>("/users", data);
@@ -34,4 +35,11 @@ export async function updateUserStores(
   data: UpdateUserStoresRequest,
 ): Promise<User> {
   return apiPut<User>(`/users/${id}/stores`, data);
+}
+
+export async function searchUsers(query: string): Promise<User[]> {
+  const data = await apiGet<PagedResponse<User>>(
+    `/users/search?query=${encodeURIComponent(query)}&page=0&size=20`,
+  );
+  return data.content;
 }

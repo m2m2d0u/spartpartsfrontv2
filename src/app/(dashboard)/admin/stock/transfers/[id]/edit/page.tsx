@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getStockTransferById } from "@/services/stock-transfers.server";
-import { getWarehouses } from "@/services/warehouses.server";
+import { getWarehouseById } from "@/services/warehouses.server";
 import { getParts } from "@/services/parts.server";
 import { StockTransferForm } from "../../_components/stock-transfer-form";
 
@@ -17,13 +17,20 @@ type Props = {
 
 export default async function EditStockTransferPage({ params }: Props) {
   const { id } = await params;
-  const [transfer, warehousesPage, partsPage] = await Promise.all([
+  const [transfer, partsPage] = await Promise.all([
     getStockTransferById(id).catch(() => null),
-    getWarehouses(0, 200, true),
     getParts(0, 500),
   ]);
 
   if (!transfer || transfer.status !== "PENDING") notFound();
+
+  // Fetch the warehouses used in this transfer so selects display labels
+  const warehouseIds = [
+    ...new Set([transfer.sourceWarehouseId, transfer.destinationWarehouseId]),
+  ];
+  const initialWarehouses = await Promise.all(
+    warehouseIds.map((whId) => getWarehouseById(whId)),
+  );
 
   const t = await getTranslations("stockTransfers");
   const tNav = await getTranslations("nav");
@@ -52,9 +59,9 @@ export default async function EditStockTransferPage({ params }: Props) {
       />
 
       <StockTransferForm
-        warehouses={warehousesPage.content}
         parts={partOptions}
         transfer={transfer}
+        initialWarehouses={initialWarehouses}
       />
     </>
   );

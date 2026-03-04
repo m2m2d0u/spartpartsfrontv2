@@ -11,11 +11,8 @@ import {
 import { getUserById } from "@/services/users.server";
 import { WarehouseAssignments } from "../_components/warehouse-assignments";
 import { StoreAssignments } from "../_components/store-assignments";
-import { getWarehouses } from "@/services/warehouses.server";
-import { getStores } from "@/services/stores.server";
-import { getActiveRoles } from "@/services/roles.server";
 import { PermissionGate } from "@/components/PermissionGate";
-import { Permission, UserRole, UserRoleCode } from "@/types";
+import { Permission, UserRoleCode } from "@/types";
 
 export const metadata: Metadata = {
   title: "User Detail",
@@ -39,12 +36,6 @@ export default async function UserDetailPage({ params }: Props) {
   const showWarehouses =
     user.roleCode === UserRoleCode.OPERATEUR_ENTREPOT ||
     user.roleCode === UserRoleCode.RESPONSABLE_ENTREPOT;
-
-  const [warehousesPage, storesPage, activeRoles] = await Promise.all([
-    showWarehouses ? getWarehouses(0, 200, true) : Promise.resolve(null),
-    showStores ? getStores(0, 200, true) : Promise.resolve(null),
-    showWarehouses ? getActiveRoles() : Promise.resolve([]),
-  ]);
 
   return (
     <>
@@ -107,20 +98,17 @@ export default async function UserDetailPage({ params }: Props) {
 
         {/* Assignments based on role */}
         <div className="space-y-6 xl:col-span-2">
-          {showStores && storesPage && (
+          {showStores && (
             <StoreAssignments
               userId={user.id}
               assignments={user.stores || []}
-              stores={storesPage.content}
             />
           )}
 
-          {showWarehouses && warehousesPage && (
+          {showWarehouses && (
             <WarehouseAssignments
               userId={user.id}
               assignments={user.warehouseAssignments || []}
-              warehouses={warehousesPage.content}
-              roles={activeRoles}
             />
           )}
 

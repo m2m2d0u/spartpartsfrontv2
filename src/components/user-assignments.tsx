@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { SearchableSelect } from "@/components/FormElements/searchable-select";
 import { FormDialog } from "@/components/ui/form-dialog";
@@ -13,7 +13,6 @@ type Props = {
   entityId: string;
   entityType: "store" | "warehouse";
   assignedUsers: User[];
-  allUsers: User[];
   assignPermission: Permission;
   unassignPermission: Permission;
 };
@@ -22,7 +21,6 @@ export function UserAssignments({
   entityId,
   entityType,
   assignedUsers: initialUsers,
-  allUsers,
   assignPermission,
   unassignPermission,
 }: Props) {
@@ -34,26 +32,55 @@ export function UserAssignments({
   const [addOpen, setAddOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
 
+  // Search state
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [searching, setSearching] = useState(false);
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
   // Remove dialog
   const [removeUser, setRemoveUser] = useState<User | null>(null);
 
   const tCommon = useTranslations("common");
 
-  // Available users (not yet assigned)
   const assignedIds = new Set(users.map((u) => u.id));
-  const availableUsers = allUsers
+
+  const availableItems = searchResults
     .filter((u) => !assignedIds.has(u.id))
     .map((u) => ({ value: u.id, label: `${u.name} — ${u.email}` }));
 
+  const handleUserSearch = useCallback(
+    (term: string) => {
+      if (searchTimer.current) clearTimeout(searchTimer.current);
+      if (!term.trim()) {
+        setSearchResults([]);
+        return;
+      }
+      searchTimer.current = setTimeout(async () => {
+        setSearching(true);
+        try {
+          const { searchUsers } = await import("@/services/users.service");
+          const results = await searchUsers(term);
+          setSearchResults(results);
+        } catch {
+          // silent
+        } finally {
+          setSearching(false);
+        }
+      }, 300);
+    },
+    [],
+  );
+
   function handleOpenAdd() {
     setSelectedUserId("");
+    setSearchResults([]);
     setError("");
     setAddOpen(true);
   }
 
   async function handleAdd() {
     if (!selectedUserId) return;
-    const user = allUsers.find((u) => u.id === selectedUserId);
+    const user = searchResults.find((u) => u.id === selectedUserId);
     if (!user) return;
 
     setSaving(true);
@@ -115,7 +142,6 @@ export function UserAssignments({
           <button
             type="button"
             onClick={handleOpenAdd}
-            disabled={availableUsers.length === 0}
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
           >
             <svg
@@ -193,11 +219,13 @@ export function UserAssignments({
       >
         <SearchableSelect
           label={tCommon("selectUser")}
-          items={availableUsers}
+          items={availableItems}
           value={selectedUserId}
           onChange={setSelectedUserId}
           placeholder={tCommon("selectUser")}
           searchPlaceholder={tCommon("search")}
+          onSearch={handleUserSearch}
+          searching={searching}
           required
         />
       </FormDialog>

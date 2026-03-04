@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { SearchableSelect } from "@/components/FormElements/searchable-select";
 import { FormDialog } from "@/components/ui/form-dialog";
@@ -10,13 +10,11 @@ import type { Store, UserStoreAssignment } from "@/types";
 type Props = {
   userId: string;
   assignments: UserStoreAssignment[];
-  stores: Store[];
 };
 
 export function StoreAssignments({
   userId,
   assignments: initialAssignments,
-  stores,
 }: Props) {
   const [assignments, setAssignments] =
     useState<UserStoreAssignment[]>(initialAssignments);
@@ -27,27 +25,71 @@ export function StoreAssignments({
   const [addOpen, setAddOpen] = useState(false);
   const [selectedStore, setSelectedStore] = useState("");
 
+  // Search state
+  const [searchResults, setSearchResults] = useState<Store[]>([]);
+  const [searching, setSearching] = useState(false);
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
   // Remove dialog
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
   const t = useTranslations("users");
   const tCommon = useTranslations("common");
 
-  // Available stores (not yet assigned)
   const assignedStoreIds = new Set(assignments.map((a) => a.storeId));
-  const availableStores = stores
+
+  const availableItems = searchResults
     .filter((s) => !assignedStoreIds.has(s.id))
     .map((s) => ({ value: s.id, label: `${s.code} — ${s.name}` }));
 
-  async function saveAssignments(updated: UserStoreAssignment[]) {
+  const handleStoreSearch = useCallback((term: string) => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    if (!term.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    searchTimer.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const { searchStores } = await import("@/services/stores.service");
+        const results = await searchStores(term);
+        setSearchResults(results);
+      } catch {
+        // silent
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+  }, []);
+
+  function handleOpenAdd() {
+    setSelectedStore("");
+    setSearchResults([]);
+    setError("");
+    setAddOpen(true);
+  }
+
+  async function handleAdd() {
+    if (!selectedStore) return;
+    const store = searchResults.find((s) => s.id === selectedStore);
+    if (!store) return;
+
     setSaving(true);
     setError("");
     try {
-      const { updateUserStores } = await import("@/services/users.service");
-      await updateUserStores(userId, {
-        storeIds: updated.map((a) => a.storeId),
-      });
-      setAssignments(updated);
+      const { assignUserToStore } = await import("@/services/stores.service");
+      await assignUserToStore(store.id, userId);
+      setAssignments((prev) => [
+        ...prev,
+        {
+          id: "",
+          storeId: store.id,
+          storeName: store.name,
+          storeCode: store.code,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+      setAddOpen(false);
     } catch {
       setError(t("failedSaveStores"));
     } finally {
@@ -55,35 +97,23 @@ export function StoreAssignments({
     }
   }
 
-  function handleOpenAdd() {
-    setSelectedStore("");
-    setError("");
-    setAddOpen(true);
-  }
-
-  async function handleAdd() {
-    if (!selectedStore) return;
-    const store = stores.find((s) => s.id === selectedStore);
-    if (!store) return;
-
-    const newAssignment: UserStoreAssignment = {
-      id: "",
-      storeId: store.id,
-      storeName: store.name,
-      storeCode: store.code,
-      createdAt: new Date().toISOString(),
-    };
-
-    const updated = [...assignments, newAssignment];
-    await saveAssignments(updated);
-    setAddOpen(false);
-  }
-
   async function handleRemove() {
     if (removeIndex === null) return;
-    const updated = assignments.filter((_, i) => i !== removeIndex);
-    await saveAssignments(updated);
-    setRemoveIndex(null);
+    const assignment = assignments[removeIndex];
+    setSaving(true);
+    setError("");
+    try {
+      const { unassignUserFromStore } = await import(
+        "@/services/stores.service"
+      );
+      await unassignUserFromStore(assignment.storeId, userId);
+      setAssignments((prev) => prev.filter((_, i) => i !== removeIndex));
+      setRemoveIndex(null);
+    } catch {
+      setError(t("failedSaveStores"));
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -95,7 +125,6 @@ export function StoreAssignments({
         <button
           type="button"
           onClick={handleOpenAdd}
-          disabled={availableStores.length === 0}
           className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
         >
           <svg
@@ -165,11 +194,13 @@ export function StoreAssignments({
       >
         <SearchableSelect
           label={t("store")}
-          items={availableStores}
+          items={availableItems}
           value={selectedStore}
           onChange={setSelectedStore}
           placeholder={t("selectStore")}
           searchPlaceholder={tCommon("search")}
+          onSearch={handleStoreSearch}
+          searching={searching}
           required
         />
       </FormDialog>

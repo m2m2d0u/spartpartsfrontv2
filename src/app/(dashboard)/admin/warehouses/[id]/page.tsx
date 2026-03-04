@@ -9,7 +9,6 @@ import {
   getWarehouseById,
   getWarehouseUsers,
 } from "@/services/warehouses.server";
-import { getUsers } from "@/services/users.server";
 import { PermissionGate } from "@/components/PermissionGate";
 import { UserAssignments } from "@/components/user-assignments";
 import { Permission } from "@/types";
@@ -24,15 +23,12 @@ type Props = {
 
 export default async function WarehouseDetailPage({ params }: Props) {
   const { id } = await params;
-  const [warehouse, warehouseUsers, allUsersPage] = await Promise.all([
+  const [warehouse, warehouseUsers] = await Promise.all([
     getWarehouseById(id),
     getWarehouseUsers(id),
-    getUsers(0, 200),
   ]);
 
   if (!warehouse) notFound();
-
-  const allUsers = allUsersPage.content;
 
   const fullAddress = [
     warehouse.street,
@@ -176,7 +172,6 @@ export default async function WarehouseDetailPage({ params }: Props) {
             entityId={warehouse.id}
             entityType="warehouse"
             assignedUsers={warehouseUsers}
-            allUsers={allUsers}
             assignPermission={Permission.WAREHOUSE_UPDATE}
             unassignPermission={Permission.WAREHOUSE_UPDATE}
           />

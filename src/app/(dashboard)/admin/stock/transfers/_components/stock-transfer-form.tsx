@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useFormik } from "formik";
@@ -13,9 +13,10 @@ import type { Warehouse, StockTransfer } from "@/types";
 type PartOption = { id: string; name: string; partNumber: string };
 
 type Props = {
-  warehouses: Warehouse[];
   parts: PartOption[];
   transfer?: StockTransfer;
+  /** Pre-loaded warehouses for edit mode (so selected values display labels) */
+  initialWarehouses?: Warehouse[];
 };
 
 type TransferItemRow = {
@@ -23,7 +24,11 @@ type TransferItemRow = {
   quantity: string;
 };
 
-export function StockTransferForm({ warehouses, parts, transfer }: Props) {
+export function StockTransferForm({
+  parts,
+  transfer,
+  initialWarehouses = [],
+}: Props) {
   const router = useRouter();
   const t = useTranslations("stockTransfers");
   const tCommon = useTranslations("common");
@@ -38,7 +43,13 @@ export function StockTransferForm({ warehouses, parts, transfer }: Props) {
     })) || [{ partId: "", quantity: "" }],
   );
 
-  const warehouseItems = warehouses.map((w) => ({
+  // Warehouse search state
+  const [warehouseResults, setWarehouseResults] =
+    useState<Warehouse[]>(initialWarehouses);
+  const [searchingWarehouses, setSearchingWarehouses] = useState(false);
+  const warehouseSearchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const warehouseItems = warehouseResults.map((w) => ({
     value: w.id,
     label: `${w.name} (${w.code})`,
   }));
@@ -47,6 +58,29 @@ export function StockTransferForm({ warehouses, parts, transfer }: Props) {
     value: p.id,
     label: `${p.partNumber} — ${p.name}`,
   }));
+
+  const handleWarehouseSearch = useCallback((term: string) => {
+    if (warehouseSearchTimer.current)
+      clearTimeout(warehouseSearchTimer.current);
+    if (!term.trim()) {
+      setWarehouseResults([]);
+      return;
+    }
+    warehouseSearchTimer.current = setTimeout(async () => {
+      setSearchingWarehouses(true);
+      try {
+        const { searchWarehouses } = await import(
+          "@/services/warehouses.service"
+        );
+        const results = await searchWarehouses(term);
+        setWarehouseResults(results);
+      } catch {
+        // silent
+      } finally {
+        setSearchingWarehouses(false);
+      }
+    }, 300);
+  }, []);
 
   const formik = useFormik({
     initialValues: {
@@ -153,6 +187,8 @@ export function StockTransferForm({ warehouses, parts, transfer }: Props) {
             onBlur={() => formik.setFieldTouched("sourceWarehouseId")}
             placeholder={t("selectSourceWarehouse")}
             searchPlaceholder={tCommon("search")}
+            onSearch={handleWarehouseSearch}
+            searching={searchingWarehouses}
             required
             error={
               formik.touched.sourceWarehouseId
@@ -170,6 +206,8 @@ export function StockTransferForm({ warehouses, parts, transfer }: Props) {
             onBlur={() => formik.setFieldTouched("destinationWarehouseId")}
             placeholder={t("selectDestinationWarehouse")}
             searchPlaceholder={tCommon("search")}
+            onSearch={handleWarehouseSearch}
+            searching={searchingWarehouses}
             required
             error={
               formik.touched.destinationWarehouseId

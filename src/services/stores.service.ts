@@ -2,8 +2,9 @@ import type {
   Store,
   CreateStoreRequest,
   UpdateStoreRequest,
+  PagedResponse,
 } from "@/types";
-import { apiPost, apiPut, apiDelete } from "./api-client";
+import { apiGet, apiPost, apiPut, apiDelete } from "./api-client";
 
 export async function createStore(data: CreateStoreRequest): Promise<Store> {
   return apiPost<Store>("/stores", data);
@@ -32,4 +33,11 @@ export async function unassignUserFromStore(
   userId: string,
 ): Promise<void> {
   return apiDelete(`/stores/${storeId}/users/${userId}`);
+}
+
+export async function searchStores(query: string): Promise<Store[]> {
+  const data = await apiGet<PagedResponse<Store>>(
+    `/stores/search?query=${encodeURIComponent(query)}&page=0&size=20`,
+  );
+  return data.content;
 }

@@ -1,41 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { SearchableSelect } from "@/components/FormElements/searchable-select";
 import { FormDialog } from "@/components/ui/form-dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import type {
-  Warehouse,
-  UserWarehouseAssignment,
-  PermissionCategory,
-  Role,
-} from "@/types";
-import { type Permission } from "@/types";
-import { PERMISSIONS_BY_CATEGORY } from "@/types";
-
-const CATEGORIES = Object.keys(PERMISSIONS_BY_CATEGORY) as PermissionCategory[];
-
-/** Format "STOCK_VIEW" → "Stock View" */
-function formatPermCode(code: string) {
-  return code
-    .split("_")
-    .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
-    .join(" ");
-}
+import type { Warehouse, UserWarehouseAssignment } from "@/types";
 
 type Props = {
   userId: string;
   assignments: UserWarehouseAssignment[];
-  warehouses: Warehouse[];
-  roles: Role[];
 };
 
 export function WarehouseAssignments({
   userId,
   assignments: initialAssignments,
-  warehouses,
-  roles,
 }: Props) {
   const [assignments, setAssignments] =
     useState<UserWarehouseAssignment[]>(initialAssignments);
@@ -45,13 +24,11 @@ export function WarehouseAssignments({
   // Add warehouse dialog
   const [addOpen, setAddOpen] = useState(false);
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
-  const [selectedRoleIds, setSelectedRoleIds] = useState<Set<string>>(
-    new Set(),
-  );
 
-  // Edit roles dialog
-  const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [editRoleIds, setEditRoleIds] = useState<Set<string>>(new Set());
+  // Search state
+  const [searchResults, setSearchResults] = useState<Warehouse[]>([]);
+  const [searching, setSearching] = useState(false);
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Remove dialog
   const [removeIndex, setRemoveIndex] = useState<number | null>(null);
@@ -59,76 +36,63 @@ export function WarehouseAssignments({
   const t = useTranslations("users");
   const tCommon = useTranslations("common");
 
-  function translateRole(role: Role) {
-    return role.displayName;
-  }
-
-  // Available warehouses (not yet assigned)
   const assignedWarehouseIds = new Set(assignments.map((a) => a.warehouseId));
-  const availableWarehouses = warehouses
+
+  const availableItems = searchResults
     .filter((w) => !assignedWarehouseIds.has(w.id))
     .map((w) => ({ value: w.id, label: `${w.code} — ${w.name}` }));
 
-  async function handleAdd() {
-    if (!selectedWarehouse || selectedRoleIds.size === 0) return;
-    setSaving(true);
-    setError("");
-    try {
-      const { assignRolesToUserWarehouse } = await import(
-        "@/services/roles.service"
-      );
-      await assignRolesToUserWarehouse(userId, {
-        warehouseId: selectedWarehouse,
-        roleIds: [...selectedRoleIds],
-      });
-      // Optimistic: add to local list with warehouse info
-      const warehouse = warehouses.find((w) => w.id === selectedWarehouse);
-      if (warehouse) {
-        setAssignments((prev) => [
-          ...prev,
-          {
-            warehouseId: warehouse.id,
-            warehouseName: warehouse.name,
-            warehouseCode: warehouse.code,
-            permissions: [], // Will be populated on next server fetch
-          },
-        ]);
-      }
-      setAddOpen(false);
-    } catch {
-      setError(t("failedSaveAssignments"));
-    } finally {
-      setSaving(false);
+  const handleWarehouseSearch = useCallback((term: string) => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    if (!term.trim()) {
+      setSearchResults([]);
+      return;
     }
-  }
+    searchTimer.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const { searchWarehouses } = await import(
+          "@/services/warehouses.service"
+        );
+        const results = await searchWarehouses(term);
+        setSearchResults(results);
+      } catch {
+        // silent
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+  }, []);
 
   function handleOpenAdd() {
     setSelectedWarehouse("");
-    setSelectedRoleIds(new Set());
+    setSearchResults([]);
     setError("");
     setAddOpen(true);
   }
 
-  function handleOpenEdit(index: number) {
-    setEditIndex(index);
-    setEditRoleIds(new Set());
-    setError("");
-  }
+  async function handleAdd() {
+    if (!selectedWarehouse) return;
+    const warehouse = searchResults.find((w) => w.id === selectedWarehouse);
+    if (!warehouse) return;
 
-  async function handleSaveEdit() {
-    if (editIndex === null || editRoleIds.size === 0) return;
-    const assignment = assignments[editIndex];
     setSaving(true);
     setError("");
     try {
-      const { assignRolesToUserWarehouse } = await import(
-        "@/services/roles.service"
+      const { assignUserToWarehouse } = await import(
+        "@/services/warehouses.service"
       );
-      await assignRolesToUserWarehouse(userId, {
-        warehouseId: assignment.warehouseId,
-        roleIds: [...editRoleIds],
-      });
-      setEditIndex(null);
+      await assignUserToWarehouse(warehouse.id, userId);
+      setAssignments((prev) => [
+        ...prev,
+        {
+          warehouseId: warehouse.id,
+          warehouseName: warehouse.name,
+          warehouseCode: warehouse.code,
+          permissions: [],
+        },
+      ]);
+      setAddOpen(false);
     } catch {
       setError(t("failedSaveAssignments"));
     } finally {
@@ -142,14 +106,10 @@ export function WarehouseAssignments({
     setSaving(true);
     setError("");
     try {
-      const { assignRolesToUserWarehouse } = await import(
-        "@/services/roles.service"
+      const { unassignUserFromWarehouse } = await import(
+        "@/services/warehouses.service"
       );
-      // Remove by assigning empty roles
-      await assignRolesToUserWarehouse(userId, {
-        warehouseId: assignment.warehouseId,
-        roleIds: [],
-      });
+      await unassignUserFromWarehouse(assignment.warehouseId, userId);
       setAssignments((prev) => prev.filter((_, i) => i !== removeIndex));
       setRemoveIndex(null);
     } catch {
@@ -157,87 +117,6 @@ export function WarehouseAssignments({
     } finally {
       setSaving(false);
     }
-  }
-
-  function toggleRole(
-    roleId: string,
-    current: Set<string>,
-    setter: (v: Set<string>) => void,
-  ) {
-    const next = new Set(current);
-    if (next.has(roleId)) {
-      next.delete(roleId);
-    } else {
-      next.add(roleId);
-    }
-    setter(next);
-  }
-
-  function RoleCheckboxes({
-    selected,
-    onToggle,
-  }: {
-    selected: Set<string>;
-    onToggle: (roleId: string) => void;
-  }) {
-    return (
-      <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
-        <label className="block text-body-sm font-medium text-dark dark:text-white">
-          {t("selectRoles")}
-        </label>
-        {roles.map((role) => (
-          <label
-            key={role.id}
-            className="flex cursor-pointer items-center gap-3 rounded-lg border border-stroke p-3 transition hover:bg-gray-2 dark:border-dark-3 dark:hover:bg-dark-3"
-          >
-            <input
-              type="checkbox"
-              checked={selected.has(role.id)}
-              onChange={() => onToggle(role.id)}
-              className="h-4 w-4 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
-            />
-            <div className="flex-1">
-              <span className="text-sm font-medium text-dark dark:text-white">
-                {translateRole(role)}
-              </span>
-              {role.description && (
-                <p className="text-xs text-dark-6">{role.description}</p>
-              )}
-              <span className="text-xs text-dark-6">
-                {role.permissionCount} {t("permissions").toLowerCase()}
-              </span>
-            </div>
-            {role.isSystem && (
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                {t("systemRole")}
-              </span>
-            )}
-          </label>
-        ))}
-        {roles.length === 0 && (
-          <p className="py-4 text-center text-body-sm text-dark-6">
-            {t("noRolesAvailable")}
-          </p>
-        )}
-      </div>
-    );
-  }
-
-  /** Group displayed permissions by category */
-  function groupPermissions(perms: Permission[]) {
-    const grouped: Partial<
-      Record<PermissionCategory, Permission[]>
-    > = {};
-    for (const perm of perms) {
-      for (const cat of CATEGORIES) {
-        if (PERMISSIONS_BY_CATEGORY[cat].includes(perm)) {
-          if (!grouped[cat]) grouped[cat] = [];
-          grouped[cat]!.push(perm);
-          break;
-        }
-      }
-    }
-    return grouped;
   }
 
   return (
@@ -249,7 +128,6 @@ export function WarehouseAssignments({
         <button
           type="button"
           onClick={handleOpenAdd}
-          disabled={availableWarehouses.length === 0}
           className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
         >
           <svg
@@ -282,62 +160,28 @@ export function WarehouseAssignments({
         </p>
       ) : (
         <div className="space-y-3">
-          {assignments.map((assignment, index) => {
-            const grouped = groupPermissions(assignment.permissions);
-            return (
-              <div
-                key={assignment.warehouseId}
-                className="rounded-lg border border-stroke p-4 dark:border-dark-3"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="font-medium text-dark dark:text-white">
-                    {assignment.warehouseName}
-                    <span className="ml-2 text-body-sm text-dark-6">
-                      ({assignment.warehouseCode})
-                    </span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEdit(index)}
-                      className="text-body-sm text-primary hover:underline"
-                    >
-                      {t("editRoles")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setRemoveIndex(index)}
-                      className="text-body-sm text-red hover:underline"
-                    >
-                      {tCommon("remove")}
-                    </button>
-                  </div>
+          {assignments.map((assignment, index) => (
+            <div
+              key={assignment.warehouseId}
+              className="flex items-center justify-between rounded-lg border border-stroke p-4 dark:border-dark-3"
+            >
+              <div>
+                <div className="font-medium text-dark dark:text-white">
+                  {assignment.warehouseName}
+                  <span className="ml-2 text-body-sm text-dark-6">
+                    ({assignment.warehouseCode})
+                  </span>
                 </div>
-                {/* Derived permissions (read-only display) */}
-                {Object.keys(grouped).length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    {Object.entries(grouped).map(([cat, perms]) => (
-                      <div key={cat}>
-                        <span className="text-xs font-semibold uppercase text-dark-6">
-                          {formatPermCode(cat)}
-                        </span>
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {perms!.map((perm) => (
-                            <span
-                              key={perm}
-                              className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
-                            >
-                              {formatPermCode(perm)}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
-            );
-          })}
+              <button
+                type="button"
+                onClick={() => setRemoveIndex(index)}
+                className="text-body-sm text-red hover:underline"
+              >
+                {tCommon("remove")}
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -353,41 +197,15 @@ export function WarehouseAssignments({
       >
         <SearchableSelect
           label={t("warehouse")}
-          items={availableWarehouses}
+          items={availableItems}
           value={selectedWarehouse}
           onChange={setSelectedWarehouse}
           placeholder={t("selectWarehouse")}
           searchPlaceholder={tCommon("search")}
+          onSearch={handleWarehouseSearch}
+          searching={searching}
           required
         />
-        <RoleCheckboxes
-          selected={selectedRoleIds}
-          onToggle={(id) => toggleRole(id, selectedRoleIds, setSelectedRoleIds)}
-        />
-      </FormDialog>
-
-      {/* Edit roles dialog */}
-      <FormDialog
-        open={editIndex !== null}
-        onClose={() => setEditIndex(null)}
-        onSubmit={handleSaveEdit}
-        title={t("editRoles")}
-        submitLabel={tCommon("save")}
-        cancelLabel={tCommon("cancel")}
-        loading={saving}
-      >
-        {editIndex !== null && (
-          <>
-            <p className="text-body-sm text-dark-6">
-              {t("rolesForWarehouse")}: {assignments[editIndex]?.warehouseName} (
-              {assignments[editIndex]?.warehouseCode})
-            </p>
-            <RoleCheckboxes
-              selected={editRoleIds}
-              onToggle={(id) => toggleRole(id, editRoleIds, setEditRoleIds)}
-            />
-          </>
-        )}
       </FormDialog>
 
       {/* Remove confirmation */}

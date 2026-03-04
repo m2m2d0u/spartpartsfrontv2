@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
-import { getWarehouses } from "@/services/warehouses.server";
 import { getParts } from "@/services/parts.server";
 import { StockTransferForm } from "../_components/stock-transfer-form";
 
@@ -10,10 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewStockTransferPage() {
-  const [warehousesPage, partsPage] = await Promise.all([
-    getWarehouses(0, 200, true),
-    getParts(0, 500),
-  ]);
+  const partsPage = await getParts(0, 500);
 
   const t = await getTranslations("stockTransfers");
   const tNav = await getTranslations("nav");
@@ -36,10 +32,7 @@ export default async function NewStockTransferPage() {
         ]}
       />
 
-      <StockTransferForm
-        warehouses={warehousesPage.content}
-        parts={partOptions}
-      />
+      <StockTransferForm parts={partOptions} />
     </>
   );
 }

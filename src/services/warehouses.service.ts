@@ -2,8 +2,9 @@ import type {
   Warehouse,
   CreateWarehouseRequest,
   UpdateWarehouseRequest,
+  PagedResponse,
 } from "@/types";
-import { apiPost, apiPut, apiDelete } from "./api-client";
+import { apiGet, apiPost, apiPut, apiDelete } from "./api-client";
 
 export async function createWarehouse(
   data: CreateWarehouseRequest,
@@ -34,4 +35,11 @@ export async function unassignUserFromWarehouse(
   userId: string,
 ): Promise<void> {
   return apiDelete(`/warehouses/${warehouseId}/users/${userId}`);
+}
+
+export async function searchWarehouses(query: string): Promise<Warehouse[]> {
+  const data = await apiGet<PagedResponse<Warehouse>>(
+    `/warehouses/search?query=${encodeURIComponent(query)}&page=0&size=20`,
+  );
+  return data.content;
 }
