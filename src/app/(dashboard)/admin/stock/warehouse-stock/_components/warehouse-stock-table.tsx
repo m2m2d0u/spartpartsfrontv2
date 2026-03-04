@@ -24,6 +24,7 @@ export function WarehouseStockTable({ warehouses }: Props) {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [editItem, setEditItem] = useState<WarehouseStock | null>(null);
+  const [editQuantity, setEditQuantity] = useState("");
   const [minStockValue, setMinStockValue] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -73,6 +74,7 @@ export function WarehouseStockTable({ warehouses }: Props) {
 
   function handleEditMinStock(item: WarehouseStock) {
     setEditItem(item);
+    setEditQuantity(String(item.quantity));
     setMinStockValue(String(item.minStockLevel));
   }
 
@@ -83,12 +85,13 @@ export function WarehouseStockTable({ warehouses }: Props) {
       "@/services/warehouse-stock.service"
     );
     await updateWarehouseStock(editItem.id, {
+      quantity: Number(editQuantity),
       minStockLevel: Number(minStockValue),
     });
     setStockItems((prev) =>
       prev.map((item) =>
         item.id === editItem.id
-          ? { ...item, minStockLevel: Number(minStockValue) }
+          ? { ...item, quantity: Number(editQuantity), minStockLevel: Number(minStockValue) }
           : item,
       ),
     );
@@ -306,11 +309,19 @@ export function WarehouseStockTable({ warehouses }: Props) {
         open={!!editItem}
         onClose={() => setEditItem(null)}
         onSubmit={handleSaveMinStock}
-        title={t("editMinStockLevel")}
+        title={t("editStock")}
         submitLabel={tCommon("save")}
         cancelLabel={tCommon("cancel")}
         loading={saving}
       >
+        <InputGroup
+          label={t("quantity")}
+          type="number"
+          placeholder="0"
+          value={editQuantity}
+          handleChange={(e) => setEditQuantity(e.target.value)}
+          required
+        />
         <InputGroup
           label={t("minStockLevel")}
           type="number"

@@ -59,7 +59,7 @@ export function WarehousesTable({
         <Link
           href={
             hasPermission(Permission.WAREHOUSE_UPDATE)
-              ? `/admin/warehouses/${row.id}/edit`
+              ? `/admin/warehouses/${row.id}`
               : `/admin/warehouses`
           }
           className="font-medium text-dark hover:text-primary dark:text-white"

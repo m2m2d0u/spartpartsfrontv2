@@ -50,7 +50,7 @@ export function StoresTable({ stores: initialStores }: Props) {
         <Link
           href={
             hasPermission(Permission.STORE_UPDATE)
-              ? `/admin/stores/${row.id}/edit`
+              ? `/admin/stores/${row.id}`
               : `/admin/stores`
           }
           className="font-medium text-dark hover:text-primary dark:text-white"

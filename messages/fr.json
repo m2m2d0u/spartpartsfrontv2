@@ -322,6 +322,7 @@
     "inStock": "En stock",
     "lowStock": "Stock bas",
     "editMinStockLevel": "Modifier le niveau min. de stock",
+    "editStock": "Modifier le stock",
     "searchStock": "Rechercher dans le stock...",
     "noStock": "Aucun stock trouvé",
     "noStockDescription": "Aucun article en stock dans cet entrepôt",

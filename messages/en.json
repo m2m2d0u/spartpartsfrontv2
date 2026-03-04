@@ -322,6 +322,7 @@
     "inStock": "In Stock",
     "lowStock": "Low Stock",
     "editMinStockLevel": "Edit Min Stock Level",
+    "editStock": "Edit Stock",
     "searchStock": "Search stock...",
     "noStock": "No stock found",
     "noStockDescription": "No stock items in this warehouse",
