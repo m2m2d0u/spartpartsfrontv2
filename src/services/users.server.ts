@@ -1,10 +1,10 @@
-import type { User, PagedResponse, UserRole } from "@/types";
+import type { User, PagedResponse } from "@/types";
 import { serverGet } from "./server-api";
 
 export async function getUsers(
   page = 0,
   size = 50,
-  role?: UserRole,
+  role?: string,
   isActive?: boolean,
 ): Promise<PagedResponse<User>> {
   let path = `/users?page=${page}&size=${size}`;

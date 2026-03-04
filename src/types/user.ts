@@ -1,4 +1,25 @@
-export type UserRole = "ADMIN" | "STORE_MANAGER" | "WAREHOUSE_OPERATOR";
+export type UserRole =
+  | "ADMINISTRATEUR"
+  | "RESPONSABLE_MAGASIN"
+  | "OPERATEUR_ENTREPOT"
+  | "RESPONSABLE_ENTREPOT"
+  | "MAGASINIER"
+  | "GESTIONNAIRE_COMMANDES"
+  | "RESPONSABLE_ACHATS"
+  | "COMPTABLE"
+  | "OBSERVATEUR_ENTREPOT";
+
+export enum UserRoleCode {
+  ADMINISTRATEUR = "ADMINISTRATEUR",
+  RESPONSABLE_MAGASIN = "RESPONSABLE_MAGASIN",
+  OPERATEUR_ENTREPOT = "OPERATEUR_ENTREPOT",
+  RESPONSABLE_ENTREPOT = "RESPONSABLE_ENTREPOT",
+  MAGASINIER = "MAGASINIER",
+  GESTIONNAIRE_COMMANDES = "GESTIONNAIRE_COMMANDES",
+  RESPONSABLE_ACHATS = "RESPONSABLE_ACHATS",
+  COMPTABLE = "COMPTABLE",
+  OBSERVATEUR_ENTREPOT = "OBSERVATEUR_ENTREPOT",
+}
 
 export enum Permission {
   // Stock
@@ -74,6 +95,22 @@ export enum Permission {
   // Settings
   SETTINGS_VIEW = "SETTINGS_VIEW",
   SETTINGS_UPDATE = "SETTINGS_UPDATE",
+  // System
+  USER_VIEW = "USER_VIEW",
+  USER_CREATE = "USER_CREATE",
+  USER_UPDATE = "USER_UPDATE",
+  USER_DELETE = "USER_DELETE",
+  STORE_CREATE = "STORE_CREATE",
+  STORE_UPDATE = "STORE_UPDATE",
+  STORE_DELETE = "STORE_DELETE",
+  WAREHOUSE_CREATE = "WAREHOUSE_CREATE",
+  WAREHOUSE_UPDATE = "WAREHOUSE_UPDATE",
+  WAREHOUSE_DELETE = "WAREHOUSE_DELETE",
+  ROLE_VIEW = "ROLE_VIEW",
+  ROLE_CREATE = "ROLE_CREATE",
+  ROLE_UPDATE = "ROLE_UPDATE",
+  ROLE_DELETE = "ROLE_DELETE",
+  PERMISSION_VIEW = "PERMISSION_VIEW",
 }
 
 export type PermissionCategory =
@@ -86,24 +123,110 @@ export type PermissionCategory =
   | "REPORT"
   | "CUSTOMER"
   | "PART"
-  | "SETTINGS";
+  | "SETTINGS"
+  | "SYSTEM";
 
 /** Permission grouped by category for UI rendering */
-export const PERMISSIONS_BY_CATEGORY: Record<
-  PermissionCategory,
-  Permission[]
-> = {
-  STOCK: [Permission.STOCK_VIEW, Permission.STOCK_CREATE, Permission.STOCK_UPDATE, Permission.STOCK_ADJUST, Permission.STOCK_DELETE, Permission.STOCK_EXPORT],
-  ORDER: [Permission.ORDER_VIEW, Permission.ORDER_CREATE, Permission.ORDER_UPDATE, Permission.ORDER_DELETE, Permission.ORDER_APPROVE, Permission.ORDER_FULFILL, Permission.ORDER_EXPORT],
-  INVOICE: [Permission.INVOICE_VIEW, Permission.INVOICE_CREATE, Permission.INVOICE_UPDATE, Permission.INVOICE_DELETE, Permission.INVOICE_SEND, Permission.INVOICE_PRINT, Permission.INVOICE_PAYMENT, Permission.INVOICE_EXPORT],
-  PROCUREMENT: [Permission.PROCUREMENT_VIEW, Permission.PROCUREMENT_CREATE, Permission.PROCUREMENT_UPDATE, Permission.PROCUREMENT_DELETE, Permission.PROCUREMENT_APPROVE, Permission.PROCUREMENT_RECEIVE, Permission.PROCUREMENT_EXPORT],
-  TRANSFER: [Permission.TRANSFER_VIEW, Permission.TRANSFER_CREATE, Permission.TRANSFER_UPDATE, Permission.TRANSFER_DELETE, Permission.TRANSFER_APPROVE, Permission.TRANSFER_SEND, Permission.TRANSFER_RECEIVE, Permission.TRANSFER_EXPORT],
-  RETURN: [Permission.RETURN_VIEW, Permission.RETURN_CREATE, Permission.RETURN_UPDATE, Permission.RETURN_DELETE, Permission.RETURN_APPROVE, Permission.RETURN_REFUND, Permission.RETURN_RESTOCK, Permission.RETURN_EXPORT],
-  REPORT: [Permission.REPORT_VIEW, Permission.REPORT_EXPORT, Permission.REPORT_SALES, Permission.REPORT_INVENTORY, Permission.REPORT_FINANCIAL],
-  CUSTOMER: [Permission.CUSTOMER_VIEW, Permission.CUSTOMER_CREATE, Permission.CUSTOMER_UPDATE, Permission.CUSTOMER_DELETE, Permission.CUSTOMER_EXPORT],
-  PART: [Permission.PART_VIEW, Permission.PART_CREATE, Permission.PART_UPDATE, Permission.PART_DELETE, Permission.PART_EXPORT, Permission.PART_IMPORT, Permission.PART_PRICING],
-  SETTINGS: [Permission.SETTINGS_VIEW, Permission.SETTINGS_UPDATE],
-};
+export const PERMISSIONS_BY_CATEGORY: Record<PermissionCategory, Permission[]> =
+  {
+    STOCK: [
+      Permission.STOCK_VIEW,
+      Permission.STOCK_CREATE,
+      Permission.STOCK_UPDATE,
+      Permission.STOCK_ADJUST,
+      Permission.STOCK_DELETE,
+      Permission.STOCK_EXPORT,
+    ],
+    ORDER: [
+      Permission.ORDER_VIEW,
+      Permission.ORDER_CREATE,
+      Permission.ORDER_UPDATE,
+      Permission.ORDER_DELETE,
+      Permission.ORDER_APPROVE,
+      Permission.ORDER_FULFILL,
+      Permission.ORDER_EXPORT,
+    ],
+    INVOICE: [
+      Permission.INVOICE_VIEW,
+      Permission.INVOICE_CREATE,
+      Permission.INVOICE_UPDATE,
+      Permission.INVOICE_DELETE,
+      Permission.INVOICE_SEND,
+      Permission.INVOICE_PRINT,
+      Permission.INVOICE_PAYMENT,
+      Permission.INVOICE_EXPORT,
+    ],
+    PROCUREMENT: [
+      Permission.PROCUREMENT_VIEW,
+      Permission.PROCUREMENT_CREATE,
+      Permission.PROCUREMENT_UPDATE,
+      Permission.PROCUREMENT_DELETE,
+      Permission.PROCUREMENT_APPROVE,
+      Permission.PROCUREMENT_RECEIVE,
+      Permission.PROCUREMENT_EXPORT,
+    ],
+    TRANSFER: [
+      Permission.TRANSFER_VIEW,
+      Permission.TRANSFER_CREATE,
+      Permission.TRANSFER_UPDATE,
+      Permission.TRANSFER_DELETE,
+      Permission.TRANSFER_APPROVE,
+      Permission.TRANSFER_SEND,
+      Permission.TRANSFER_RECEIVE,
+      Permission.TRANSFER_EXPORT,
+    ],
+    RETURN: [
+      Permission.RETURN_VIEW,
+      Permission.RETURN_CREATE,
+      Permission.RETURN_UPDATE,
+      Permission.RETURN_DELETE,
+      Permission.RETURN_APPROVE,
+      Permission.RETURN_REFUND,
+      Permission.RETURN_RESTOCK,
+      Permission.RETURN_EXPORT,
+    ],
+    REPORT: [
+      Permission.REPORT_VIEW,
+      Permission.REPORT_EXPORT,
+      Permission.REPORT_SALES,
+      Permission.REPORT_INVENTORY,
+      Permission.REPORT_FINANCIAL,
+    ],
+    CUSTOMER: [
+      Permission.CUSTOMER_VIEW,
+      Permission.CUSTOMER_CREATE,
+      Permission.CUSTOMER_UPDATE,
+      Permission.CUSTOMER_DELETE,
+      Permission.CUSTOMER_EXPORT,
+    ],
+    PART: [
+      Permission.PART_VIEW,
+      Permission.PART_CREATE,
+      Permission.PART_UPDATE,
+      Permission.PART_DELETE,
+      Permission.PART_EXPORT,
+      Permission.PART_IMPORT,
+      Permission.PART_PRICING,
+    ],
+    SETTINGS: [Permission.SETTINGS_VIEW, Permission.SETTINGS_UPDATE],
+    SYSTEM: [
+      Permission.USER_VIEW,
+      Permission.USER_CREATE,
+      Permission.USER_UPDATE,
+      Permission.USER_DELETE,
+      Permission.STORE_CREATE,
+      Permission.STORE_UPDATE,
+      Permission.STORE_DELETE,
+      Permission.WAREHOUSE_CREATE,
+      Permission.WAREHOUSE_UPDATE,
+      Permission.WAREHOUSE_DELETE,
+      Permission.ROLE_VIEW,
+      Permission.ROLE_CREATE,
+      Permission.ROLE_UPDATE,
+      Permission.ROLE_DELETE,
+      Permission.PERMISSION_VIEW,
+    ],
+  };
 
 export type UserWarehouseAssignment = {
   warehouseId: string;
@@ -126,7 +249,8 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
+  roleCode: UserRole;
+  roleDisplayName?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -139,14 +263,14 @@ export type CreateUserRequest = {
   name: string;
   email: string;
   password: string;
-  role: UserRole;
+  roleCode: string;
 };
 
 /** Mirrors backend UpdateUserRequest */
 export type UpdateUserRequest = {
   name: string;
   email: string;
-  role: UserRole;
+  roleCode: string;
   isActive: boolean;
 };
 

@@ -16,6 +16,14 @@ import { PERMISSIONS_BY_CATEGORY } from "@/types";
 
 const CATEGORIES = Object.keys(PERMISSIONS_BY_CATEGORY) as PermissionCategory[];
 
+/** Format "STOCK_VIEW" → "Stock View" */
+function formatPermCode(code: string) {
+  return code
+    .split("_")
+    .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
 type Props = {
   userId: string;
   assignments: UserWarehouseAssignment[];
@@ -50,11 +58,9 @@ export function WarehouseAssignments({
 
   const t = useTranslations("users");
   const tCommon = useTranslations("common");
-  const tRoles = useTranslations("roles");
 
   function translateRole(role: Role) {
-    const key = `role_${role.code}` as Parameters<typeof tRoles>[0];
-    return tRoles.has(key) ? tRoles(key) : role.displayName;
+    return role.displayName;
   }
 
   // Available warehouses (not yet assigned)
@@ -313,7 +319,7 @@ export function WarehouseAssignments({
                     {Object.entries(grouped).map(([cat, perms]) => (
                       <div key={cat}>
                         <span className="text-xs font-semibold uppercase text-dark-6">
-                          {t(`cat_${cat}`)}
+                          {formatPermCode(cat)}
                         </span>
                         <div className="mt-1 flex flex-wrap gap-1">
                           {perms!.map((perm) => (
@@ -321,7 +327,7 @@ export function WarehouseAssignments({
                               key={perm}
                               className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
                             >
-                              {t(`perm_${perm}`)}
+                              {formatPermCode(perm)}
                             </span>
                           ))}
                         </div>

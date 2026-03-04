@@ -6,6 +6,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { DataTableSkeleton } from "@/components/DataTable/skeleton";
 import { getWarehouses } from "@/services/warehouses.server";
 import { getStores } from "@/services/stores.server";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import { WarehousesTable } from "./_components/warehouses-table";
 
 export const metadata: Metadata = {
@@ -38,12 +40,14 @@ export default async function WarehousesPage() {
           { label: tNav("warehouses") },
         ]}
         actions={
-          <Link
-            href="/admin/warehouses/new"
-            className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            {t("addWarehouse")}
-          </Link>
+          <PermissionGate permission={Permission.WAREHOUSE_CREATE}>
+            <Link
+              href="/admin/warehouses/new"
+              className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              {t("addWarehouse")}
+            </Link>
+          </PermissionGate>
         }
       />
 

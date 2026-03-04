@@ -7,6 +7,8 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { getStoreStatusVariant } from "@/lib/status-variants";
 import { getStoreById } from "@/services/stores.server";
 import { getWarehousesByStore } from "@/services/warehouses.server";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 
 export const metadata: Metadata = {
   title: "Store Detail",
@@ -42,20 +44,22 @@ export default async function StoreDetailPage({ params }: Props) {
           { label: store.name },
         ]}
         actions={
-          <div className="flex items-center gap-3">
-            <Link
-              href={`/admin/stores/${store.id}/settings`}
-              className="rounded-lg border border-stroke px-5 py-2.5 text-sm font-medium text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white dark:hover:bg-dark-2"
-            >
-              {t("storeSettings")}
-            </Link>
-            <Link
-              href={`/admin/stores/${store.id}/edit`}
-              className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-            >
-              {t("editStore")}
-            </Link>
-          </div>
+          <PermissionGate permission={Permission.STORE_UPDATE}>
+            <div className="flex items-center gap-3">
+              <Link
+                href={`/admin/stores/${store.id}/settings`}
+                className="rounded-lg border border-stroke px-5 py-2.5 text-sm font-medium text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white dark:hover:bg-dark-2"
+              >
+                {t("storeSettings")}
+              </Link>
+              <Link
+                href={`/admin/stores/${store.id}/edit`}
+                className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+              >
+                {t("editStore")}
+              </Link>
+            </div>
+          </PermissionGate>
         }
       />
 
@@ -176,12 +180,14 @@ export default async function StoreDetailPage({ params }: Props) {
               <h3 className="text-lg font-semibold text-dark dark:text-white">
                 {tNav("warehouses")}
               </h3>
-              <Link
-                href={`/admin/warehouses/new?storeId=${store.id}`}
-                className="text-body-sm text-primary hover:underline"
-              >
-                {tCommon("add")}
-              </Link>
+              <PermissionGate permission={Permission.WAREHOUSE_CREATE}>
+                <Link
+                  href={`/admin/warehouses/new?storeId=${store.id}`}
+                  className="text-body-sm text-primary hover:underline"
+                >
+                  {tCommon("add")}
+                </Link>
+              </PermissionGate>
             </div>
             {warehouses.length === 0 ? (
               <p className="text-body-sm text-dark-6">

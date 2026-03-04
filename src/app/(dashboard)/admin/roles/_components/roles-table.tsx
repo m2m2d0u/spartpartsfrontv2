@@ -7,6 +7,8 @@ import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getRoleStatusVariant, getRoleTypeVariant } from "@/lib/status-variants";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import type { Role } from "@/types";
 
 type Props = {
@@ -25,8 +27,7 @@ export function RolesTable({ roles: initialRoles }: Props) {
   const tCommon = useTranslations("common");
 
   function translateRole(role: Role) {
-    const key = `role_${role.code}` as Parameters<typeof t>[0];
-    return t.has(key) ? t(key) : role.displayName;
+    return role.displayName;
   }
 
   const filtered = roles.filter((r) => {
@@ -110,21 +111,25 @@ export function RolesTable({ roles: initialRoles }: Props) {
           >
             {tCommon("view")}
           </Link>
-          <Link
-            href={`/admin/roles/${row.id}/edit`}
-            className="text-body-sm text-primary hover:underline"
-          >
-            {tCommon("edit")}
-          </Link>
-          {!row.isSystem && (
-            <button
-              type="button"
-              onClick={() => setDeleteId(row.id)}
-              className="text-body-sm text-red hover:underline"
+          <PermissionGate permission={Permission.ROLE_UPDATE}>
+            <Link
+              href={`/admin/roles/${row.id}/edit`}
+              className="text-body-sm text-primary hover:underline"
             >
-              {t("deleteRole")}
-            </button>
-          )}
+              {tCommon("edit")}
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission={Permission.ROLE_DELETE}>
+            {!row.isSystem && (
+              <button
+                type="button"
+                onClick={() => setDeleteId(row.id)}
+                className="text-body-sm text-red hover:underline"
+              >
+                {t("deleteRole")}
+              </button>
+            )}
+          </PermissionGate>
         </div>
       ),
       className: "text-right",

@@ -119,12 +119,21 @@ export function getUserStatusVariant(isActive: boolean): BadgeVariant {
 
 export function getUserRoleVariant(role: string): BadgeVariant {
   switch (role) {
-    case "ADMIN":
+    case "ADMINISTRATEUR":
       return "error";
-    case "STORE_MANAGER":
+    case "RESPONSABLE_MAGASIN":
       return "info";
-    case "WAREHOUSE_OPERATOR":
+    case "OPERATEUR_ENTREPOT":
+    case "RESPONSABLE_ENTREPOT":
       return "warning";
+    case "MAGASINIER":
+    case "GESTIONNAIRE_COMMANDES":
+    case "RESPONSABLE_ACHATS":
+      return "success";
+    case "COMPTABLE":
+      return "info";
+    case "OBSERVATEUR_ENTREPOT":
+      return "neutral";
     default:
       return "neutral";
   }

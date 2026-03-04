@@ -41,16 +41,12 @@ export function RolePermissions({
   const [success, setSuccess] = useState("");
   const t = useTranslations("roles");
   const tCommon = useTranslations("common");
-  const tUsers = useTranslations("users");
-
   function translatePerm(perm: PermissionInfo) {
-    const key = `perm_${perm.code}` as Parameters<typeof tUsers>[0];
-    return tUsers.has(key) ? tUsers(key) : perm.displayName;
+    return perm.displayName;
   }
 
   function translateCategory(cat: PermissionCategoryGroup) {
-    const key = `cat_${cat.code}` as Parameters<typeof tUsers>[0];
-    return tUsers.has(key) ? tUsers(key) : cat.displayName;
+    return cat.displayName;
   }
 
   function translateLevel(perm: PermissionInfo) {

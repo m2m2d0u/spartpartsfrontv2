@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getUserById } from "@/services/users.server";
+import { getActiveRoles } from "@/services/roles.server";
 import { UserForm } from "../../_components/user-form";
 
 export const metadata: Metadata = {
@@ -15,7 +16,10 @@ type Props = {
 
 export default async function EditUserPage({ params }: Props) {
   const { id } = await params;
-  const user = await getUserById(id);
+  const [user, roles] = await Promise.all([
+    getUserById(id),
+    getActiveRoles(),
+  ]);
 
   if (!user) notFound();
 
@@ -34,7 +38,7 @@ export default async function EditUserPage({ params }: Props) {
         ]}
       />
 
-      <UserForm user={user} />
+      <UserForm user={user} roles={roles} />
     </>
   );
 }

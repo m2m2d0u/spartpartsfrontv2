@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
+import { getActiveRoles } from "@/services/roles.server";
 import { UserForm } from "../_components/user-form";
 
 export const metadata: Metadata = {
@@ -8,8 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default async function NewUserPage() {
-  const t = await getTranslations("users");
-  const tNav = await getTranslations("nav");
+  const [t, tNav, roles] = await Promise.all([
+    getTranslations("users"),
+    getTranslations("nav"),
+    getActiveRoles(),
+  ]);
 
   return (
     <>
@@ -22,7 +26,7 @@ export default async function NewUserPage() {
         ]}
       />
 
-      <UserForm />
+      <UserForm roles={roles} />
     </>
   );
 }

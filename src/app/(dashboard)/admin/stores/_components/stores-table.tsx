@@ -7,6 +7,8 @@ import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getStoreStatusVariant } from "@/lib/status-variants";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import type { Store } from "@/types";
 
 type Props = {
@@ -77,25 +79,29 @@ export function StoresTable({ stores: initialStores }: Props) {
       header: "",
       render: (row) => (
         <div className="flex items-center justify-end gap-2">
-          <Link
-            href={`/admin/stores/${row.id}/edit`}
-            className="text-body-sm text-primary hover:underline"
-          >
-            {tCommon("edit")}
-          </Link>
-          <Link
-            href={`/admin/stores/${row.id}/settings`}
-            className="text-body-sm text-dark-5 hover:underline dark:text-dark-6"
-          >
-            {t("settings")}
-          </Link>
-          <button
-            type="button"
-            onClick={() => setDeleteId(row.id)}
-            className="text-body-sm text-red hover:underline"
-          >
-            {tCommon("delete")}
-          </button>
+          <PermissionGate permission={Permission.STORE_UPDATE}>
+            <Link
+              href={`/admin/stores/${row.id}/edit`}
+              className="text-body-sm text-primary hover:underline"
+            >
+              {tCommon("edit")}
+            </Link>
+            <Link
+              href={`/admin/stores/${row.id}/settings`}
+              className="text-body-sm text-dark-5 hover:underline dark:text-dark-6"
+            >
+              {t("settings")}
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission={Permission.STORE_DELETE}>
+            <button
+              type="button"
+              onClick={() => setDeleteId(row.id)}
+              className="text-body-sm text-red hover:underline"
+            >
+              {tCommon("delete")}
+            </button>
+          </PermissionGate>
         </div>
       ),
       className: "text-right",

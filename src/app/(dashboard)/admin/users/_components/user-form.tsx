@@ -9,19 +9,14 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
-import type { User, UserRole } from "@/types";
+import type { User, Role } from "@/types";
 
 type Props = {
   user?: User;
+  roles: Role[];
 };
 
-const ROLES: { value: UserRole; labelKey: string }[] = [
-  { value: "ADMIN", labelKey: "role_ADMIN" },
-  { value: "STORE_MANAGER", labelKey: "role_STORE_MANAGER" },
-  { value: "WAREHOUSE_OPERATOR", labelKey: "role_WAREHOUSE_OPERATOR" },
-];
-
-export function UserForm({ user }: Props) {
+export function UserForm({ user, roles }: Props) {
   const router = useRouter();
   const isEditing = !!user;
   const [serverError, setServerError] = useState("");
@@ -39,7 +34,7 @@ export function UserForm({ user }: Props) {
       : Yup.string()
           .min(8, tVal("passwordMin"))
           .required(tVal("passwordRequired")),
-    role: Yup.string().required(tVal("roleRequired")),
+    roleCode: Yup.string().required(tVal("roleRequired")),
     isActive: Yup.boolean(),
   });
 
@@ -48,7 +43,7 @@ export function UserForm({ user }: Props) {
       name: user?.name || "",
       email: user?.email || "",
       password: "",
-      role: user?.role || "",
+      roleCode: user?.roleCode || "",
       isActive: user?.isActive ?? true,
     },
     validationSchema: userSchema,
@@ -61,7 +56,7 @@ export function UserForm({ user }: Props) {
           await updateUser(user.id, {
             name: values.name,
             email: values.email,
-            role: values.role as UserRole,
+            roleCode: values.roleCode,
             isActive: values.isActive,
           });
           router.push(`/admin/users/${user.id}`);
@@ -71,7 +66,7 @@ export function UserForm({ user }: Props) {
             name: values.name,
             email: values.email,
             password: values.password,
-            role: values.role as UserRole,
+            roleCode: values.roleCode,
           });
           router.push(`/admin/users/${created.id}`);
         }
@@ -133,12 +128,12 @@ export function UserForm({ user }: Props) {
 
         <Select
           label={t("role")}
-          name="role"
-          items={ROLES.map((r) => ({ value: r.value, label: t(r.labelKey) }))}
-          value={formik.values.role}
+          name="roleCode"
+          items={roles.map((r) => ({ value: r.code, label: r.displayName }))}
+          value={formik.values.roleCode}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          error={fieldError("role")}
+          error={fieldError("roleCode")}
           placeholder={t("selectRole")}
         />
 

@@ -7,6 +7,8 @@ import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getWarehouseStatusVariant } from "@/lib/status-variants";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import type { Warehouse, Store } from "@/types";
 
 type Props = {
@@ -96,19 +98,23 @@ export function WarehousesTable({
       header: "",
       render: (row) => (
         <div className="flex items-center justify-end gap-2">
-          <Link
-            href={`/admin/warehouses/${row.id}/edit`}
-            className="text-body-sm text-primary hover:underline"
-          >
-            {tCommon("edit")}
-          </Link>
-          <button
-            type="button"
-            onClick={() => setDeleteId(row.id)}
-            className="text-body-sm text-red hover:underline"
-          >
-            {tCommon("delete")}
-          </button>
+          <PermissionGate permission={Permission.WAREHOUSE_UPDATE}>
+            <Link
+              href={`/admin/warehouses/${row.id}/edit`}
+              className="text-body-sm text-primary hover:underline"
+            >
+              {tCommon("edit")}
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission={Permission.WAREHOUSE_DELETE}>
+            <button
+              type="button"
+              onClick={() => setDeleteId(row.id)}
+              className="text-body-sm text-red hover:underline"
+            >
+              {tCommon("delete")}
+            </button>
+          </PermissionGate>
         </div>
       ),
       className: "text-right",

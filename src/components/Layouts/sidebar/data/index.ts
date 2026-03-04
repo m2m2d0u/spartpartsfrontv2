@@ -1,6 +1,5 @@
 import * as Icons from "../icons";
 import { Permission } from "@/types";
-import type { UserRole } from "@/types";
 
 type NavSubItem = {
   title: string;
@@ -14,8 +13,6 @@ type NavItem = {
   url?: string;
   icon: typeof Icons.HomeIcon;
   items: NavSubItem[];
-  /** Roles that can see this item. If omitted, visible to all roles. */
-  roles?: UserRole[];
   /** Permission required to see this item. If omitted, no permission check. */
   permission?: Permission;
 };
@@ -23,13 +20,10 @@ type NavItem = {
 type NavSection = {
   label: string;
   items: NavItem[];
-  /** Roles that can see this section. If omitted, visible to all roles. */
-  roles?: UserRole[];
 };
 
 export function getNavData(
   t: (key: string) => string,
-  role?: UserRole,
   hasPermission?: (code: Permission) => boolean,
 ): NavSection[] {
   const all: NavSection[] = [
@@ -140,15 +134,16 @@ export function getNavData(
         {
           title: t("locations"),
           icon: Icons.BuildingIcon,
-          roles: ["ADMIN", "STORE_MANAGER"],
           items: [
             {
               title: t("stores"),
               url: "/admin/stores",
+              permission: Permission.STORE_CREATE,
             },
             {
               title: t("warehouses"),
               url: "/admin/warehouses",
+              permission: Permission.WAREHOUSE_CREATE,
             },
           ],
         },
@@ -156,41 +151,41 @@ export function getNavData(
     },
     {
       label: t("configuration"),
-      roles: ["ADMIN"],
       items: [
         {
           title: t("settings"),
           url: "/admin/settings",
           icon: Icons.SettingsIcon,
+          permission: Permission.SETTINGS_VIEW,
           items: [],
         },
         {
           title: t("users"),
           url: "/admin/users",
           icon: Icons.Authentication,
+          permission: Permission.USER_VIEW,
           items: [],
         },
         {
           title: t("roles"),
           url: "/admin/roles",
           icon: Icons.ShieldIcon,
+          permission: Permission.ROLE_VIEW,
           items: [],
         },
       ],
     },
   ];
 
-  if (!role) return all;
+  if (!hasPermission) return all;
 
   const checkPerm = (code?: Permission) =>
-    !code || !hasPermission || hasPermission(code);
+    !code || hasPermission(code);
 
   return all
-    .filter((section) => !section.roles || section.roles.includes(role))
     .map((section) => ({
       ...section,
       items: section.items
-        .filter((item) => !item.roles || item.roles.includes(role))
         .filter((item) => checkPerm(item.permission))
         .map((item) => ({
           ...item,

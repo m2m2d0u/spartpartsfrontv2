@@ -5,6 +5,8 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTableSkeleton } from "@/components/DataTable/skeleton";
 import { getStores } from "@/services/stores.server";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import { StoresTable } from "./_components/stores-table";
 
 export const metadata: Metadata = {
@@ -29,12 +31,14 @@ export default async function StoresPage() {
           { label: tNav("stores") },
         ]}
         actions={
-          <Link
-            href="/admin/stores/new"
-            className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            {t("addStore")}
-          </Link>
+          <PermissionGate permission={Permission.STORE_CREATE}>
+            <Link
+              href="/admin/stores/new"
+              className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              {t("addStore")}
+            </Link>
+          </PermissionGate>
         }
       />
 

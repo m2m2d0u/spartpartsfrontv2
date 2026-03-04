@@ -27,8 +27,7 @@ export default async function EditRolePage({ params }: Props) {
   const t = await getTranslations("roles");
   const tNav = await getTranslations("nav");
 
-  const roleKey = `role_${role.code}` as Parameters<typeof t>[0];
-  const roleName = t.has(roleKey) ? t(roleKey) : role.displayName;
+  const roleName = role.displayName;
 
   return (
     <>

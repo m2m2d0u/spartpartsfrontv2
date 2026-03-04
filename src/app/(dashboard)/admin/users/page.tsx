@@ -5,6 +5,8 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { DataTableSkeleton } from "@/components/DataTable/skeleton";
 import { getUsers } from "@/services/users.server";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 import { UsersTable } from "./_components/users-table";
 
 export const metadata: Metadata = {
@@ -29,12 +31,14 @@ export default async function UsersPage() {
           { label: tNav("users") },
         ]}
         actions={
-          <Link
-            href="/admin/users/new"
-            className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            {t("addUser")}
-          </Link>
+          <PermissionGate permission={Permission.USER_CREATE}>
+            <Link
+              href="/admin/users/new"
+              className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              {t("addUser")}
+            </Link>
+          </PermissionGate>
         }
       />
 

@@ -6,6 +6,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getWarehouseStatusVariant } from "@/lib/status-variants";
 import { getWarehouseById } from "@/services/warehouses.server";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 
 export const metadata: Metadata = {
   title: "Warehouse Detail",
@@ -45,12 +47,14 @@ export default async function WarehouseDetailPage({ params }: Props) {
           { label: warehouse.name },
         ]}
         actions={
-          <Link
-            href={`/admin/warehouses/${warehouse.id}/edit`}
-            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            {t("editWarehouse")}
-          </Link>
+          <PermissionGate permission={Permission.WAREHOUSE_UPDATE}>
+            <Link
+              href={`/admin/warehouses/${warehouse.id}/edit`}
+              className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              {t("editWarehouse")}
+            </Link>
+          </PermissionGate>
         }
       />
 

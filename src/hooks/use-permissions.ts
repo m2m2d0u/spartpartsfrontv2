@@ -7,7 +7,7 @@ import { type Permission } from "@/types";
 export function usePermissions() {
   const { user } = useAuth();
 
-  const isAdmin = user?.roleCode === "ADMIN";
+  const isAdmin = user?.roleCode === "ADMINISTRATEUR";
 
   const allPermissions = useMemo(() => {
     if (!user || isAdmin) return new Set<string>();

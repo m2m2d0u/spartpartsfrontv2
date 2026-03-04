@@ -4,13 +4,18 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { getUserStatusVariant, getUserRoleVariant } from "@/lib/status-variants";
+import {
+  getUserStatusVariant,
+  getUserRoleVariant,
+} from "@/lib/status-variants";
 import { getUserById } from "@/services/users.server";
 import { WarehouseAssignments } from "../_components/warehouse-assignments";
 import { StoreAssignments } from "../_components/store-assignments";
 import { getWarehouses } from "@/services/warehouses.server";
 import { getStores } from "@/services/stores.server";
 import { getActiveRoles } from "@/services/roles.server";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission, UserRole, UserRoleCode } from "@/types";
 
 export const metadata: Metadata = {
   title: "User Detail",
@@ -30,8 +35,10 @@ export default async function UserDetailPage({ params }: Props) {
   const tNav = await getTranslations("nav");
   const tCommon = await getTranslations("common");
 
-  const showStores = user.role === "STORE_MANAGER";
-  const showWarehouses = user.role === "WAREHOUSE_OPERATOR";
+  const showStores = user.roleCode === UserRoleCode.RESPONSABLE_MAGASIN;
+  const showWarehouses =
+    user.roleCode === UserRoleCode.OPERATEUR_ENTREPOT ||
+    user.roleCode === UserRoleCode.RESPONSABLE_ENTREPOT;
 
   const [warehousesPage, storesPage, activeRoles] = await Promise.all([
     showWarehouses ? getWarehouses(0, 200, true) : Promise.resolve(null),
@@ -49,12 +56,14 @@ export default async function UserDetailPage({ params }: Props) {
           { label: user.name },
         ]}
         actions={
-          <Link
-            href={`/admin/users/${user.id}/edit`}
-            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            {t("editUser")}
-          </Link>
+          <PermissionGate permission={Permission.USER_UPDATE}>
+            <Link
+              href={`/admin/users/${user.id}/edit`}
+              className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              {t("editUser")}
+            </Link>
+          </PermissionGate>
         }
       />
 
@@ -87,8 +96,8 @@ export default async function UserDetailPage({ params }: Props) {
               <div>
                 <dt className="text-body-sm text-dark-6">{t("role")}</dt>
                 <dd>
-                  <StatusBadge variant={getUserRoleVariant(user.role)}>
-                    {t(`role_${user.role}`)}
+                  <StatusBadge variant={getUserRoleVariant(user.roleCode)}>
+                    {user.roleDisplayName || user.roleCode}
                   </StatusBadge>
                 </dd>
               </div>
@@ -115,7 +124,7 @@ export default async function UserDetailPage({ params }: Props) {
             />
           )}
 
-          {user.role === "ADMIN" && (
+          {user.roleCode === UserRoleCode.ADMINISTRATEUR && (
             <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
               <p className="py-4 text-center text-body-sm text-dark-6">
                 {t("adminFullAccess")}

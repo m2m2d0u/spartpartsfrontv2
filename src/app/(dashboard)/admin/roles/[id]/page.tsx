@@ -6,6 +6,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getRoleStatusVariant, getRoleTypeVariant } from "@/lib/status-variants";
 import { getRoleById } from "@/services/roles.server";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
 
 export const metadata: Metadata = {
   title: "Role Detail",
@@ -24,30 +26,17 @@ export default async function RoleDetailPage({ params }: Props) {
   const t = await getTranslations("roles");
   const tNav = await getTranslations("nav");
   const tCommon = await getTranslations("common");
-  const tUsers = await getTranslations("users");
-
   // Group permissions by category code
   const grouped: Record<string, { label: string; perms: typeof role.permissions }> = {};
   for (const perm of role.permissions) {
     const catCode = perm.category;
     if (!grouped[catCode]) {
-      const catKey = `cat_${catCode}` as Parameters<typeof tUsers>[0];
       grouped[catCode] = {
-        label: tUsers.has(catKey) ? tUsers(catKey) : (perm.categoryDisplayName || catCode),
+        label: perm.categoryDisplayName || catCode,
         perms: [],
       };
     }
     grouped[catCode].perms.push(perm);
-  }
-
-  function translateRole(r: { code: string; displayName: string }) {
-    const key = `role_${r.code}` as Parameters<typeof t>[0];
-    return t.has(key) ? t(key) : r.displayName;
-  }
-
-  function translatePerm(perm: { code: string; displayName: string }) {
-    const key = `perm_${perm.code}` as Parameters<typeof tUsers>[0];
-    return tUsers.has(key) ? tUsers(key) : perm.displayName;
   }
 
   function translateLevel(level: string, fallback: string) {
@@ -73,19 +62,21 @@ export default async function RoleDetailPage({ params }: Props) {
   return (
     <>
       <PageHeader
-        title={translateRole(role)}
+        title={role.displayName}
         breadcrumbs={[
           { label: tNav("dashboard"), href: "/admin" },
           { label: tNav("roles"), href: "/admin/roles" },
-          { label: translateRole(role) },
+          { label: role.displayName },
         ]}
         actions={
-          <Link
-            href={`/admin/roles/${role.id}/edit`}
-            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            {t("editRole")}
-          </Link>
+          <PermissionGate permission={Permission.ROLE_UPDATE}>
+            <Link
+              href={`/admin/roles/${role.id}/edit`}
+              className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              {t("editRole")}
+            </Link>
+          </PermissionGate>
         }
       />
 
@@ -106,7 +97,7 @@ export default async function RoleDetailPage({ params }: Props) {
               <div>
                 <dt className="text-body-sm text-dark-6">{t("roleName")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
-                  {translateRole(role)}
+                  {role.displayName}
                 </dd>
               </div>
               <div>
@@ -177,7 +168,7 @@ export default async function RoleDetailPage({ params }: Props) {
                           key={perm.id}
                           variant={getLevelColor(perm.level)}
                         >
-                          {translatePerm(perm)}
+                          {perm.displayName}
                         </StatusBadge>
                       ))}
                     </div>

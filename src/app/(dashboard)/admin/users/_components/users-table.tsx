@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getUserStatusVariant, getUserRoleVariant } from "@/lib/status-variants";
-import type { User, UserRole } from "@/types";
+import { PermissionGate } from "@/components/PermissionGate";
+import { Permission } from "@/types";
+import type { User } from "@/types";
 
 type Props = {
   users: User[];
 };
-
-const ROLES: UserRole[] = ["ADMIN", "STORE_MANAGER", "WAREHOUSE_OPERATOR"];
 
 export function UsersTable({ users: initialUsers }: Props) {
   const [users, setUsers] = useState(initialUsers);
@@ -22,13 +22,23 @@ export function UsersTable({ users: initialUsers }: Props) {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const t = useTranslations("users");
+
+  const roleOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const u of initialUsers) {
+      if (u.roleCode && !map.has(u.roleCode)) {
+        map.set(u.roleCode, u.roleDisplayName || u.roleCode);
+      }
+    }
+    return [...map.entries()].map(([value, label]) => ({ value, label }));
+  }, [initialUsers]);
   const tCommon = useTranslations("common");
 
   const filtered = users.filter((u) => {
     const matchesSearch =
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase());
-    const matchesRole = !roleFilter || u.role === roleFilter;
+    const matchesRole = !roleFilter || u.roleCode === roleFilter;
     return matchesSearch && matchesRole;
   });
 
@@ -68,9 +78,9 @@ export function UsersTable({ users: initialUsers }: Props) {
       key: "role",
       header: t("role"),
       render: (row) =>
-        row.role ? (
-          <StatusBadge variant={getUserRoleVariant(row.role)}>
-            {t(`role_${row.role}`)}
+        row.roleCode ? (
+          <StatusBadge variant={getUserRoleVariant(row.roleCode)}>
+            {row.roleDisplayName || row.roleCode}
           </StatusBadge>
         ) : (
           <span className="text-body-sm text-dark-6">—</span>
@@ -96,21 +106,25 @@ export function UsersTable({ users: initialUsers }: Props) {
           >
             {tCommon("view")}
           </Link>
-          <Link
-            href={`/admin/users/${row.id}/edit`}
-            className="text-body-sm text-primary hover:underline"
-          >
-            {tCommon("edit")}
-          </Link>
-          {row.isActive && (
-            <button
-              type="button"
-              onClick={() => setDeleteId(row.id)}
-              className="text-body-sm text-red hover:underline"
+          <PermissionGate permission={Permission.USER_UPDATE}>
+            <Link
+              href={`/admin/users/${row.id}/edit`}
+              className="text-body-sm text-primary hover:underline"
             >
-              {t("deactivate")}
-            </button>
-          )}
+              {tCommon("edit")}
+            </Link>
+          </PermissionGate>
+          <PermissionGate permission={Permission.USER_DELETE}>
+            {row.isActive && (
+              <button
+                type="button"
+                onClick={() => setDeleteId(row.id)}
+                className="text-body-sm text-red hover:underline"
+              >
+                {t("deactivate")}
+              </button>
+            )}
+          </PermissionGate>
         </div>
       ),
       className: "text-right",
@@ -131,9 +145,9 @@ export function UsersTable({ users: initialUsers }: Props) {
             className="rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
           >
             <option value="">{t("allRoles")}</option>
-            {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {t(`role_${r}`)}
+            {roleOptions.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.label}
               </option>
             ))}
           </select>
