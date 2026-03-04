@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useFormik } from "formik";
@@ -11,9 +11,11 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { SearchableSelect } from "@/components/FormElements/searchable-select";
 import { standardFormat } from "@/lib/format-number";
+import { InvoiceStatusCode, InvoiceTypeCode } from "@/types";
 import type {
   Invoice,
   InvoiceTemplate,
+  InvoiceType,
   InvoiceStatus,
   Customer,
   Warehouse,
@@ -54,13 +56,25 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
     })) || [{ partId: "", quantity: "", unitPrice: "", discountPercent: "0" }],
   );
 
-  // Parts search
+  // Parts search — keep initial parts stable so selected labels are never lost
+  const initialParts = useRef<PartOption[]>(
+    invoice?.items.map((i) => ({
+      id: i.partId,
+      name: i.partName,
+      partNumber: i.partNumber,
+      sellingPrice: i.unitPrice,
+    })) || [],
+  );
   const [partResults, setPartResults] = useState<PartOption[]>([]);
   const [searchingParts, setSearchingParts] = useState(false);
   const partSearchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // Warehouse search
-  const [warehouseResults, setWarehouseResults] = useState<Warehouse[]>([]);
+  // Warehouse search — seed with existing invoice warehouse when editing
+  const [warehouseResults, setWarehouseResults] = useState<Warehouse[]>(
+    invoice?.sourceWarehouseId && invoice.sourceWarehouseName
+      ? [{ id: invoice.sourceWarehouseId, name: invoice.sourceWarehouseName, code: "" } as Warehouse]
+      : [],
+  );
   const [searchingWarehouses, setSearchingWarehouses] = useState(false);
   const warehouseSearchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const selectedWarehouseId = useRef(invoice?.sourceWarehouseId || "");
@@ -83,14 +97,22 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
     label: tpl.name,
   }));
 
-  const partItems = partResults.map((p) => ({
+  // Merge initial parts (for labels of already-selected items) with search results
+  const allParts = useMemo(() => {
+    const map = new Map<string, PartOption>();
+    for (const p of initialParts.current) map.set(p.id, p);
+    for (const p of partResults) map.set(p.id, p);
+    return Array.from(map.values());
+  }, [partResults]);
+
+  const partItems = allParts.map((p) => ({
     value: p.id,
     label: `${p.partNumber} — ${p.name}`,
   }));
 
   const warehouseItems = warehouseResults.map((w) => ({
     value: w.id,
-    label: `${w.name} (${w.code})`,
+    label: w.code ? `${w.name} (${w.code})` : w.name,
   }));
 
   const handlePartSearch = useCallback((term: string) => {
@@ -173,10 +195,10 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
 
   const formik = useFormik({
     initialValues: {
-      invoiceType: invoice?.invoiceType || "STANDARD",
-      status: (invoice?.status as string) || "DRAFT",
+      invoiceType: invoice?.invoiceType || InvoiceTypeCode.STANDARD,
+      status: (invoice?.status as string) || InvoiceStatusCode.DRAFT,
       customerId: invoice?.customerId || "",
-      templateId: invoice?.templateId || "",
+      templateId: invoice?.templateId || (templates.find((t) => t.isDefault)?.id ?? templates[0]?.id ?? ""),
       issuedDate: invoice?.issuedDate
         ? invoice.issuedDate.substring(0, 10)
         : new Date().toISOString().substring(0, 10),
@@ -234,7 +256,7 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
             "@/services/invoices.service"
           );
           await createInvoice({
-            invoiceType: values.invoiceType as "PROFORMA" | "STANDARD" | "DEPOSIT",
+            invoiceType: values.invoiceType as InvoiceType,
             status: values.status as InvoiceStatus,
             customerId: values.customerId,
             templateId: values.templateId,
@@ -281,9 +303,13 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
         const updated = { ...item, [field]: value };
         // Auto-fill unitPrice when a part is selected
         if (field === "partId" && value) {
-          const selectedPart = partResults.find((p) => p.id === value);
+          const selectedPart = allParts.find((p) => p.id === value);
           if (selectedPart) {
             updated.unitPrice = String(selectedPart.sellingPrice);
+            // Pin selected part so its label persists when search clears
+            if (!initialParts.current.some((p) => p.id === value)) {
+              initialParts.current = [...initialParts.current, selectedPart];
+            }
           }
           if (!updated.quantity) {
             updated.quantity = "1";
@@ -317,9 +343,9 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
             <Select
               label={t("invoiceType")}
               items={[
-                { value: "STANDARD", label: t("type_STANDARD") },
-                { value: "PROFORMA", label: t("type_PROFORMA") },
-                { value: "DEPOSIT", label: t("type_DEPOSIT") },
+                { value: InvoiceTypeCode.STANDARD, label: t("type_STANDARD") },
+                { value: InvoiceTypeCode.PROFORMA, label: t("type_PROFORMA") },
+                { value: InvoiceTypeCode.DEPOSIT, label: t("type_DEPOSIT") },
               ]}
               value={formik.values.invoiceType}
               onChange={(e) =>
@@ -332,14 +358,10 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
             <Select
               label={t("invoiceStatus")}
               items={[
-                { value: "DRAFT", label: t("status_DRAFT") },
-                { value: "SENT", label: t("status_SENT") },
-                { value: "PAID", label: t("status_PAID") },
-                { value: "PARTIALLY_PAID", label: t("status_PARTIALLY_PAID") },
-                { value: "OVERDUE", label: t("status_OVERDUE") },
-                { value: "CANCELLED", label: t("status_CANCELLED") },
-                { value: "ACCEPTED", label: t("status_ACCEPTED") },
-                { value: "EXPIRED", label: t("status_EXPIRED") },
+                { value: InvoiceStatusCode.DRAFT, label: t("status_DRAFT") },
+                { value: InvoiceStatusCode.PAID, label: t("status_PAID") },
+                { value: InvoiceStatusCode.PARTIALLY_PAID, label: t("status_PARTIALLY_PAID") },
+                { value: InvoiceStatusCode.OVERDUE, label: t("status_OVERDUE") },
               ]}
               value={formik.values.status}
               onChange={(e) =>

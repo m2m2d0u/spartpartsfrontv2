@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { FormSection } from "@/components/FormSection";
+import { InvoiceStatusCode } from "@/types";
 import type { InvoiceStatus } from "@/types";
 
 type Props = {
@@ -12,25 +13,21 @@ type Props = {
 };
 
 const STATUS_TRANSITIONS: Record<InvoiceStatus, InvoiceStatus[]> = {
-  DRAFT: ["SENT", "CANCELLED"],
-  SENT: ["PAID", "PARTIALLY_PAID", "OVERDUE", "CANCELLED", "ACCEPTED"],
-  ACCEPTED: ["PAID", "PARTIALLY_PAID", "OVERDUE", "CANCELLED"],
-  PARTIALLY_PAID: ["PAID", "OVERDUE", "CANCELLED"],
-  OVERDUE: ["PAID", "PARTIALLY_PAID", "CANCELLED"],
-  PAID: [],
-  CANCELLED: [],
-  EXPIRED: [],
+  [InvoiceStatusCode.DRAFT]: [InvoiceStatusCode.PAID, InvoiceStatusCode.PARTIALLY_PAID, InvoiceStatusCode.OVERDUE],
+  [InvoiceStatusCode.SENT]: [],
+  [InvoiceStatusCode.ACCEPTED]: [],
+  [InvoiceStatusCode.PARTIALLY_PAID]: [InvoiceStatusCode.PAID, InvoiceStatusCode.OVERDUE],
+  [InvoiceStatusCode.OVERDUE]: [InvoiceStatusCode.PAID, InvoiceStatusCode.PARTIALLY_PAID],
+  [InvoiceStatusCode.PAID]: [],
+  [InvoiceStatusCode.CANCELLED]: [],
+  [InvoiceStatusCode.EXPIRED]: [],
 };
 
 const STATUS_BUTTON_STYLES: Partial<Record<InvoiceStatus, string>> = {
-  PAID: "bg-[#027A48] text-white hover:bg-opacity-90",
-  SENT: "bg-primary text-white hover:bg-opacity-90",
-  ACCEPTED: "bg-primary text-white hover:bg-opacity-90",
-  PARTIALLY_PAID:
+  [InvoiceStatusCode.PAID]: "bg-[#027A48] text-white hover:bg-opacity-90",
+  [InvoiceStatusCode.PARTIALLY_PAID]:
     "bg-[#B54708] text-white hover:bg-opacity-90",
-  OVERDUE: "bg-[#B42318] text-white hover:bg-opacity-90",
-  CANCELLED:
-    "border border-red text-red hover:bg-red/5",
+  [InvoiceStatusCode.OVERDUE]: "bg-[#B42318] text-white hover:bg-opacity-90",
 };
 
 export function InvoiceStatusActions({ invoiceId, currentStatus }: Props) {

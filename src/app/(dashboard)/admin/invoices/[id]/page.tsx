@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { FormSection } from "@/components/FormSection";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PermissionGate } from "@/components/PermissionGate";
-import { Permission } from "@/types";
+import { Permission, InvoiceStatusCode } from "@/types";
 import { getInvoiceStatusVariant } from "@/lib/status-variants";
 import { standardFormat } from "@/lib/format-number";
 import { getInvoiceById } from "@/services/invoices.server";
@@ -55,7 +55,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
               invoiceId={invoice.id}
               invoiceNumber={invoice.invoiceNumber}
             />
-            {invoice.status === "DRAFT" && (
+            {invoice.status === InvoiceStatusCode.DRAFT && (
               <PermissionGate permission={Permission.INVOICE_UPDATE}>
                 <Link
                   href={`/admin/invoices/${invoice.id}/edit`}

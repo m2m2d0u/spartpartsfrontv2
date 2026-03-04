@@ -10,20 +10,12 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import { getInvoiceStatusVariant } from "@/lib/status-variants";
 import { standardFormat } from "@/lib/format-number";
+import { InvoiceStatusCode, InvoiceTypeCode } from "@/types";
 import type { Invoice, InvoiceStatus, InvoiceType } from "@/types";
 
-const STATUSES: InvoiceStatus[] = [
-  "DRAFT",
-  "SENT",
-  "PAID",
-  "PARTIALLY_PAID",
-  "OVERDUE",
-  "CANCELLED",
-  "ACCEPTED",
-  "EXPIRED",
-];
+const STATUSES: InvoiceStatus[] = Object.values(InvoiceStatusCode);
 
-const TYPES: InvoiceType[] = ["PROFORMA", "STANDARD", "DEPOSIT"];
+const TYPES: InvoiceType[] = Object.values(InvoiceTypeCode);
 
 type Props = {
   invoices: Invoice[];
@@ -165,7 +157,7 @@ export function InvoicesTable({ invoices: initial }: Props) {
           >
             {t("downloadPdf")}
           </button>
-          {row.status === "DRAFT" && (
+          {row.status === InvoiceStatusCode.DRAFT && (
             <>
               <PermissionGate permission={Permission.INVOICE_UPDATE}>
                 <Link

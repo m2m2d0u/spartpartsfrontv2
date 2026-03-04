@@ -10,6 +10,7 @@ import { Select } from "@/components/FormElements/select";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
 import { UploadIcon } from "@/assets/icons";
+import { InvoiceDesignCode } from "@/types";
 import type { InvoiceTemplate, InvoiceDesign } from "@/types";
 
 type Props = {
@@ -17,11 +18,11 @@ type Props = {
 };
 
 const DESIGN_OPTIONS: { value: InvoiceDesign; label: string }[] = [
-  { value: "CLASSIC", label: "Classic" },
-  { value: "MODERN", label: "Modern" },
-  { value: "ELEGANT", label: "Elegant" },
-  { value: "COMPACT", label: "Compact" },
-  { value: "PROFESSIONAL", label: "Professional" },
+  { value: InvoiceDesignCode.CLASSIC, label: "Classic" },
+  { value: InvoiceDesignCode.MODERN, label: "Modern" },
+  { value: InvoiceDesignCode.ELEGANT, label: "Elegant" },
+  { value: InvoiceDesignCode.COMPACT, label: "Compact" },
+  { value: InvoiceDesignCode.PROFESSIONAL, label: "Professional" },
 ];
 
 const FONT_OPTIONS = [
@@ -225,7 +226,7 @@ export function InvoiceTemplateForm({ template }: Props) {
       primaryColor: template?.primaryColor || "#000000",
       accentColor: template?.accentColor || "#4F46E5",
       fontFamily: template?.fontFamily || "Helvetica",
-      design: template?.design || "CLASSIC",
+      design: template?.design || InvoiceDesignCode.CLASSIC,
       headerLayout: template?.headerLayout || "LOGO_LEFT",
       showNinea: template?.showNinea ?? true,
       showRccm: template?.showRccm ?? true,

@@ -1,3 +1,5 @@
+import { InvoiceStatusCode } from "@/types";
+
 type BadgeVariant = "success" | "warning" | "error" | "info" | "neutral";
 
 export function getRoleTypeVariant(isSystem: boolean): BadgeVariant {
@@ -12,17 +14,17 @@ export function getInvoiceStatusVariant(
   status: string,
 ): BadgeVariant {
   switch (status) {
-    case "PAID":
+    case InvoiceStatusCode.PAID:
       return "success";
-    case "SENT":
-    case "PARTIALLY_PAID":
-    case "ACCEPTED":
+    case InvoiceStatusCode.SENT:
+    case InvoiceStatusCode.PARTIALLY_PAID:
+    case InvoiceStatusCode.ACCEPTED:
       return "info";
-    case "OVERDUE":
-    case "EXPIRED":
-    case "CANCELLED":
+    case InvoiceStatusCode.OVERDUE:
+    case InvoiceStatusCode.EXPIRED:
+    case InvoiceStatusCode.CANCELLED:
       return "error";
-    case "DRAFT":
+    case InvoiceStatusCode.DRAFT:
       return "neutral";
     default:
       return "neutral";
