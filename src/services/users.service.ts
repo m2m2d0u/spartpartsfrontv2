@@ -39,7 +39,7 @@ export async function updateUserStores(
 
 export async function searchUsers(query: string): Promise<User[]> {
   const data = await apiGet<PagedResponse<User>>(
-    `/users/search?query=${encodeURIComponent(query)}&page=0&size=20`,
+    `/users?name=${encodeURIComponent(query)}&page=0&size=20`,
   );
   return data.content;
 }

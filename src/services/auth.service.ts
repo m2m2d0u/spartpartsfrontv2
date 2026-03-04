@@ -115,6 +115,7 @@ export type MeResponse = {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  permissions: string[];
   accessibleStores: MeStore[];
   accessibleWarehouses: MeWarehouse[];
   warehouseAssignments: MeWarehouseAssignment[];

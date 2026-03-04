@@ -37,7 +37,7 @@ export async function unassignUserFromStore(
 
 export async function searchStores(query: string): Promise<Store[]> {
   const data = await apiGet<PagedResponse<Store>>(
-    `/stores/search?query=${encodeURIComponent(query)}&page=0&size=20`,
+    `/stores?name=${encodeURIComponent(query)}&page=0&size=20`,
   );
   return data.content;
 }

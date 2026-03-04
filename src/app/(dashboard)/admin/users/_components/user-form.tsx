@@ -9,7 +9,7 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
-import type { User, Role } from "@/types";
+import { User, Role, UserRole } from "@/types";
 
 type Props = {
   user?: User;
@@ -43,7 +43,7 @@ export function UserForm({ user, roles }: Props) {
       name: user?.name || "",
       email: user?.email || "",
       password: "",
-      roleCode: user?.roleCode || "",
+      roleCode: user?.roleCode as UserRole,
       isActive: user?.isActive ?? true,
     },
     validationSchema: userSchema,

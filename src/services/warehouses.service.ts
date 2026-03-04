@@ -39,7 +39,7 @@ export async function unassignUserFromWarehouse(
 
 export async function searchWarehouses(query: string): Promise<Warehouse[]> {
   const data = await apiGet<PagedResponse<Warehouse>>(
-    `/warehouses/search?query=${encodeURIComponent(query)}&page=0&size=20`,
+    `/warehouses?name=${encodeURIComponent(query)}&page=0&size=20`,
   );
   return data.content;
 }

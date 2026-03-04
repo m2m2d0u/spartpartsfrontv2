@@ -270,7 +270,7 @@ export type CreateUserRequest = {
 export type UpdateUserRequest = {
   name: string;
   email: string;
-  roleCode: string;
+  roleCode: UserRole;
   isActive: boolean;
 };
 

@@ -6,6 +6,8 @@ type NavSubItem = {
   url: string;
   /** Permission required to see this sub-item. If omitted, inherits parent visibility. */
   permission?: Permission;
+  /** When set, overrides the permission check for visibility. */
+  visible?: boolean;
 };
 
 type NavItem = {
@@ -22,9 +24,15 @@ type NavSection = {
   items: NavItem[];
 };
 
+type NavResources = {
+  hasStores: boolean;
+  hasWarehouses: boolean;
+};
+
 export function getNavData(
   t: (key: string) => string,
   hasPermission?: (code: Permission) => boolean,
+  resources?: NavResources,
 ): NavSection[] {
   const all: NavSection[] = [
     {
@@ -139,11 +147,13 @@ export function getNavData(
               title: t("stores"),
               url: "/admin/stores",
               permission: Permission.STORE_CREATE,
+              visible: resources?.hasStores,
             },
             {
               title: t("warehouses"),
               url: "/admin/warehouses",
               permission: Permission.WAREHOUSE_CREATE,
+              visible: resources?.hasWarehouses,
             },
           ],
         },
@@ -182,6 +192,9 @@ export function getNavData(
   const checkPerm = (code?: Permission) =>
     !code || hasPermission(code);
 
+  const checkSubItem = (sub: NavSubItem) =>
+    sub.visible !== undefined ? sub.visible : checkPerm(sub.permission);
+
   return all
     .map((section) => ({
       ...section,
@@ -189,7 +202,7 @@ export function getNavData(
         .filter((item) => checkPerm(item.permission))
         .map((item) => ({
           ...item,
-          items: item.items.filter((sub) => checkPerm(sub.permission)),
+          items: item.items.filter(checkSubItem),
         })),
     }))
     .filter((section) => section.items.length > 0);
