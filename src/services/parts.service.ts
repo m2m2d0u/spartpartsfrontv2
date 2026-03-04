@@ -1,5 +1,5 @@
 import type { Part, PartImage, CreatePartRequest, UpdatePartRequest } from "@/types";
-import { apiPost, apiPut, apiDelete } from "./api-client";
+import { apiPost, apiPostFormData, apiPut, apiDelete } from "./api-client";
 
 export async function createPart(data: CreatePartRequest): Promise<Part> {
   return apiPost<Part>("/parts", data);
@@ -28,4 +28,20 @@ export async function removePartImage(
   imageId: string,
 ): Promise<void> {
   return apiDelete(`/parts/${partId}/images/${imageId}`);
+}
+
+/** Bulk import parts from an Excel/CSV file */
+export type BulkImportResult = {
+  totalRows: number;
+  successCount: number;
+  errorCount: number;
+  errors: { row: number; field: string; message: string }[];
+};
+
+export async function bulkImportParts(
+  file: File,
+): Promise<BulkImportResult> {
+  const formData = new FormData();
+  formData.append("file", file);
+  return apiPostFormData<BulkImportResult>("/parts/bulk-import", formData);
 }
