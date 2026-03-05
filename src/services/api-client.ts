@@ -177,3 +177,20 @@ export async function apiGetBlob(path: string): Promise<Blob> {
   }
   return res.blob();
 }
+
+export async function apiPostFormDataBlob(
+  path: string,
+  formData: FormData,
+): Promise<Blob> {
+  const res = await fetchWithAuth(`${API_BASE_URL}${path}`, {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) {
+    throw new ApiError(
+      `Request failed with status ${res.status}`,
+      res.status,
+    );
+  }
+  return res.blob();
+}

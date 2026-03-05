@@ -764,7 +764,10 @@
     "signature": "Signature",
     "watermark": "Watermark",
     "clickToView": "Click to view",
-    "loadingImage": "Loading..."
+    "loadingImage": "Loading...",
+    "previewDesign": "Preview design",
+    "previewDesignTitle": "Design Preview — {design}",
+    "previewFailed": "Failed to load design preview. Please try again."
   },
   "invoices": {
     "title": "Invoices",

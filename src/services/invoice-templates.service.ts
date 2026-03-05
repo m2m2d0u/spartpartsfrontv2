@@ -4,7 +4,7 @@ import type {
   UpdateInvoiceTemplateRequest,
 } from "@/types";
 import type { ImageResponse } from "@/types/store";
-import { apiGet, apiPost, apiPut, apiDelete, apiPostFormData, apiPutFormData } from "./api-client";
+import { apiGet, apiPostFormDataBlob, apiPost, apiPut, apiDelete, apiPostFormData, apiPutFormData } from "./api-client";
 
 export async function createInvoiceTemplate(
   data: CreateInvoiceTemplateRequest,
@@ -70,6 +70,27 @@ export async function updateInvoiceTemplateWithFiles(
   if (files.signature) formData.append("signature", files.signature);
   if (files.watermark) formData.append("watermark", files.watermark);
   return apiPutFormData<InvoiceTemplate>(`/invoice-templates/${id}/with-files`, formData);
+}
+
+/** Returns a blob URL for the design preview PDF */
+export async function previewDesign(
+  design: string,
+  templateData: CreateInvoiceTemplateRequest,
+  logo?: File | null,
+  stamp?: File | null,
+): Promise<string> {
+  const formData = new FormData();
+  formData.append(
+    "template",
+    new Blob([JSON.stringify(templateData)], { type: "application/json" }),
+  );
+  if (logo) formData.append("logo", logo);
+  if (stamp) formData.append("stamp", stamp);
+  const blob = await apiPostFormDataBlob(
+    `/invoice-templates/designs/${design}/preview`,
+    formData,
+  );
+  return URL.createObjectURL(blob);
 }
 
 /** Get template image as base64 */

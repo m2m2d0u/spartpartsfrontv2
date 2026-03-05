@@ -764,7 +764,10 @@
     "signature": "Signature",
     "watermark": "Filigrane",
     "clickToView": "Cliquer pour voir",
-    "loadingImage": "Chargement..."
+    "loadingImage": "Chargement...",
+    "previewDesign": "Aperçu du design",
+    "previewDesignTitle": "Aperçu du design — {design}",
+    "previewFailed": "Impossible de charger l'aperçu du design. Veuillez réessayer."
   },
   "invoices": {
     "title": "Factures",

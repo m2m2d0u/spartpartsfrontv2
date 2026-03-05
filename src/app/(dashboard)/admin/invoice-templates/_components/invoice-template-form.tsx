@@ -12,6 +12,7 @@ import { FormSection } from "@/components/FormSection";
 import { UploadIcon } from "@/assets/icons";
 import { InvoiceDesignCode } from "@/types";
 import type { InvoiceTemplate, InvoiceDesign } from "@/types";
+import { PdfViewerDialog } from "@/components/ui/pdf-viewer-dialog";
 
 type Props = {
   template?: InvoiceTemplate;
@@ -171,6 +172,9 @@ export function InvoiceTemplateForm({ template }: Props) {
   const isEditing = !!template;
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
+  const [previewing, setPreviewing] = useState(false);
 
   const t = useTranslations("invoiceTemplates");
   const tCommon = useTranslations("common");
@@ -335,6 +339,60 @@ export function InvoiceTemplateForm({ template }: Props) {
     },
   });
 
+  async function handlePreviewDesign() {
+    setPreviewing(true);
+    setError("");
+    try {
+      const { previewDesign } = await import(
+        "@/services/invoice-templates.service"
+      );
+      const v = formik.values;
+      const blobUrl = await previewDesign(
+        v.design,
+        {
+          name: v.name || "Preview",
+          description: v.description || undefined,
+          isDefault: v.isDefault,
+          primaryColor: v.primaryColor,
+          accentColor: v.accentColor,
+          fontFamily: v.fontFamily,
+          design: v.design as InvoiceDesign,
+          headerLayout: v.headerLayout,
+          logoUrl: removed.logo ? undefined : (template?.logoUrl ?? undefined),
+          headerImageUrl: removed.headerImage ? undefined : (template?.headerImageUrl ?? undefined),
+          footerImageUrl: removed.footerImage ? undefined : (template?.footerImageUrl ?? undefined),
+          stampImageUrl: removed.stamp ? undefined : (template?.stampImageUrl ?? undefined),
+          signatureImageUrl: removed.signature ? undefined : (template?.signatureImageUrl ?? undefined),
+          watermarkImageUrl: removed.watermark ? undefined : (template?.watermarkImageUrl ?? undefined),
+          showNinea: v.showNinea,
+          showRccm: v.showRccm,
+          showTaxId: v.showTaxId,
+          showWarehouseAddress: v.showWarehouseAddress,
+          showCustomerTaxId: v.showCustomerTaxId,
+          showPaymentTerms: v.showPaymentTerms,
+          showDiscountColumn: v.showDiscountColumn,
+          defaultNotes: v.defaultNotes || undefined,
+        },
+        files.logo,
+        files.stamp,
+      );
+      setPreviewBlobUrl(blobUrl);
+      setPreviewOpen(true);
+    } catch {
+      setError(t("previewFailed"));
+    } finally {
+      setPreviewing(false);
+    }
+  }
+
+  function handleClosePreview() {
+    setPreviewOpen(false);
+    if (previewBlobUrl) {
+      URL.revokeObjectURL(previewBlobUrl);
+      setPreviewBlobUrl(null);
+    }
+  }
+
   /** Translation key map for image labels */
   const imageLabels: Record<string, string> = {
     logo: t("logoUrl"),
@@ -438,15 +496,61 @@ export function InvoiceTemplateForm({ template }: Props) {
             value={formik.values.fontFamily}
             onChange={(e) => formik.setFieldValue("fontFamily", e.target.value)}
           />
-          <Select
-            label={t("design")}
-            items={DESIGN_OPTIONS.map((d) => ({
-              value: d.value,
-              label: t(`design_${d.value}`),
-            }))}
-            value={formik.values.design}
-            onChange={(e) => formik.setFieldValue("design", e.target.value)}
-          />
+          <div>
+            <Select
+              label={t("design")}
+              items={DESIGN_OPTIONS.map((d) => ({
+                value: d.value,
+                label: t(`design_${d.value}`),
+              }))}
+              value={formik.values.design}
+              onChange={(e) => formik.setFieldValue("design", e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={handlePreviewDesign}
+              disabled={previewing}
+              className="mt-2 inline-flex items-center gap-1.5 text-body-sm font-medium text-primary hover:underline disabled:opacity-50"
+            >
+              {previewing ? (
+                <svg
+                  className="size-4 animate-spin"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="shrink-0"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+              {t("previewDesign")}
+            </button>
+          </div>
           <Select
             label={t("headerLayout")}
             items={HEADER_LAYOUT_OPTIONS}
@@ -562,6 +666,13 @@ export function InvoiceTemplateForm({ template }: Props) {
               : t("createTemplate")}
         </button>
       </div>
+
+      <PdfViewerDialog
+        open={previewOpen}
+        onClose={handleClosePreview}
+        blobUrl={previewBlobUrl}
+        title={t("previewDesignTitle", { design: t(`design_${formik.values.design}`) })}
+      />
     </form>
   );
 }
