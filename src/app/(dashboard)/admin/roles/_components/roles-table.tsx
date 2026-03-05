@@ -101,6 +101,15 @@ export function RolesTable({ roles: initialRoles, totalElements: initialTotal, i
       ),
     },
     {
+      key: "roleLevel",
+      header: t("roleLevel"),
+      render: (row) => (
+        <StatusBadge variant={row.roleLevel === "SYSTEM" ? "info" : row.roleLevel === "STORE" ? "success" : "warning"}>
+          {t(`roleLevel_${row.roleLevel}`)}
+        </StatusBadge>
+      ),
+    },
+    {
       key: "permissionCount",
       header: t("permissionCount"),
       render: (row) => (

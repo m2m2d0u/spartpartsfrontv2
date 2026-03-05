@@ -1,9 +1,13 @@
+export type RoleLevel = "SYSTEM" | "STORE" | "WAREHOUSE";
+
 export type Role = {
   id: string;
   code: string;
   displayName: string;
   description: string;
   isSystem: boolean;
+  isSuperAdmin: boolean;
+  roleLevel: RoleLevel;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -45,6 +49,7 @@ export type CreateRoleRequest = {
   code: string;
   displayName: string;
   description?: string;
+  roleLevel?: RoleLevel;
   permissionIds?: string[];
 };
 

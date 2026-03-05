@@ -114,6 +114,14 @@ export default async function RoleDetailPage({ params }: Props) {
                   </StatusBadge>
                 </dd>
               </div>
+              <div>
+                <dt className="text-body-sm text-dark-6">{t("roleLevel")}</dt>
+                <dd>
+                  <StatusBadge variant={role.roleLevel === "SYSTEM" ? "info" : role.roleLevel === "STORE" ? "success" : "warning"}>
+                    {t(`roleLevel_${role.roleLevel}`)}
+                  </StatusBadge>
+                </dd>
+              </div>
               {role.description && (
                 <div>
                   <dt className="text-body-sm text-dark-6">

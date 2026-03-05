@@ -1,3 +1,5 @@
+import { RoleLevel } from "@/types/role";
+
 export enum Permission {
   // Stock
   STOCK_VIEW = "STOCK_VIEW",
@@ -228,6 +230,8 @@ export type User = {
   email: string;
   roleCode: string;
   roleDisplayName?: string;
+  roleLevel?: RoleLevel;
+  isSuperAdmin?: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

@@ -32,8 +32,15 @@ export default async function UserDetailPage({ params }: Props) {
   const tNav = await getTranslations("nav");
   const tCommon = await getTranslations("common");
 
-  const showStores = (user.stores?.length ?? 0) > 0;
-  const showWarehouses = (user.warehouseAssignments?.length ?? 0) > 0;
+  const isSuperAdmin = user.isSuperAdmin === true;
+  const showStores =
+    isSuperAdmin || user.roleLevel === "SYSTEM" || user.roleLevel === "STORE";
+  const showWarehouses =
+    isSuperAdmin ||
+    user.roleLevel === "SYSTEM" ||
+    user.roleLevel === "WAREHOUSE";
+
+  console.log(isSuperAdmin, showStores, showWarehouses);
 
   return (
     <>
@@ -99,7 +106,7 @@ export default async function UserDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Assignments based on role */}
+        {/* Assignments based on role level */}
         <div className="space-y-6 xl:col-span-2">
           {showStores && (
             <StoreAssignments
@@ -107,14 +114,12 @@ export default async function UserDetailPage({ params }: Props) {
               assignments={user.stores || []}
             />
           )}
-
           {showWarehouses && (
             <WarehouseAssignments
               userId={user.id}
               assignments={user.warehouseAssignments || []}
             />
           )}
-
           {!showStores && !showWarehouses && (
             <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
               <p className="py-4 text-center text-body-sm text-dark-6">

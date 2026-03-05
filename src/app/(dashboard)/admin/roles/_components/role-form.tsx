@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
-import type { Role } from "@/types";
+import type { Role, RoleLevel } from "@/types";
 
 type Props = {
   role?: Role;
@@ -33,6 +33,11 @@ export function RoleForm({ role }: Props) {
           )
           .required(tVal("required")),
     displayName: Yup.string().trim().required(tVal("nameRequired")),
+    roleLevel: isEditing
+      ? Yup.string()
+      : Yup.string()
+          .oneOf(["SYSTEM", "STORE", "WAREHOUSE"], tVal("required"))
+          .required(tVal("required")),
     description: Yup.string(),
     isActive: Yup.boolean(),
   });
@@ -41,6 +46,7 @@ export function RoleForm({ role }: Props) {
     initialValues: {
       code: role?.code || "",
       displayName: role?.displayName || "",
+      roleLevel: role?.roleLevel || "",
       description: role?.description || "",
       isActive: role?.isActive ?? true,
     },
@@ -62,6 +68,7 @@ export function RoleForm({ role }: Props) {
           const created = await createRole({
             code: values.code,
             displayName: values.displayName,
+            roleLevel: values.roleLevel as RoleLevel,
             description: values.description || undefined,
           });
           router.push(`/admin/roles/${created.id}`);
@@ -108,6 +115,32 @@ export function RoleForm({ role }: Props) {
             onBlur={formik.handleBlur}
             error={fieldError("displayName")}
           />
+        </div>
+
+        <div>
+          <label
+            htmlFor="roleLevel"
+            className="mb-1 block text-body-sm font-medium text-dark dark:text-white"
+          >
+            {t("roleLevel")} <span className="text-red">*</span>
+          </label>
+          <select
+            id="roleLevel"
+            name="roleLevel"
+            value={formik.values.roleLevel}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            disabled={isEditing}
+            className="w-full rounded-lg border border-stroke bg-transparent px-4 py-3 text-dark outline-none transition focus:border-primary disabled:cursor-not-allowed disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:disabled:bg-dark-3"
+          >
+            <option value="">{t("selectRoleLevel")}</option>
+            <option value="SYSTEM">{t("roleLevel_SYSTEM")}</option>
+            <option value="STORE">{t("roleLevel_STORE")}</option>
+            <option value="WAREHOUSE">{t("roleLevel_WAREHOUSE")}</option>
+          </select>
+          {formik.touched.roleLevel && formik.errors.roleLevel && (
+            <p className="mt-1 text-body-sm text-red">{formik.errors.roleLevel}</p>
+          )}
         </div>
 
         <InputGroup
