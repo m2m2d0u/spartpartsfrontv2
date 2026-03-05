@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getWarehouses } from "@/services/warehouses.server";
+import { getStores } from "@/services/stores.server";
 import { WarehouseStockTable } from "./_components/warehouse-stock-table";
 
 export const metadata: Metadata = {
@@ -9,7 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default async function WarehouseStockPage() {
-  const warehousesPage = await getWarehouses(0, 200, true);
+  const [warehousesPage, storesPage] = await Promise.all([
+    getWarehouses(0, 200, true),
+    getStores(0, 200, true),
+  ]);
 
   const t = await getTranslations("warehouseStock");
   const tNav = await getTranslations("nav");
@@ -25,7 +29,10 @@ export default async function WarehouseStockPage() {
         ]}
       />
 
-      <WarehouseStockTable warehouses={warehousesPage.content} />
+      <WarehouseStockTable
+        warehouses={warehousesPage.content}
+        stores={storesPage.content}
+      />
     </>
   );
 }

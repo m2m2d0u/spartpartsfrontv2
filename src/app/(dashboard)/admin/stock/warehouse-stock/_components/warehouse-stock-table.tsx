@@ -10,15 +10,26 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import { cn } from "@/lib/utils";
-import type { Warehouse, WarehouseStock, Part } from "@/types";
+import type { Warehouse, WarehouseStock, Part, Store } from "@/types";
 
 type Props = {
   warehouses: Warehouse[];
+  stores: Store[];
 };
 
-export function WarehouseStockTable({ warehouses }: Props) {
+export function WarehouseStockTable({ warehouses, stores }: Props) {
+  const hasMultipleStores = stores.length > 1;
+
+  const [selectedStore, setSelectedStore] = useState(
+    stores[0]?.id || "",
+  );
+
+  const filteredWarehouses = hasMultipleStores
+    ? warehouses.filter((w) => w.storeId === selectedStore)
+    : warehouses;
+
   const [selectedWarehouse, setSelectedWarehouse] = useState(
-    warehouses[0]?.id || "",
+    filteredWarehouses[0]?.id || "",
   );
   const [stockItems, setStockItems] = useState<WarehouseStock[]>([]);
   const [loading, setLoading] = useState(false);
@@ -240,12 +251,38 @@ export function WarehouseStockTable({ warehouses }: Props) {
     },
   ];
 
+  function handleStoreChange(storeId: string) {
+    setSelectedStore(storeId);
+    const storeWarehouses = warehouses.filter((w) => w.storeId === storeId);
+    setSelectedWarehouse(storeWarehouses[0]?.id || "");
+  }
+
   return (
     <>
-      {/* Warehouse tabs + Add Part button */}
+      {/* Store filter + Warehouse tabs + Add Part button */}
+      {hasMultipleStores && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {stores.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => handleStoreChange(s.id)}
+              className={cn(
+                "rounded-lg border px-4 py-2 text-sm font-medium transition",
+                selectedStore === s.id
+                  ? "border-primary bg-primary/10 text-primary dark:bg-primary/20"
+                  : "border-stroke bg-white text-dark hover:border-primary hover:text-primary dark:border-dark-3 dark:bg-gray-dark dark:text-white dark:hover:border-primary dark:hover:text-primary",
+              )}
+            >
+              {s.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-2">
-          {warehouses.map((w) => (
+          {filteredWarehouses.map((w) => (
             <button
               key={w.id}
               type="button"
