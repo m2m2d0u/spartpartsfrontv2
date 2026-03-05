@@ -1,26 +1,3 @@
-export type UserRole =
-  | "ADMINISTRATEUR"
-  | "RESPONSABLE_MAGASIN"
-  | "OPERATEUR_ENTREPOT"
-  | "RESPONSABLE_ENTREPOT"
-  | "MAGASINIER"
-  | "GESTIONNAIRE_COMMANDES"
-  | "RESPONSABLE_ACHATS"
-  | "COMPTABLE"
-  | "OBSERVATEUR_ENTREPOT";
-
-export enum UserRoleCode {
-  ADMINISTRATEUR = "ADMINISTRATEUR",
-  RESPONSABLE_MAGASIN = "RESPONSABLE_MAGASIN",
-  OPERATEUR_ENTREPOT = "OPERATEUR_ENTREPOT",
-  RESPONSABLE_ENTREPOT = "RESPONSABLE_ENTREPOT",
-  MAGASINIER = "MAGASINIER",
-  GESTIONNAIRE_COMMANDES = "GESTIONNAIRE_COMMANDES",
-  RESPONSABLE_ACHATS = "RESPONSABLE_ACHATS",
-  COMPTABLE = "COMPTABLE",
-  OBSERVATEUR_ENTREPOT = "OBSERVATEUR_ENTREPOT",
-}
-
 export enum Permission {
   // Stock
   STOCK_VIEW = "STOCK_VIEW",
@@ -249,7 +226,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  roleCode: UserRole;
+  roleCode: string;
   roleDisplayName?: string;
   isActive: boolean;
   createdAt: string;
@@ -270,7 +247,7 @@ export type CreateUserRequest = {
 export type UpdateUserRequest = {
   name: string;
   email: string;
-  roleCode: UserRole;
+  roleCode: string;
   isActive: boolean;
 };
 

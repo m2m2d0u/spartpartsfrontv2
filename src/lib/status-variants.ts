@@ -120,27 +120,6 @@ export function getUserStatusVariant(isActive: boolean): BadgeVariant {
   return isActive ? "success" : "neutral";
 }
 
-export function getUserRoleVariant(role: string): BadgeVariant {
-  switch (role) {
-    case "ADMINISTRATEUR":
-      return "error";
-    case "RESPONSABLE_MAGASIN":
-      return "info";
-    case "OPERATEUR_ENTREPOT":
-    case "RESPONSABLE_ENTREPOT":
-      return "warning";
-    case "MAGASINIER":
-    case "GESTIONNAIRE_COMMANDES":
-    case "RESPONSABLE_ACHATS":
-      return "success";
-    case "COMPTABLE":
-      return "info";
-    case "OBSERVATEUR_ENTREPOT":
-      return "neutral";
-    default:
-      return "neutral";
-  }
-}
 
 export function getStockMovementTypeVariant(
   type: string,

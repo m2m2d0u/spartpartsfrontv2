@@ -2,15 +2,13 @@
 
 import { useMemo, useCallback } from "react";
 import { useAuth } from "@/context/auth-context";
-import { type Permission, UserRoleCode } from "@/types";
+import type { Permission } from "@/types";
 
 export function usePermissions() {
   const { user } = useAuth();
 
-  const isAdmin = user?.roleCode === UserRoleCode.ADMINISTRATEUR;
-
   const allPermissions = useMemo(() => {
-    if (!user || isAdmin) return new Set<string>();
+    if (!user) return new Set<string>();
     const perms = new Set<string>();
     // Role-level permissions
     if (user.permissions) {
@@ -19,29 +17,29 @@ export function usePermissions() {
       }
     }
     // Warehouse-assignment-level permissions
-    for (const assignment of user.warehouseAssignments) {
-      for (const p of assignment.permissions) {
-        perms.add(p);
+    if (user.warehouseAssignments) {
+      for (const assignment of user.warehouseAssignments) {
+        for (const p of assignment.permissions) {
+          perms.add(p);
+        }
       }
     }
     return perms;
-  }, [user, isAdmin]);
+  }, [user]);
 
   const hasPermission = useCallback(
     (code: Permission): boolean => {
-      if (isAdmin) return true;
       return allPermissions.has(code);
     },
-    [isAdmin, allPermissions],
+    [allPermissions],
   );
 
   const hasAnyPermission = useCallback(
     (codes: Permission[]): boolean => {
-      if (isAdmin) return true;
       return codes.some((code) => allPermissions.has(code));
     },
-    [isAdmin, allPermissions],
+    [allPermissions],
   );
 
-  return { hasPermission, hasAnyPermission, isAdmin };
+  return { hasPermission, hasAnyPermission };
 }

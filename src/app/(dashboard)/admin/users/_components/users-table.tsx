@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { getUserStatusVariant, getUserRoleVariant } from "@/lib/status-variants";
+import { getUserStatusVariant } from "@/lib/status-variants";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import type { User } from "@/types";
@@ -93,7 +93,7 @@ export function UsersTable({ users: initialUsers, totalElements: initialTotal, i
       header: t("role"),
       render: (row) =>
         row.roleCode ? (
-          <StatusBadge variant={getUserRoleVariant(row.roleCode)}>
+          <StatusBadge variant="info">
             {row.roleDisplayName || row.roleCode}
           </StatusBadge>
         ) : (

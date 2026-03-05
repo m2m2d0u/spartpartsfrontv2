@@ -9,7 +9,6 @@ import { updateUser } from "@/services/users.service";
 import { EmailIcon, UserIcon } from "@/assets/icons";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { ShowcaseSection } from "@/components/Layouts/showcase-section";
-import type { UserRole } from "@/types";
 
 export function PersonalInfoForm() {
   const { user, refreshUser } = useAuth();
@@ -39,7 +38,7 @@ export function PersonalInfoForm() {
         await updateUser(user.id, {
           name: values.name,
           email: values.email,
-          roleCode: user.roleCode as UserRole,
+          roleCode: user.roleCode,
           isActive: user.isActive,
         });
         await refreshUser();

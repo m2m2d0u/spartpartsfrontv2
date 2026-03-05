@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EmailIcon, PasswordIcon } from "@/assets/icons";
 import InputGroup from "@/components/FormElements/InputGroup";
@@ -64,7 +65,7 @@ export function SigninForm() {
       <InputGroup
         type="password"
         label="Password"
-        className="mb-6 [&_input]:py-[15px]"
+        className="mb-4 [&_input]:py-[15px]"
         placeholder="Enter your password"
         name="password"
         handleChange={(e) => {
@@ -74,6 +75,15 @@ export function SigninForm() {
         value={password}
         icon={<PasswordIcon />}
       />
+
+      <div className="mb-6 text-right">
+        <Link
+          href="/auth/forgot-password"
+          className="text-sm text-primary hover:underline"
+        >
+          Forgot password?
+        </Link>
+      </div>
 
       <button
         type="submit"

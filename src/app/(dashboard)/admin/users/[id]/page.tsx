@@ -6,13 +6,13 @@ import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
   getUserStatusVariant,
-  getUserRoleVariant,
 } from "@/lib/status-variants";
 import { getUserById } from "@/services/users.server";
 import { WarehouseAssignments } from "../_components/warehouse-assignments";
 import { StoreAssignments } from "../_components/store-assignments";
+import { AdminResetPasswordButton } from "../_components/admin-reset-password";
 import { PermissionGate } from "@/components/PermissionGate";
-import { Permission, UserRoleCode } from "@/types";
+import { Permission } from "@/types";
 
 export const metadata: Metadata = {
   title: "User Detail",
@@ -32,10 +32,8 @@ export default async function UserDetailPage({ params }: Props) {
   const tNav = await getTranslations("nav");
   const tCommon = await getTranslations("common");
 
-  const showStores = user.roleCode === UserRoleCode.RESPONSABLE_MAGASIN;
-  const showWarehouses =
-    user.roleCode === UserRoleCode.OPERATEUR_ENTREPOT ||
-    user.roleCode === UserRoleCode.RESPONSABLE_ENTREPOT;
+  const showStores = (user.stores?.length ?? 0) > 0;
+  const showWarehouses = (user.warehouseAssignments?.length ?? 0) > 0;
 
   return (
     <>
@@ -47,14 +45,19 @@ export default async function UserDetailPage({ params }: Props) {
           { label: user.name },
         ]}
         actions={
-          <PermissionGate permission={Permission.USER_UPDATE}>
-            <Link
-              href={`/admin/users/${user.id}/edit`}
-              className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-            >
-              {t("editUser")}
-            </Link>
-          </PermissionGate>
+          <div className="flex items-center gap-2">
+            <PermissionGate permission={Permission.USER_UPDATE}>
+              <AdminResetPasswordButton userId={user.id} />
+            </PermissionGate>
+            <PermissionGate permission={Permission.USER_UPDATE}>
+              <Link
+                href={`/admin/users/${user.id}/edit`}
+                className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+              >
+                {t("editUser")}
+              </Link>
+            </PermissionGate>
+          </div>
         }
       />
 
@@ -87,7 +90,7 @@ export default async function UserDetailPage({ params }: Props) {
               <div>
                 <dt className="text-body-sm text-dark-6">{t("role")}</dt>
                 <dd>
-                  <StatusBadge variant={getUserRoleVariant(user.roleCode)}>
+                  <StatusBadge variant="info">
                     {user.roleDisplayName || user.roleCode}
                   </StatusBadge>
                 </dd>
@@ -112,10 +115,10 @@ export default async function UserDetailPage({ params }: Props) {
             />
           )}
 
-          {user.roleCode === UserRoleCode.ADMINISTRATEUR && (
+          {!showStores && !showWarehouses && (
             <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
               <p className="py-4 text-center text-body-sm text-dark-6">
-                {t("adminFullAccess")}
+                {t("noAssignments")}
               </p>
             </div>
           )}
