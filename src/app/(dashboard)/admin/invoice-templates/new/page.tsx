@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
+import { getAllTaxRates } from "@/services/tax-rates.server";
 import { InvoiceTemplateForm } from "../_components/invoice-template-form";
 
 export const metadata: Metadata = {
@@ -8,8 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default async function NewInvoiceTemplatePage() {
-  const t = await getTranslations("invoiceTemplates");
-  const tNav = await getTranslations("nav");
+  const [t, tNav, taxRates] = await Promise.all([
+    getTranslations("invoiceTemplates"),
+    getTranslations("nav"),
+    getAllTaxRates().catch(() => []),
+  ]);
 
   return (
     <>
@@ -23,7 +27,7 @@ export default async function NewInvoiceTemplatePage() {
         ]}
       />
 
-      <InvoiceTemplateForm />
+      <InvoiceTemplateForm taxRates={taxRates} />
     </>
   );
 }

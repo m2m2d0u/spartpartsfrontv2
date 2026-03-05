@@ -130,6 +130,12 @@ export default async function InvoiceTemplateDetailPage({ params }: Props) {
                 {template.headerLayout}
               </p>
             </div>
+            <div>
+              <p className="text-body-sm text-dark-6">{t("taxRate")}</p>
+              <p className="mt-1 font-medium text-dark dark:text-white">
+                {template.taxRateLabel ?? t("noTaxRate")}
+              </p>
+            </div>
           </div>
         </FormSection>
 

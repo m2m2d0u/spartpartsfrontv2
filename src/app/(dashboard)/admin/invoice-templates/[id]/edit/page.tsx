@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getInvoiceTemplateById } from "@/services/invoice-templates.server";
+import { getAllTaxRates } from "@/services/tax-rates.server";
 import { InvoiceTemplateForm } from "../../_components/invoice-template-form";
 
 export const metadata: Metadata = {
@@ -15,7 +16,10 @@ type Props = {
 
 export default async function EditInvoiceTemplatePage({ params }: Props) {
   const { id } = await params;
-  const template = await getInvoiceTemplateById(id).catch(() => null);
+  const [template, taxRates] = await Promise.all([
+    getInvoiceTemplateById(id).catch(() => null),
+    getAllTaxRates().catch(() => []),
+  ]);
 
   if (!template) notFound();
 
@@ -39,7 +43,7 @@ export default async function EditInvoiceTemplatePage({ params }: Props) {
         ]}
       />
 
-      <InvoiceTemplateForm template={template} />
+      <InvoiceTemplateForm template={template} taxRates={taxRates} />
     </>
   );
 }

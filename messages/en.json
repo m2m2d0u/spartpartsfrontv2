@@ -750,6 +750,8 @@
     "showDiscountColumn": "Show Discount Column",
     "defaultNotes": "Default Notes",
     "defaultNotesPlaceholder": "Default notes that will appear on invoices using this template",
+    "taxRate": "Tax Rate",
+    "noTaxRate": "No tax rate",
     "searchTemplates": "Search templates...",
     "noTemplates": "No templates found",
     "noTemplatesDescription": "Create your first invoice template to get started",

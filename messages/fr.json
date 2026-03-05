@@ -750,6 +750,8 @@
     "showDiscountColumn": "Afficher la colonne remise",
     "defaultNotes": "Notes par défaut",
     "defaultNotesPlaceholder": "Notes par défaut qui apparaîtront sur les factures utilisant ce modèle",
+    "taxRate": "Taux de taxe",
+    "noTaxRate": "Aucun taux de taxe",
     "searchTemplates": "Rechercher des modèles...",
     "noTemplates": "Aucun modèle trouvé",
     "noTemplatesDescription": "Créez votre premier modèle de facture pour commencer",

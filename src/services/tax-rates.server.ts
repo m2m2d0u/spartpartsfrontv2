@@ -9,3 +9,7 @@ export async function getTaxRates(
     `/tax-rates?page=${page}&size=${size}`,
   );
 }
+
+export async function getAllTaxRates(): Promise<TaxRate[]> {
+  return serverGet<TaxRate[]>("/tax-rates/all");
+}

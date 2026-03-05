@@ -127,6 +127,8 @@ export type InvoiceTemplate = {
   showCustomerTaxId: boolean;
   showPaymentTerms: boolean;
   showDiscountColumn: boolean;
+  taxRateId: string | null;
+  taxRateLabel: string | null;
   defaultNotes: string;
   createdAt: string;
   updatedAt: string;
@@ -157,6 +159,7 @@ export type CreateInvoiceTemplateRequest = {
   showCustomerTaxId?: boolean;
   showPaymentTerms?: boolean;
   showDiscountColumn?: boolean;
+  taxRateId?: string;
   defaultNotes?: string;
 };
 

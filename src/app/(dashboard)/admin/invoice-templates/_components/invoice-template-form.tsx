@@ -11,11 +11,12 @@ import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
 import { UploadIcon } from "@/assets/icons";
 import { InvoiceDesignCode } from "@/types";
-import type { InvoiceTemplate, InvoiceDesign } from "@/types";
+import type { InvoiceTemplate, InvoiceDesign, TaxRate } from "@/types";
 import { PdfViewerDialog } from "@/components/ui/pdf-viewer-dialog";
 
 type Props = {
   template?: InvoiceTemplate;
+  taxRates?: TaxRate[];
 };
 
 const DESIGN_OPTIONS: { value: InvoiceDesign; label: string }[] = [
@@ -167,7 +168,7 @@ function ImageUploadZone({
   );
 }
 
-export function InvoiceTemplateForm({ template }: Props) {
+export function InvoiceTemplateForm({ template, taxRates = [] }: Props) {
   const router = useRouter();
   const isEditing = !!template;
   const [saving, setSaving] = useState(false);
@@ -239,6 +240,7 @@ export function InvoiceTemplateForm({ template }: Props) {
       showCustomerTaxId: template?.showCustomerTaxId ?? true,
       showPaymentTerms: template?.showPaymentTerms ?? true,
       showDiscountColumn: template?.showDiscountColumn ?? true,
+      taxRateId: template?.taxRateId || "",
       defaultNotes: template?.defaultNotes || "",
     },
     validationSchema: Yup.object({
@@ -284,6 +286,7 @@ export function InvoiceTemplateForm({ template }: Props) {
           showCustomerTaxId: values.showCustomerTaxId,
           showPaymentTerms: values.showPaymentTerms,
           showDiscountColumn: values.showDiscountColumn,
+          taxRateId: values.taxRateId || undefined,
           defaultNotes: values.defaultNotes || undefined,
         };
 
@@ -371,6 +374,7 @@ export function InvoiceTemplateForm({ template }: Props) {
           showCustomerTaxId: v.showCustomerTaxId,
           showPaymentTerms: v.showPaymentTerms,
           showDiscountColumn: v.showDiscountColumn,
+          taxRateId: v.taxRateId || undefined,
           defaultNotes: v.defaultNotes || undefined,
         },
         files.logo,
@@ -557,6 +561,20 @@ export function InvoiceTemplateForm({ template }: Props) {
             value={formik.values.headerLayout}
             onChange={(e) =>
               formik.setFieldValue("headerLayout", e.target.value)
+            }
+          />
+          <Select
+            label={t("taxRate")}
+            items={[
+              { value: "", label: t("noTaxRate") },
+              ...taxRates.map((tr) => ({
+                value: tr.id,
+                label: `${tr.label} (${tr.rate}%)`,
+              })),
+            ]}
+            value={formik.values.taxRateId}
+            onChange={(e) =>
+              formik.setFieldValue("taxRateId", e.target.value)
             }
           />
         </div>
