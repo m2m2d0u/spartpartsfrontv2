@@ -9,7 +9,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import { getInvoiceStatusVariant } from "@/lib/status-variants";
-import { standardFormat } from "@/lib/format-number";
+import { formatCurrency, type CurrencyFormatOptions } from "@/lib/format-number";
 import { InvoiceStatusCode, InvoiceTypeCode } from "@/types";
 import type { Invoice, InvoiceStatus, InvoiceType } from "@/types";
 
@@ -19,9 +19,10 @@ const TYPES: InvoiceType[] = Object.values(InvoiceTypeCode);
 
 type Props = {
   invoices: Invoice[];
+  currencyOptions?: CurrencyFormatOptions;
 };
 
-export function InvoicesTable({ invoices: initial }: Props) {
+export function InvoicesTable({ invoices: initial, currencyOptions }: Props) {
   const [invoices, setInvoices] = useState(initial);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -124,7 +125,7 @@ export function InvoicesTable({ invoices: initial }: Props) {
       header: t("totalAmount"),
       render: (row) => (
         <span className="font-medium text-dark dark:text-white">
-          {standardFormat(row.totalAmount)}
+          {formatCurrency(row.totalAmount, currencyOptions)}
         </span>
       ),
     },

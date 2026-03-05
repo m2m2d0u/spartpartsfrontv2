@@ -26,6 +26,10 @@ export type Store = {
   defaultInvoiceNotes: string | null;
   defaultWarehouseId: string | null;
   portalWarehouseId: string | null;
+  currencySymbol: string | null;
+  currencyPosition: string | null;
+  currencyDecimals: number | null;
+  thousandsSeparator: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -58,6 +62,10 @@ export type CreateStoreRequest = {
   defaultInvoiceNotes?: string;
   defaultWarehouseId?: string;
   portalWarehouseId?: string;
+  currencySymbol?: string;
+  currencyPosition?: string;
+  currencyDecimals?: number;
+  thousandsSeparator?: string;
 };
 
 /** Mirrors backend UpdateStoreRequest */

@@ -5,6 +5,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
+import { Select } from "@/components/FormElements/select";
 import { FormSection } from "@/components/FormSection";
 import type { CompanySettings, Store } from "@/types";
 
@@ -39,6 +40,10 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
       .integer(tVal("mustBeWholeNumber"))
       .nullable(),
     defaultInvoiceNotes: Yup.string(),
+    currencySymbol: Yup.string(),
+    currencyPosition: Yup.string(),
+    currencyDecimals: Yup.string(),
+    thousandsSeparator: Yup.string(),
   });
 
   const formik = useFormik({
@@ -60,6 +65,12 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
           ? String(store.defaultProformaValidity)
           : "",
       defaultInvoiceNotes: store.defaultInvoiceNotes || "",
+      currencySymbol: store.currencySymbol || "",
+      currencyPosition: store.currencyPosition || "",
+      currencyDecimals: store.currencyDecimals != null
+        ? String(store.currencyDecimals)
+        : "",
+      thousandsSeparator: store.thousandsSeparator || "",
     },
     validationSchema: overridesSchema,
     onSubmit: async (values) => {
@@ -87,6 +98,12 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
           ? parseInt(values.defaultProformaValidity)
           : undefined,
         defaultInvoiceNotes: values.defaultInvoiceNotes || undefined,
+        currencySymbol: values.currencySymbol || undefined,
+        currencyPosition: values.currencyPosition || undefined,
+        currencyDecimals: values.currencyDecimals
+          ? parseInt(values.currencyDecimals)
+          : undefined,
+        thousandsSeparator: values.thousandsSeparator || undefined,
       });
       setSaved(true);
     },
@@ -224,6 +241,64 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
             placeholder={companySettings.defaultInvoiceNotes}
             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
           />
+        </div>
+
+        <div className="border-t border-stroke pt-5 dark:border-dark-3">
+          <h4 className="mb-4 text-body-sm font-medium text-dark dark:text-white">
+            {t("currencySettings")}
+          </h4>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <InputGroup
+              label={t("currencySymbol")}
+              name="currencySymbol"
+              type="text"
+              placeholder={companySettings.currencySymbol || "FCFA"}
+              value={formik.values.currencySymbol}
+              handleChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            <Select
+              label={t("currencyPosition")}
+              items={[
+                { value: "", label: t("useDefault") },
+                { value: "BEFORE", label: t("beforeAmount") },
+                { value: "AFTER", label: t("afterAmount") },
+              ]}
+              value={formik.values.currencyPosition}
+              onChange={(e) => {
+                formik.setFieldValue("currencyPosition", e.target.value);
+                setSaved(false);
+              }}
+            />
+            <Select
+              label={t("currencyDecimals")}
+              items={[
+                { value: "", label: t("useDefault") },
+                { value: "0", label: "0 (1 000)" },
+                { value: "2", label: "2 (1 000,00)" },
+                { value: "3", label: "3 (1 000,000)" },
+              ]}
+              value={formik.values.currencyDecimals}
+              onChange={(e) => {
+                formik.setFieldValue("currencyDecimals", e.target.value);
+                setSaved(false);
+              }}
+            />
+            <Select
+              label={t("thousandsSeparator")}
+              items={[
+                { value: "", label: t("useDefault") },
+                { value: " ", label: t("separatorSpace") },
+                { value: ".", label: t("separatorDot") },
+                { value: ",", label: t("separatorComma") },
+              ]}
+              value={formik.values.thousandsSeparator}
+              onChange={(e) => {
+                formik.setFieldValue("thousandsSeparator", e.target.value);
+                setSaved(false);
+              }}
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-3 pt-2">

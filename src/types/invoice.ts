@@ -191,6 +191,7 @@ export type CreateInvoiceRequest = {
 
 /** Mirrors backend UpdateInvoiceRequest */
 export type UpdateInvoiceRequest = {
+  invoiceType?: InvoiceType;
   orderId?: string;
   proformaId?: string;
   depositId?: string;

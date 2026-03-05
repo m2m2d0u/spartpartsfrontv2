@@ -10,7 +10,7 @@ import { FormDialog } from "@/components/ui/form-dialog";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { SearchableSelect } from "@/components/FormElements/searchable-select";
-import { standardFormat } from "@/lib/format-number";
+import { formatCurrency, type CurrencyFormatOptions } from "@/lib/format-number";
 import { InvoiceStatusCode, InvoiceTypeCode } from "@/types";
 import type {
   Invoice,
@@ -25,6 +25,7 @@ type Props = {
   invoice?: Invoice;
   customers: Customer[];
   templates: InvoiceTemplate[];
+  currencyOptions?: CurrencyFormatOptions;
 };
 
 type InvoiceItemRow = {
@@ -36,7 +37,7 @@ type InvoiceItemRow = {
 
 type PartOption = { id: string; name: string; partNumber: string; sellingPrice: number };
 
-export function InvoiceForm({ invoice, customers, templates }: Props) {
+export function InvoiceForm({ invoice, customers, templates, currencyOptions }: Props) {
   const router = useRouter();
   const isEditing = !!invoice;
   const [saving, setSaving] = useState(false);
@@ -242,6 +243,7 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
             "@/services/invoices.service"
           );
           await updateInvoice(invoice.id, {
+            invoiceType: values.invoiceType as InvoiceType,
             templateId: values.templateId,
             issuedDate: values.issuedDate,
             dueDate: values.dueDate || undefined,
@@ -339,21 +341,19 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
         description={t("invoiceDetailsDesc")}
       >
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {!isEditing && (
-            <Select
-              label={t("invoiceType")}
-              items={[
-                { value: InvoiceTypeCode.STANDARD, label: t("type_STANDARD") },
-                { value: InvoiceTypeCode.PROFORMA, label: t("type_PROFORMA") },
-                { value: InvoiceTypeCode.DEPOSIT, label: t("type_DEPOSIT") },
-              ]}
-              value={formik.values.invoiceType}
-              onChange={(e) =>
-                formik.setFieldValue("invoiceType", e.target.value)
-              }
-              required
-            />
-          )}
+          <Select
+            label={t("invoiceType")}
+            items={[
+              { value: InvoiceTypeCode.STANDARD, label: t("type_STANDARD") },
+              { value: InvoiceTypeCode.PROFORMA, label: t("type_PROFORMA") },
+              { value: InvoiceTypeCode.DEPOSIT, label: t("type_DEPOSIT") },
+            ]}
+            value={formik.values.invoiceType}
+            onChange={(e) =>
+              formik.setFieldValue("invoiceType", e.target.value)
+            }
+            required
+          />
           {!isEditing && (
             <Select
               label={t("invoiceStatus")}
@@ -522,7 +522,7 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
                   {t("lineTotal")}
                 </p>
                 <p className="py-3 font-medium text-dark dark:text-white">
-                  {standardFormat(lineTotal(item))}
+                  {formatCurrency(lineTotal(item), currencyOptions)}
                 </p>
               </div>
               {items.length > 1 && (
@@ -562,7 +562,7 @@ export function InvoiceForm({ invoice, customers, templates }: Props) {
             <div className="text-right">
               <span className="text-body-sm text-dark-6">{t("totalAmount")}:</span>{" "}
               <span className="text-lg font-semibold text-dark dark:text-white">
-                {standardFormat(grandTotal)}
+                {formatCurrency(grandTotal, currencyOptions)}
               </span>
             </div>
           </div>

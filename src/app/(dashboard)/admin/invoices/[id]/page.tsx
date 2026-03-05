@@ -8,8 +8,9 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Permission, InvoiceStatusCode } from "@/types";
 import { getInvoiceStatusVariant } from "@/lib/status-variants";
-import { standardFormat } from "@/lib/format-number";
+import { formatCurrency } from "@/lib/format-number";
 import { getInvoiceById } from "@/services/invoices.server";
+import { getCompanySettings } from "@/services/company-settings.server";
 import {
   Table,
   TableBody,
@@ -31,13 +32,23 @@ type Props = {
 
 export default async function InvoiceDetailPage({ params }: Props) {
   const { id } = await params;
-  const invoice = await getInvoiceById(id).catch(() => null);
+  const [invoice, companySettings] = await Promise.all([
+    getInvoiceById(id).catch(() => null),
+    getCompanySettings(),
+  ]);
 
   if (!invoice) notFound();
 
   const t = await getTranslations("invoices");
   const tNav = await getTranslations("nav");
   const tCommon = await getTranslations("common");
+
+  const currencyOpts = {
+    symbol: companySettings.currencySymbol,
+    position: companySettings.currencyPosition,
+    decimals: companySettings.currencyDecimals,
+    thousandsSeparator: companySettings.thousandsSeparator,
+  };
 
   return (
     <>
@@ -226,7 +237,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
                   <TableCell>{item.partName}</TableCell>
                   <TableCell className="text-right">{item.quantity}</TableCell>
                   <TableCell className="text-right">
-                    {standardFormat(item.unitPrice)}
+                    {formatCurrency(item.unitPrice, currencyOpts)}
                   </TableCell>
                   <TableCell className="text-right">
                     {item.discountPercent > 0
@@ -235,11 +246,11 @@ export default async function InvoiceDetailPage({ params }: Props) {
                   </TableCell>
                   <TableCell className="text-right">
                     {item.discountAmount > 0
-                      ? standardFormat(item.discountAmount)
+                      ? formatCurrency(item.discountAmount, currencyOpts)
                       : "—"}
                   </TableCell>
                   <TableCell className="text-right font-medium text-dark dark:text-white">
-                    {standardFormat(item.totalPrice)}
+                    {formatCurrency(item.totalPrice, currencyOpts)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -252,14 +263,14 @@ export default async function InvoiceDetailPage({ params }: Props) {
               <div className="flex justify-between text-sm">
                 <span className="text-dark-6">{t("subtotal")}</span>
                 <span className="text-dark dark:text-white">
-                  {standardFormat(invoice.subtotal)}
+                  {formatCurrency(invoice.subtotal, currencyOpts)}
                 </span>
               </div>
               {invoice.discountAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-dark-6">{t("discount")}</span>
                   <span className="text-red">
-                    -{standardFormat(invoice.discountAmount)}
+                    -{formatCurrency(invoice.discountAmount, currencyOpts)}
                   </span>
                 </div>
               )}
@@ -267,7 +278,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
                 <div className="flex justify-between text-sm">
                   <span className="text-dark-6">{t("tax")}</span>
                   <span className="text-dark dark:text-white">
-                    {standardFormat(invoice.taxAmount)}
+                    {formatCurrency(invoice.taxAmount, currencyOpts)}
                   </span>
                 </div>
               )}
@@ -275,7 +286,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
                 <div className="flex justify-between text-sm">
                   <span className="text-dark-6">{t("depositDeduction")}</span>
                   <span className="text-red">
-                    -{standardFormat(invoice.depositDeduction)}
+                    -{formatCurrency(invoice.depositDeduction, currencyOpts)}
                   </span>
                 </div>
               )}
@@ -284,7 +295,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
                   {t("totalAmount")}
                 </span>
                 <span className="font-semibold text-dark dark:text-white">
-                  {standardFormat(invoice.totalAmount)}
+                  {formatCurrency(invoice.totalAmount, currencyOpts)}
                 </span>
               </div>
             </div>
@@ -314,7 +325,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
                     </TableCell>
                     <TableCell>{payment.paymentMethod}</TableCell>
                     <TableCell className="text-right font-medium text-dark dark:text-white">
-                      {standardFormat(payment.amount)}
+                      {formatCurrency(payment.amount, currencyOpts)}
                     </TableCell>
                     <TableCell>{payment.reference || "—"}</TableCell>
                     <TableCell>{payment.notes || "—"}</TableCell>

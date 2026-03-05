@@ -30,6 +30,7 @@ export type CompanySettings = {
   currencySymbol: string;
   currencyPosition: string;
   currencyDecimals: number;
+  thousandsSeparator: string;
   defaultWarehouseId: string | null;
   portalWarehouseId: string | null;
   portalEnabled: boolean;

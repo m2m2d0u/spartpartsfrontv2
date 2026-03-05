@@ -18,6 +18,7 @@ export function BulkImportForm() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<BulkImportResult | null>(null);
   const [error, setError] = useState("");
+  const [downloading, setDownloading] = useState(false);
 
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
@@ -64,6 +65,18 @@ export function BulkImportForm() {
     }
   }
 
+  async function handleDownloadTemplate() {
+    setDownloading(true);
+    try {
+      const { downloadImportTemplate } = await import("@/services/parts.service");
+      await downloadImportTemplate();
+    } catch {
+      setError(t("bulkImportFailed"));
+    } finally {
+      setDownloading(false);
+    }
+  }
+
   const fileExtension = file?.name.split(".").pop()?.toLowerCase();
   const isValidType = fileExtension === "xlsx" || fileExtension === "xls" || fileExtension === "csv";
 
@@ -71,6 +84,54 @@ export function BulkImportForm() {
     <div className="space-y-6">
       {/* File Upload */}
       <FormSection title={t("bulkImportTitle")} description={t("bulkImportDesc")}>
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={handleDownloadTemplate}
+            disabled={downloading}
+            className="inline-flex items-center gap-2 rounded-lg border border-stroke px-4 py-2.5 text-sm font-medium text-dark hover:bg-gray-2 disabled:opacity-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-2"
+          >
+            {downloading ? (
+              <svg
+                className="size-4 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+            ) : (
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                className="shrink-0"
+              >
+                <path
+                  d="M14 10v2.667A1.334 1.334 0 0112.667 14H3.333A1.334 1.334 0 012 12.667V10M4.667 6.667L8 10l3.333-3.333M8 10V2"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            )}
+            {t("downloadTemplate")}
+          </button>
+        </div>
+
         {file ? (
           <div className="flex items-center justify-between rounded-lg border border-stroke p-4 dark:border-dark-3">
             <div className="flex items-center gap-3">

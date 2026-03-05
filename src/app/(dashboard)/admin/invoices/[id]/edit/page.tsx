@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { getInvoiceById } from "@/services/invoices.server";
 import { getCustomers } from "@/services/customers.server";
 import { getInvoiceTemplates } from "@/services/invoice-templates.server";
+import { getCompanySettings } from "@/services/company-settings.server";
 import { InvoiceForm } from "../../_components/invoice-form";
 import { InvoiceStatusCode, InvoiceTypeCode } from "@/types";
 
@@ -19,10 +20,11 @@ type Props = {
 export default async function EditInvoicePage({ params }: Props) {
   const { id } = await params;
 
-  const [invoice, customersPage, templatesPage] = await Promise.all([
+  const [invoice, customersPage, templatesPage, settings] = await Promise.all([
     getInvoiceById(id).catch(() => null),
     getCustomers(0, 500),
     getInvoiceTemplates(0, 100),
+    getCompanySettings(),
   ]);
 
   if (!invoice || invoice.status !== InvoiceStatusCode.DRAFT) notFound();
@@ -51,6 +53,12 @@ export default async function EditInvoicePage({ params }: Props) {
         invoice={invoice}
         customers={customersPage.content}
         templates={templatesPage.content}
+        currencyOptions={{
+          symbol: settings.currencySymbol,
+          position: settings.currencyPosition,
+          decimals: settings.currencyDecimals,
+          thousandsSeparator: settings.thousandsSeparator,
+        }}
       />
     </>
   );

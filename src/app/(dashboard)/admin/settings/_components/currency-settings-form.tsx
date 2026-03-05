@@ -19,6 +19,7 @@ export function CurrencySettingsForm({ settings }: Props) {
     currencySymbol: settings.currencySymbol,
     currencyPosition: settings.currencyPosition,
     currencyDecimals: String(settings.currencyDecimals),
+    thousandsSeparator: settings.thousandsSeparator || " ",
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -33,6 +34,7 @@ export function CurrencySettingsForm({ settings }: Props) {
       currencySymbol: form.currencySymbol,
       currencyPosition: form.currencyPosition,
       currencyDecimals: parseInt(form.currencyDecimals),
+      thousandsSeparator: form.thousandsSeparator,
     });
     setSaving(false);
     setSaved(true);
@@ -44,7 +46,7 @@ export function CurrencySettingsForm({ settings }: Props) {
       description={t("description")}
     >
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <InputGroup
             label={t("currencySymbol")}
             name="currencySymbol"
@@ -71,9 +73,9 @@ export function CurrencySettingsForm({ settings }: Props) {
           <Select
             label={t("decimalPlaces")}
             items={[
-              { value: "0", label: "0 (1,000)" },
-              { value: "2", label: "2 (1,000.00)" },
-              { value: "3", label: "3 (1,000.000)" },
+              { value: "0", label: "0 (1 000)" },
+              { value: "2", label: "2 (1 000,00)" },
+              { value: "3", label: "3 (1 000,000)" },
             ]}
             value={form.currencyDecimals}
             onChange={(e) => {
@@ -84,15 +86,36 @@ export function CurrencySettingsForm({ settings }: Props) {
               setSaved(false);
             }}
           />
+          <Select
+            label={t("thousandsSeparator")}
+            items={[
+              { value: " ", label: t("separatorSpace") },
+              { value: ".", label: t("separatorDot") },
+              { value: ",", label: t("separatorComma") },
+            ]}
+            value={form.thousandsSeparator}
+            onChange={(e) => {
+              setForm((prev) => ({
+                ...prev,
+                thousandsSeparator: e.target.value,
+              }));
+              setSaved(false);
+            }}
+          />
         </div>
 
         <div className="rounded-lg bg-gray-2 p-4 dark:bg-dark-2">
           <p className="text-body-sm text-dark-6">
             {t("preview")}:{" "}
             <span className="font-medium text-dark dark:text-white">
-              {form.currencyPosition === "BEFORE"
-                ? `${form.currencySymbol} 1${parseInt(form.currencyDecimals) > 0 ? "." + "0".repeat(parseInt(form.currencyDecimals)) : ",000"}`
-                : `1${parseInt(form.currencyDecimals) > 0 ? "." + "0".repeat(parseInt(form.currencyDecimals)) : ",000"} ${form.currencySymbol}`}
+              {(() => {
+                const sep = form.thousandsSeparator || " ";
+                const dec = parseInt(form.currencyDecimals);
+                const num = `1${sep}000${dec > 0 ? "," + "0".repeat(dec) : ""}`;
+                return form.currencyPosition === "BEFORE"
+                  ? `${form.currencySymbol} ${num}`
+                  : `${num} ${form.currencySymbol}`;
+              })()}
             </span>
           </p>
         </div>

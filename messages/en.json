@@ -176,7 +176,8 @@
     "bulkImportField": "Field",
     "bulkImportMessage": "Error Message",
     "bulkImportViewParts": "View Parts",
-    "bulkImportUploadAnother": "Upload Another File"
+    "bulkImportUploadAnother": "Upload Another File",
+    "downloadTemplate": "Download Template"
   },
   "categories": {
     "title": "Categories",
@@ -445,6 +446,17 @@
     "paymentTerms": "Payment Terms (days)",
     "proformaValidity": "Proforma Validity (days)",
     "defaultInvoiceNotes": "Default Invoice Notes",
+    "currencySettings": "Currency Settings",
+    "currencySymbol": "Currency Symbol",
+    "currencyPosition": "Symbol Position",
+    "currencyDecimals": "Decimal Places",
+    "useDefault": "Use company default",
+    "beforeAmount": "Before amount ($100)",
+    "afterAmount": "After amount (100 FCFA)",
+    "thousandsSeparator": "Thousands Separator",
+    "separatorSpace": "Space (1 000)",
+    "separatorDot": "Dot (1.000)",
+    "separatorComma": "Comma (1,000)",
     "saveOverrides": "Save Overrides",
     "savedSuccess": "Store overrides saved successfully"
   },
@@ -503,6 +515,10 @@
       "beforeAmount": "Before amount ($100)",
       "afterAmount": "After amount (100 FCFA)",
       "decimalPlaces": "Decimal Places",
+      "thousandsSeparator": "Thousands Separator",
+      "separatorSpace": "Space (1 000)",
+      "separatorDot": "Dot (1.000)",
+      "separatorComma": "Comma (1,000)",
       "preview": "Preview:",
       "saveCurrency": "Save Currency Settings",
       "savedSuccess": "Currency settings saved successfully"

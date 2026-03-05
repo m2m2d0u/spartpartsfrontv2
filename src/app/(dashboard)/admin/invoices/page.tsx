@@ -7,6 +7,7 @@ import { DataTableSkeleton } from "@/components/DataTable/skeleton";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import { getInvoices } from "@/services/invoices.server";
+import { getCompanySettings } from "@/services/company-settings.server";
 import { InvoicesTable } from "./_components/invoices-table";
 
 export const metadata: Metadata = {
@@ -14,8 +15,21 @@ export const metadata: Metadata = {
 };
 
 async function InvoicesData() {
-  const page = await getInvoices(0, 200);
-  return <InvoicesTable invoices={page.content} />;
+  const [page, settings] = await Promise.all([
+    getInvoices(0, 200),
+    getCompanySettings(),
+  ]);
+  return (
+    <InvoicesTable
+      invoices={page.content}
+      currencyOptions={{
+        symbol: settings.currencySymbol,
+        position: settings.currencyPosition,
+        decimals: settings.currencyDecimals,
+        thousandsSeparator: settings.thousandsSeparator,
+      }}
+    />
+  );
 }
 
 export default async function InvoicesPage() {

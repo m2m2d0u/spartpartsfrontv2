@@ -1,5 +1,5 @@
 import type { Part, PartImage, CreatePartRequest, UpdatePartRequest } from "@/types";
-import { apiPost, apiPostFormData, apiPut, apiDelete } from "./api-client";
+import { apiPost, apiPostFormData, apiPut, apiDelete, apiGetBlob } from "./api-client";
 
 export async function createPart(data: CreatePartRequest): Promise<Part> {
   return apiPost<Part>("/parts", data);
@@ -44,4 +44,17 @@ export async function bulkImportParts(
   const formData = new FormData();
   formData.append("file", file);
   return apiPostFormData<BulkImportResult>("/parts/bulk-import", formData);
+}
+
+/** Downloads the import template Excel file */
+export async function downloadImportTemplate(): Promise<void> {
+  const blob = await apiGetBlob("/parts/import-template");
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "parts_import_template.xlsx";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }

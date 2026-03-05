@@ -176,7 +176,8 @@
     "bulkImportField": "Champ",
     "bulkImportMessage": "Message d'erreur",
     "bulkImportViewParts": "Voir les pièces",
-    "bulkImportUploadAnother": "Télécharger un autre fichier"
+    "bulkImportUploadAnother": "Télécharger un autre fichier",
+    "downloadTemplate": "Télécharger le modèle"
   },
   "categories": {
     "title": "Catégories",
@@ -445,6 +446,17 @@
     "paymentTerms": "Conditions de paiement (jours)",
     "proformaValidity": "Validité du proforma (jours)",
     "defaultInvoiceNotes": "Notes de facture par défaut",
+    "currencySettings": "Paramètres de devise",
+    "currencySymbol": "Symbole de devise",
+    "currencyPosition": "Position du symbole",
+    "currencyDecimals": "Décimales",
+    "useDefault": "Utiliser la valeur par défaut",
+    "beforeAmount": "Avant le montant ($100)",
+    "afterAmount": "Après le montant (100 FCFA)",
+    "thousandsSeparator": "Séparateur de milliers",
+    "separatorSpace": "Espace (1 000)",
+    "separatorDot": "Point (1.000)",
+    "separatorComma": "Virgule (1,000)",
     "saveOverrides": "Enregistrer les paramètres",
     "savedSuccess": "Paramètres du magasin enregistrés avec succès"
   },
@@ -503,6 +515,10 @@
       "beforeAmount": "Avant le montant ($100)",
       "afterAmount": "Après le montant (100 FCFA)",
       "decimalPlaces": "Décimales",
+      "thousandsSeparator": "Séparateur de milliers",
+      "separatorSpace": "Espace (1 000)",
+      "separatorDot": "Point (1.000)",
+      "separatorComma": "Virgule (1,000)",
       "preview": "Aperçu :",
       "saveCurrency": "Enregistrer les paramètres de devise",
       "savedSuccess": "Paramètres de devise enregistrés avec succès"

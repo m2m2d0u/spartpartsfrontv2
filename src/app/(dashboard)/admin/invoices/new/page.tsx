@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getCustomers } from "@/services/customers.server";
 import { getInvoiceTemplates } from "@/services/invoice-templates.server";
+import { getCompanySettings } from "@/services/company-settings.server";
 import { InvoiceForm } from "../_components/invoice-form";
 
 export const metadata: Metadata = {
@@ -10,9 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default async function NewInvoicePage() {
-  const [customersPage, templatesPage] = await Promise.all([
+  const [customersPage, templatesPage, settings] = await Promise.all([
     getCustomers(0, 500),
     getInvoiceTemplates(0, 100),
+    getCompanySettings(),
   ]);
 
   const t = await getTranslations("invoices");
@@ -33,6 +35,12 @@ export default async function NewInvoicePage() {
       <InvoiceForm
         customers={customersPage.content}
         templates={templatesPage.content}
+        currencyOptions={{
+          symbol: settings.currencySymbol,
+          position: settings.currencyPosition,
+          decimals: settings.currencyDecimals,
+          thousandsSeparator: settings.thousandsSeparator,
+        }}
       />
     </>
   );
