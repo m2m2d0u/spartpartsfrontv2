@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "./api.config";
+import { RoleLevel } from "@/types";
 
 export type AuthTokens = {
   accessToken: string;
@@ -112,33 +113,30 @@ export type MeResponse = {
   email: string;
   roleCode: string;
   roleDisplayName: string;
+  roleLevel: RoleLevel;
+  superAdmin: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  permissions: string[];
-  accessibleStores: MeStore[];
-  accessibleWarehouses: MeWarehouse[];
   warehouseAssignments: MeWarehouseAssignment[];
 };
 
-export type MeStore = {
-  id: string;
-  code: string;
-  name: string;
-  city: string;
-  country: string;
-  isActive: boolean;
-};
+/**
+ * Decode the JWT payload to extract permissions.
+ * The token contains `permissions` and `role` claims.
+ */
+export function getTokenPermissions(): string[] {
+  const token = getAccessToken();
+  if (!token) return [];
 
-export type MeWarehouse = {
-  id: string;
-  code: string;
-  name: string;
-  location: string;
-  storeId: string;
-  storeName: string;
-  isActive: boolean;
-};
+  try {
+    const payload = token.split(".")[1];
+    const decoded = JSON.parse(atob(payload));
+    return decoded.permissions || [];
+  } catch {
+    return [];
+  }
+}
 
 export type MeWarehouseAssignment = {
   warehouseId: string;

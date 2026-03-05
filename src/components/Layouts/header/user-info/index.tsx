@@ -18,10 +18,13 @@ export function UserInfo() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
   const t = useTranslations("profile");
+  const tRoles = useTranslations("roles");
 
   const USER = {
     name: user?.name ?? "User",
     email: user?.email ?? "",
+    role: user?.roleDisplayName ?? "",
+    level: user?.roleLevel ?? "",
     img: "/images/user/user-03.png",
   };
 
@@ -40,7 +43,14 @@ export function UserInfo() {
             height={200}
           />
           <figcaption className="flex items-center gap-1 font-medium text-dark dark:text-dark-6 max-[1024px]:sr-only">
-            <span>{USER.name}</span>
+            <div className="text-left">
+              <span className="block">{USER.name}</span>
+              {USER.role && (
+                <span className="block text-xs font-normal text-dark-5 dark:text-dark-6">
+                  {USER.role}
+                </span>
+              )}
+            </div>
 
             <ChevronUpIcon
               aria-hidden
@@ -70,12 +80,25 @@ export function UserInfo() {
             height={200}
           />
 
-          <figcaption className="space-y-1 text-base font-medium">
-            <div className="mb-2 leading-none text-dark dark:text-white">
+          <figcaption className="space-y-1.5 text-base font-medium">
+            <div className="leading-none text-dark dark:text-white">
               {USER.name}
             </div>
 
-            <div className="leading-none text-gray-6">{USER.email}</div>
+            <div className="text-sm leading-none text-gray-6">{USER.email}</div>
+
+            {USER.role && (
+              <div className="flex items-center gap-1.5">
+                <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary dark:bg-primary/20">
+                  {USER.role}
+                </span>
+                {USER.level && (
+                  <span className="text-xs text-dark-5 dark:text-dark-6">
+                    {tRoles(`roleLevel_${USER.level}`)}
+                  </span>
+                )}
+              </div>
+            )}
           </figcaption>
         </figure>
 

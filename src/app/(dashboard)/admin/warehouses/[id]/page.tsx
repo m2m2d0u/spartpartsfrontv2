@@ -25,7 +25,7 @@ export default async function WarehouseDetailPage({ params }: Props) {
   const { id } = await params;
   const [warehouse, warehouseUsers] = await Promise.all([
     getWarehouseById(id),
-    getWarehouseUsers(id),
+    getWarehouseUsers(id).catch(() => []),
   ]);
 
   if (!warehouse) notFound();

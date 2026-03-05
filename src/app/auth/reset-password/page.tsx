@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="rounded-[10px] bg-white p-8 shadow-1 dark:bg-gray-dark dark:shadow-card sm:p-12">
-      <div className="mb-8 text-center">
+    <>
+      <div className="mb-8">
         <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white">
           Reset Password
         </h1>
@@ -21,6 +21,6 @@ export default function ResetPasswordPage() {
       <Suspense>
         <ResetPasswordForm />
       </Suspense>
-    </div>
+    </>
   );
 }

@@ -10,6 +10,7 @@ type InputGroupProps = {
   required?: boolean;
   disabled?: boolean;
   active?: boolean;
+  autoComplete?: string;
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   value?: string;
@@ -29,6 +30,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
   required,
   disabled,
   active,
+  autoComplete,
   handleChange,
   onBlur,
   icon,
@@ -75,6 +77,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
             props.height === "sm" && "py-2.5",
           )}
           disabled={disabled}
+          autoComplete={autoComplete}
           data-active={active}
         />
 

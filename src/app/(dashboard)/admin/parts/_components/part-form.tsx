@@ -6,8 +6,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
-import { Select } from "@/components/FormElements/select";
 import { SearchableSelect } from "@/components/FormElements/searchable-select";
+import { SearchableMultiSelect } from "@/components/FormElements/searchable-multi-select";
 import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
 import { FormDialog } from "@/components/ui/form-dialog";
@@ -19,10 +19,11 @@ type Props = {
   categories: Category[];
 };
 
-export function PartForm({ part, categories }: Props) {
+export function PartForm({ part, categories: initialCategories }: Props) {
   const router = useRouter();
   const isEditing = !!part;
   const [serverError, setServerError] = useState("");
+  const [localCategories, setLocalCategories] = useState(initialCategories);
   const t = useTranslations("parts");
   const tCommon = useTranslations("common");
   const tVal = useTranslations("validation");
@@ -125,7 +126,7 @@ export function PartForm({ part, categories }: Props) {
     },
   });
 
-  const categoryItems = categories.map((c) => ({
+  const categoryItems = localCategories.map((c) => ({
     value: c.id,
     label: c.name,
   }));
@@ -142,6 +143,11 @@ export function PartForm({ part, categories }: Props) {
       }))
     : [];
 
+  const tagItems = tags.map((t) => ({
+    value: t.id,
+    label: t.name,
+  }));
+
   function fieldError(name: keyof typeof formik.values) {
     return formik.touched[name] ? (formik.errors[name] as string) : undefined;
   }
@@ -152,34 +158,41 @@ export function PartForm({ part, categories }: Props) {
     formik.setFieldValue("carModelId", "");
   }
 
-  function handleTagToggle(tagId: string) {
-    const current = formik.values.tagIds;
-    const next = current.includes(tagId)
-      ? current.filter((id) => id !== tagId)
-      : [...current, tagId];
-    formik.setFieldValue("tagIds", next);
-  }
-
-  /* ── Tag search ────────────────────────────────────────── */
-  const [tagSearch, setTagSearch] = useState("");
-  const filteredTags = tagSearch
-    ? tags.filter((t) =>
-        t.name.toLowerCase().includes(tagSearch.toLowerCase()),
-      )
-    : tags;
-  const tagSearchHasExactMatch = tags.some(
-    (t) => t.name.toLowerCase() === tagSearch.toLowerCase(),
-  );
-
   /* ── Inline creation state ─────────────────────────────── */
+  const [createCategoryOpen, setCreateCategoryOpen] = useState(false);
   const [createBrandOpen, setCreateBrandOpen] = useState(false);
   const [createModelOpen, setCreateModelOpen] = useState(false);
   const [createTagOpen, setCreateTagOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
   const [newBrandName, setNewBrandName] = useState("");
   const [newModelName, setNewModelName] = useState("");
   const [newTagName, setNewTagName] = useState("");
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState("");
+
+  function handleCreateCategory(searchTerm: string) {
+    setNewCategoryName(searchTerm);
+    setCreateError("");
+    setCreateCategoryOpen(true);
+  }
+
+  async function handleSubmitNewCategory() {
+    if (!newCategoryName.trim()) return;
+    setCreateLoading(true);
+    setCreateError("");
+    try {
+      const { createCategory } = await import("@/services/categories.service");
+      const created = await createCategory({ name: newCategoryName.trim() });
+      setLocalCategories((prev) => [...prev, created]);
+      formik.setFieldValue("categoryId", created.id);
+      setCreateCategoryOpen(false);
+      setNewCategoryName("");
+    } catch {
+      setCreateError(t("failedCreateCategory"));
+    } finally {
+      setCreateLoading(false);
+    }
+  }
 
   function handleCreateBrand(searchTerm: string) {
     setNewBrandName(searchTerm);
@@ -237,8 +250,8 @@ export function PartForm({ part, categories }: Props) {
     }
   }
 
-  function handleCreateTag() {
-    setNewTagName(tagSearch.trim());
+  function handleCreateTag(searchTerm: string) {
+    setNewTagName(searchTerm);
     setCreateError("");
     setCreateTagOpen(true);
   }
@@ -255,7 +268,6 @@ export function PartForm({ part, categories }: Props) {
       formik.setFieldValue("tagIds", [...formik.values.tagIds, created.id]);
       setCreateTagOpen(false);
       setNewTagName("");
-      setTagSearch("");
     } catch {
       setCreateError(t("failedCreateTag"));
     } finally {
@@ -333,15 +345,17 @@ export function PartForm({ part, categories }: Props) {
           />
         </div>
 
-        <Select
+        <SearchableSelect
           label={t("category")}
           name="categoryId"
           placeholder={t("selectCategory")}
           items={categoryItems}
           value={formik.values.categoryId}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
+          onChange={(val) => formik.setFieldValue("categoryId", val)}
+          onBlur={() => formik.setFieldTouched("categoryId", true)}
           error={fieldError("categoryId")}
+          onCreateNew={handleCreateCategory}
+          createNewLabel={(term) => t("createNewCategory", { name: term })}
         />
 
         {/* Car Brand & Model */}
@@ -375,65 +389,16 @@ export function PartForm({ part, categories }: Props) {
         </div>
 
         {/* Tags */}
-        <div>
-          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-            {t("tagsLabel")}
-          </label>
-          <input
-            type="text"
-            value={tagSearch}
-            onChange={(e) => setTagSearch(e.target.value)}
-            placeholder={t("searchTags")}
-            className="mb-3 w-full rounded-lg border border-stroke bg-transparent px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-5 focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6 dark:focus:border-primary"
-          />
-          <div className="flex flex-wrap gap-2">
-            {filteredTags.map((tag) => {
-              const selected = formik.values.tagIds.includes(tag.id);
-              return (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => handleTagToggle(tag.id)}
-                  className={`rounded-full border px-3.5 py-1.5 text-body-sm transition ${
-                    selected
-                      ? "border-primary bg-primary/10 text-primary dark:bg-primary/20"
-                      : "border-stroke text-dark-6 hover:border-primary hover:text-primary dark:border-dark-3"
-                  }`}
-                >
-                  {tag.name}
-                </button>
-              );
-            })}
-            {tagSearch.trim() && !tagSearchHasExactMatch && (
-              <button
-                type="button"
-                onClick={handleCreateTag}
-                className="flex items-center gap-1.5 rounded-full border border-dashed border-primary px-3.5 py-1.5 text-body-sm text-primary transition hover:bg-primary/5 dark:hover:bg-primary/10"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  className="shrink-0"
-                >
-                  <path
-                    d="M8 3v10M3 8h10"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                {t("createNewTag", { name: tagSearch.trim() })}
-              </button>
-            )}
-          </div>
-          {filteredTags.length === 0 && !tagSearch.trim() && (
-            <p className="mt-2 text-body-sm text-dark-5 dark:text-dark-6">
-              {t("noTagsAvailable")}
-            </p>
-          )}
-        </div>
+        <SearchableMultiSelect
+          label={t("tagsLabel")}
+          placeholder={t("selectTags")}
+          searchPlaceholder={t("searchTags")}
+          items={tagItems}
+          value={formik.values.tagIds}
+          onChange={(ids) => formik.setFieldValue("tagIds", ids)}
+          onCreateNew={handleCreateTag}
+          createNewLabel={(term) => t("createNewTag", { name: term })}
+        />
 
         <div className="border-t border-stroke pt-5 dark:border-dark-3">
           <h4 className="mb-4 text-body-sm font-medium text-dark dark:text-white">
@@ -517,6 +482,39 @@ export function PartForm({ part, categories }: Props) {
           </button>
         </div>
       </form>
+
+      {/* Inline create category dialog */}
+      <FormDialog
+        open={createCategoryOpen}
+        onClose={() => {
+          setCreateCategoryOpen(false);
+          setCreateError("");
+        }}
+        onSubmit={handleSubmitNewCategory}
+        title={t("quickCreateCategory")}
+        submitLabel={tCommon("save")}
+        cancelLabel={tCommon("cancel")}
+        loading={createLoading}
+      >
+        {createError && (
+          <div className="rounded-lg bg-[#FEF3F2] px-4 py-3 text-sm text-[#B42318] dark:bg-[#B42318]/10 dark:text-[#FDA29B]">
+            {createError}
+          </div>
+        )}
+        <div>
+          <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+            {t("categoryNameLabel")}
+          </label>
+          <input
+            type="text"
+            value={newCategoryName}
+            onChange={(e) => setNewCategoryName(e.target.value)}
+            placeholder={t("categoryNamePlaceholder")}
+            autoFocus
+            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+          />
+        </div>
+      </FormDialog>
 
       {/* Inline create brand dialog */}
       <FormDialog

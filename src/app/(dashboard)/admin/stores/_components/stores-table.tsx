@@ -8,7 +8,6 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { getStoreStatusVariant } from "@/lib/status-variants";
 import { PermissionGate } from "@/components/PermissionGate";
-import { usePermissions } from "@/hooks/use-permissions";
 import { Permission } from "@/types";
 import type { Store } from "@/types";
 
@@ -29,7 +28,6 @@ export function StoresTable({ stores: initialStores, totalElements: initialTotal
   const [search, setSearch] = useState("");
   const t = useTranslations("stores");
   const tCommon = useTranslations("common");
-  const { hasPermission } = usePermissions();
 
   const fetchPage = useCallback(async (page: number) => {
     const { apiGet } = await import("@/services/api-client");
@@ -64,11 +62,7 @@ export function StoresTable({ stores: initialStores, totalElements: initialTotal
       header: t("name"),
       render: (row) => (
         <Link
-          href={
-            hasPermission(Permission.STORE_UPDATE)
-              ? `/admin/stores/${row.id}`
-              : `/admin/stores`
-          }
+          href={`/admin/stores/${row.id}`}
           className="font-medium text-dark hover:text-primary dark:text-white"
         >
           {row.name}
@@ -101,6 +95,12 @@ export function StoresTable({ stores: initialStores, totalElements: initialTotal
       header: "",
       render: (row) => (
         <div className="flex items-center justify-end gap-2">
+          <Link
+            href={`/admin/stores/${row.id}`}
+            className="text-body-sm text-primary hover:underline"
+          >
+            {tCommon("view")}
+          </Link>
           <PermissionGate permission={Permission.STORE_UPDATE}>
             <Link
               href={`/admin/stores/${row.id}/edit`}

@@ -142,12 +142,10 @@ export function getNavData(
             {
               title: t("stores"),
               url: "/admin/stores",
-              permission: Permission.STORE_CREATE,
             },
             {
               title: t("warehouses"),
               url: "/admin/warehouses",
-              permission: Permission.WAREHOUSE_CREATE,
             },
           ],
         },

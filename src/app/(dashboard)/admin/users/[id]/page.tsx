@@ -40,8 +40,6 @@ export default async function UserDetailPage({ params }: Props) {
     user.roleLevel === "SYSTEM" ||
     user.roleLevel === "WAREHOUSE";
 
-  console.log(isSuperAdmin, showStores, showWarehouses);
-
   return (
     <>
       <PageHeader

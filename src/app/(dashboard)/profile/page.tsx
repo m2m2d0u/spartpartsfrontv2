@@ -1,16 +1,50 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
+import { getTokenPermissions } from "@/services/auth.service";
 import { useTranslations } from "next-intl";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PageHeader } from "@/components/PageHeader";
+import type { Store, Warehouse } from "@/types";
 
 export default function ProfilePage() {
   const { user, isLoading } = useAuth();
   const t = useTranslations("profile");
   const tNav = useTranslations("nav");
   const tCommon = useTranslations("common");
+
+  const [stores, setStores] = useState<Store[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [loadingResources, setLoadingResources] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const { apiGet } = await import("@/services/api-client");
+        const [storesData, warehousesData] = await Promise.all([
+          apiGet<Store[]>("/stores/my"),
+          apiGet<Warehouse[]>("/warehouses/my"),
+        ]);
+        if (!cancelled) {
+          setStores(storesData);
+          setWarehouses(warehousesData);
+        }
+      } catch {
+        // silently fail
+      } finally {
+        if (!cancelled) setLoadingResources(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -116,7 +150,7 @@ export default function ProfilePage() {
                 {t("permissions")}
               </h4>
               <p className="text-sm text-dark-6">
-                {t("permissionsCount", { count: user.permissions.length })}
+                {t("permissionsCount", { count: getTokenPermissions().length })}
               </p>
             </div>
           </div>
@@ -129,11 +163,15 @@ export default function ProfilePage() {
             <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
               {t("accessibleStores")}
             </h3>
-            {user.accessibleStores.length === 0 ? (
+            {loadingResources ? (
+              <div className="flex justify-center py-4">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            ) : stores.length === 0 ? (
               <p className="text-body-sm text-dark-6">{t("noStores")}</p>
             ) : (
               <ul className="space-y-2">
-                {user.accessibleStores.map((store) => (
+                {stores.map((store) => (
                   <li
                     key={store.id}
                     className="flex items-center justify-between rounded-lg border border-stroke px-4 py-3 dark:border-dark-3"
@@ -162,11 +200,15 @@ export default function ProfilePage() {
             <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
               {t("accessibleWarehouses")}
             </h3>
-            {user.accessibleWarehouses.length === 0 ? (
+            {loadingResources ? (
+              <div className="flex justify-center py-4">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            ) : warehouses.length === 0 ? (
               <p className="text-body-sm text-dark-6">{t("noWarehouses")}</p>
             ) : (
               <ul className="space-y-2">
-                {user.accessibleWarehouses.map((wh) => (
+                {warehouses.map((wh) => (
                   <li
                     key={wh.id}
                     className="flex items-center justify-between rounded-lg border border-stroke px-4 py-3 dark:border-dark-3"

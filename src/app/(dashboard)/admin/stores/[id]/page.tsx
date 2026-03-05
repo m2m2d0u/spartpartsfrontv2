@@ -29,7 +29,7 @@ export default async function StoreDetailPage({ params }: Props) {
   const [store, warehousesPage, storeUsers] = await Promise.all([
     getStoreById(id),
     getWarehousesByStore(id),
-    getStoreUsers(id),
+    getStoreUsers(id).catch(() => []),
   ]);
 
   if (!store) notFound();
