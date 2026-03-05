@@ -9,6 +9,7 @@ export type PartImage = {
 export type Part = {
   id: string;
   partNumber: string;
+  reference: string | null;
   name: string;
   description: string;
   shortDescription: string;
@@ -32,6 +33,7 @@ export type Part = {
 /** Mirrors backend CreatePartRequest */
 export type CreatePartRequest = {
   partNumber: string;
+  reference?: string;
   name: string;
   description?: string;
   shortDescription?: string;

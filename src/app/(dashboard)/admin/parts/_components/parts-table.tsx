@@ -26,6 +26,7 @@ export function PartsTable({ parts: initialParts }: Props) {
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.partNumber.toLowerCase().includes(search.toLowerCase()) ||
+      (p.reference ?? "").toLowerCase().includes(search.toLowerCase()) ||
       (p.categoryName ?? "").toLowerCase().includes(search.toLowerCase()) ||
       (p.carBrandName ?? "").toLowerCase().includes(search.toLowerCase()) ||
       (p.carModelName ?? "").toLowerCase().includes(search.toLowerCase()),
@@ -52,6 +53,15 @@ export function PartsTable({ parts: initialParts }: Props) {
         >
           {row.partNumber}
         </Link>
+      ),
+    },
+    {
+      key: "reference",
+      header: t("reference"),
+      render: (row) => (
+        <span className="text-body-sm text-dark-6">
+          {row.reference || "—"}
+        </span>
       ),
     },
     {

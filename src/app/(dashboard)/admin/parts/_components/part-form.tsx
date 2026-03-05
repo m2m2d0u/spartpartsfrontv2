@@ -41,6 +41,8 @@ export function PartForm({ part, categories }: Props) {
       .trim()
       .max(50, tVal("partNumberMaxLength", { max: 50 }))
       .required(tVal("partNumberRequired")),
+    reference: Yup.string()
+      .max(100, tVal("referenceMaxLength", { max: 100 })),
     name: Yup.string()
       .trim()
       .max(200, tVal("partNameMaxLength", { max: 200 }))
@@ -72,6 +74,7 @@ export function PartForm({ part, categories }: Props) {
   const formik = useFormik({
     initialValues: {
       partNumber: part?.partNumber || "",
+      reference: part?.reference || "",
       name: part?.name || "",
       description: part?.description || "",
       shortDescription: part?.shortDescription || "",
@@ -90,6 +93,7 @@ export function PartForm({ part, categories }: Props) {
       setServerError("");
       const payload = {
         partNumber: values.partNumber,
+        reference: values.reference || undefined,
         name: values.name,
         description: values.description || undefined,
         shortDescription: values.shortDescription || undefined,
@@ -268,7 +272,7 @@ export function PartForm({ part, categories }: Props) {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           <InputGroup
             label={t("partNumber")}
             name="partNumber"
@@ -278,6 +282,16 @@ export function PartForm({ part, categories }: Props) {
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={fieldError("partNumber")}
+          />
+          <InputGroup
+            label={t("reference")}
+            name="reference"
+            type="text"
+            placeholder={t("referencePlaceholder")}
+            value={formik.values.reference}
+            handleChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={fieldError("reference")}
           />
           <InputGroup
             label={t("partName")}

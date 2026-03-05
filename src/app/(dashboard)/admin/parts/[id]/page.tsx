@@ -63,6 +63,14 @@ export default async function PartDetailPage({ params }: Props) {
                   {part.partNumber}
                 </dd>
               </div>
+              {part.reference && (
+                <div>
+                  <dt className="text-body-sm text-dark-6">{t("reference")}</dt>
+                  <dd className="font-medium text-dark dark:text-white">
+                    {part.reference}
+                  </dd>
+                </div>
+              )}
               <div>
                 <dt className="text-body-sm text-dark-6">{t("category")}</dt>
                 <dd className="font-medium text-dark dark:text-white">
