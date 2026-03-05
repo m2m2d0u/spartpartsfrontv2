@@ -5,6 +5,14 @@ export type PurchaseOrderStatus =
   | "RECEIVED"
   | "CANCELLED";
 
+export enum PurchaseOrderStatusCode {
+  DRAFT = "DRAFT",
+  SENT = "SENT",
+  PARTIALLY_RECEIVED = "PARTIALLY_RECEIVED",
+  RECEIVED = "RECEIVED",
+  CANCELLED = "CANCELLED",
+}
+
 /** Mirrors backend PurchaseOrderItemResponse */
 export type PurchaseOrderItem = {
   id: string;
@@ -32,4 +40,33 @@ export type PurchaseOrder = {
   items: PurchaseOrderItem[];
   createdAt: string;
   updatedAt: string;
+};
+
+/** Mirrors backend PurchaseOrderItemRequest */
+export type PurchaseOrderItemRequest = {
+  partId: string;
+  quantity: number;
+  unitPrice: number;
+};
+
+/** Mirrors backend CreatePurchaseOrderRequest */
+export type CreatePurchaseOrderRequest = {
+  supplierId: string;
+  status?: PurchaseOrderStatus;
+  orderDate: string;
+  expectedDeliveryDate?: string;
+  destinationWarehouseId?: string;
+  notes?: string;
+  items: PurchaseOrderItemRequest[];
+};
+
+/** Mirrors backend UpdatePurchaseOrderRequest */
+export type UpdatePurchaseOrderRequest = {
+  supplierId: string;
+  status?: PurchaseOrderStatus;
+  orderDate: string;
+  expectedDeliveryDate?: string;
+  destinationWarehouseId?: string;
+  notes?: string;
+  items: PurchaseOrderItemRequest[];
 };

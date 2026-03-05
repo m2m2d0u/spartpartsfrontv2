@@ -67,14 +67,14 @@ export function getPurchaseOrderStatusVariant(
   status: string,
 ): BadgeVariant {
   switch (status) {
-    case "received":
+    case "RECEIVED":
       return "success";
-    case "sent":
-    case "partially_received":
+    case "SENT":
+    case "PARTIALLY_RECEIVED":
       return "info";
-    case "draft":
+    case "DRAFT":
       return "neutral";
-    case "cancelled":
+    case "CANCELLED":
       return "error";
     default:
       return "neutral";
