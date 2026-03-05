@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 async function CategoriesData() {
-  const paged = await getCategories();
-  return <CategoriesTable categories={paged.content} />;
+  const paged = await getCategories(0, 20);
+  return <CategoriesTable categories={paged.content} totalElements={paged.totalElements} initialPage={1} />;
 }
 
 export default async function CategoriesPage() {

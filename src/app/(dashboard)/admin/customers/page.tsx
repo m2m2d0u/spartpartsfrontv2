@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 async function CustomersData() {
-  const customersPage = await getCustomers(0, 200);
-  return <CustomersTable customers={customersPage.content} />;
+  const customersPage = await getCustomers(0, 20);
+  return <CustomersTable customers={customersPage.content} totalElements={customersPage.totalElements} initialPage={1} />;
 }
 
 export default async function CustomersPage() {

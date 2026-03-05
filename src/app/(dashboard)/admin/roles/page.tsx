@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 async function RolesData() {
-  const rolesPage = await getRoles(0, 200);
-  return <RolesTable roles={rolesPage.content} />;
+  const rolesPage = await getRoles(0, 20);
+  return <RolesTable roles={rolesPage.content} totalElements={rolesPage.totalElements} initialPage={1} />;
 }
 
 export default async function RolesPage() {

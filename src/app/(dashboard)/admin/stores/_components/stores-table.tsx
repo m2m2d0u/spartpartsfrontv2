@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -12,18 +12,34 @@ import { usePermissions } from "@/hooks/use-permissions";
 import { Permission } from "@/types";
 import type { Store } from "@/types";
 
+const PAGE_SIZE = 20;
+
 type Props = {
   stores: Store[];
+  totalElements: number;
+  initialPage: number;
 };
 
-export function StoresTable({ stores: initialStores }: Props) {
+export function StoresTable({ stores: initialStores, totalElements: initialTotal, initialPage }: Props) {
   const [stores, setStores] = useState(initialStores);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const t = useTranslations("stores");
   const tCommon = useTranslations("common");
   const { hasPermission } = usePermissions();
+
+  const fetchPage = useCallback(async (page: number) => {
+    const { apiGet } = await import("@/services/api-client");
+    const data = await apiGet<{ content: Store[]; totalElements: number }>(
+      `/stores?page=${page - 1}&size=${PAGE_SIZE}`,
+    );
+    setStores(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
+  }, []);
 
   const filtered = stores.filter(
     (s) =>
@@ -37,9 +53,9 @@ export function StoresTable({ stores: initialStores }: Props) {
     setDeleting(true);
     const { deleteStore } = await import("@/services/stores.service");
     await deleteStore(deleteId);
-    setStores((prev) => prev.filter((s) => s.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   const columns: Column<Store>[] = [
@@ -124,6 +140,10 @@ export function StoresTable({ stores: initialStores }: Props) {
         rowKey={(row) => row.id}
         emptyMessage={t("noStores")}
         emptyDescription={t("noStoresDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

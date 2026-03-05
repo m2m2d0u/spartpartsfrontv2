@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -12,16 +12,24 @@ import { usePermissions } from "@/hooks/use-permissions";
 import { Permission } from "@/types";
 import type { Warehouse, Store } from "@/types";
 
+const PAGE_SIZE = 20;
+
 type Props = {
   warehouses: Warehouse[];
   stores: Store[];
+  totalElements: number;
+  initialPage: number;
 };
 
 export function WarehousesTable({
   warehouses: initialWarehouses,
   stores,
+  totalElements: initialTotal,
+  initialPage,
 }: Props) {
   const [warehouses, setWarehouses] = useState(initialWarehouses);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
@@ -29,6 +37,16 @@ export function WarehousesTable({
   const t = useTranslations("warehouses");
   const tCommon = useTranslations("common");
   const { hasPermission } = usePermissions();
+
+  const fetchPage = useCallback(async (page: number) => {
+    const { apiGet } = await import("@/services/api-client");
+    const data = await apiGet<{ content: Warehouse[]; totalElements: number }>(
+      `/warehouses?page=${page - 1}&size=${PAGE_SIZE}`,
+    );
+    setWarehouses(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
+  }, []);
 
   const filtered = warehouses.filter((w) => {
     const matchesSearch =
@@ -46,9 +64,9 @@ export function WarehousesTable({
       "@/services/warehouses.service"
     );
     await deleteWarehouse(deleteId);
-    setWarehouses((prev) => prev.filter((w) => w.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   const columns: Column<Warehouse>[] = [
@@ -151,6 +169,10 @@ export function WarehousesTable({
         rowKey={(row) => row.id}
         emptyMessage={t("noWarehouses")}
         emptyDescription={t("noWarehousesDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

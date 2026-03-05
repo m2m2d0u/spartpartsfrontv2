@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -10,18 +10,34 @@ import { Permission } from "@/types";
 import { useLookup } from "@/stores/lookup-store";
 import type { CarBrand } from "@/types";
 
+const PAGE_SIZE = 20;
+
 type Props = {
   carBrands: CarBrand[];
+  totalElements: number;
+  initialPage: number;
 };
 
-export function CarBrandsTable({ carBrands: initialCarBrands }: Props) {
+export function CarBrandsTable({ carBrands: initialCarBrands, totalElements: initialTotal, initialPage }: Props) {
   const [carBrands, setCarBrands] = useState(initialCarBrands);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const t = useTranslations("carBrands");
   const tCommon = useTranslations("common");
   const { invalidateBrands } = useLookup();
+
+  const fetchPage = useCallback(async (page: number) => {
+    const { apiGet } = await import("@/services/api-client");
+    const data = await apiGet<{ content: CarBrand[]; totalElements: number }>(
+      `/car-brands?page=${page - 1}&size=${PAGE_SIZE}`,
+    );
+    setCarBrands(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
+  }, []);
 
   const filtered = carBrands.filter((b) =>
     b.name.toLowerCase().includes(search.toLowerCase()),
@@ -35,9 +51,9 @@ export function CarBrandsTable({ carBrands: initialCarBrands }: Props) {
     );
     await deleteCarBrand(deleteId);
     invalidateBrands();
-    setCarBrands((prev) => prev.filter((b) => b.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   const columns: Column<CarBrand>[] = [
@@ -110,6 +126,10 @@ export function CarBrandsTable({ carBrands: initialCarBrands }: Props) {
         rowKey={(row) => row.id}
         emptyMessage={t("noCarBrands")}
         emptyDescription={t("noCarBrandsDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

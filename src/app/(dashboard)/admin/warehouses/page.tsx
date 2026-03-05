@@ -16,13 +16,15 @@ export const metadata: Metadata = {
 
 async function WarehousesData() {
   const [warehousesPage, storesPage] = await Promise.all([
-    getWarehouses(),
+    getWarehouses(0, 20),
     getStores(),
   ]);
   return (
     <WarehousesTable
       warehouses={warehousesPage.content}
       stores={storesPage.content}
+      totalElements={warehousesPage.totalElements}
+      initialPage={1}
     />
   );
 }

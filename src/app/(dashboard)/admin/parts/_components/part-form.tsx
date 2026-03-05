@@ -278,6 +278,7 @@ export function PartForm({ part, categories }: Props) {
             name="partNumber"
             type="text"
             placeholder={t("partNumberPlaceholder")}
+            required
             value={formik.values.partNumber}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -298,6 +299,7 @@ export function PartForm({ part, categories }: Props) {
             name="name"
             type="text"
             placeholder={t("partNamePlaceholder")}
+            required
             value={formik.values.name}
             handleChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -443,6 +445,7 @@ export function PartForm({ part, categories }: Props) {
               name="sellingPrice"
               type="number"
               placeholder="0"
+              required
               value={formik.values.sellingPrice}
               handleChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -453,6 +456,7 @@ export function PartForm({ part, categories }: Props) {
               name="purchasePrice"
               type="number"
               placeholder="0"
+              required
               value={formik.values.purchasePrice}
               handleChange={formik.handleChange}
               onBlur={formik.handleBlur}

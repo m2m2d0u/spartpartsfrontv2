@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 async function StoresData() {
-  const pagedStores = await getStores();
-  return <StoresTable stores={pagedStores.content} />;
+  const pagedStores = await getStores(0, 20);
+  return <StoresTable stores={pagedStores.content} totalElements={pagedStores.totalElements} initialPage={1} />;
 }
 
 export default async function StoresPage() {

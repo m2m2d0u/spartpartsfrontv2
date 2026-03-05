@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -9,17 +9,33 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import type { Supplier } from "@/types";
 
+const PAGE_SIZE = 20;
+
 type Props = {
   suppliers: Supplier[];
+  totalElements: number;
+  initialPage: number;
 };
 
-export function SuppliersTable({ suppliers: initial }: Props) {
+export function SuppliersTable({ suppliers: initial, totalElements: initialTotal, initialPage }: Props) {
   const [suppliers, setSuppliers] = useState(initial);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const t = useTranslations("suppliers");
   const tCommon = useTranslations("common");
+
+  const fetchPage = useCallback(async (page: number) => {
+    const { apiGet } = await import("@/services/api-client");
+    const data = await apiGet<{ content: Supplier[]; totalElements: number }>(
+      `/suppliers?page=${page - 1}&size=${PAGE_SIZE}`,
+    );
+    setSuppliers(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
+  }, []);
 
   const filtered = suppliers.filter((s) => {
     if (!search) return true;
@@ -37,9 +53,9 @@ export function SuppliersTable({ suppliers: initial }: Props) {
     setDeleting(true);
     const { deleteSupplier } = await import("@/services/suppliers.service");
     await deleteSupplier(deleteId);
-    setSuppliers((prev) => prev.filter((s) => s.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   const columns: Column<Supplier>[] = [
@@ -115,6 +131,10 @@ export function SuppliersTable({ suppliers: initial }: Props) {
         rowKey={(row) => row.id}
         emptyMessage={t("noSuppliers")}
         emptyDescription={t("noSuppliersDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

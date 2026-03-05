@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 async function TagsData() {
-  const paged = await getTags();
-  return <TagsTable tags={paged.content} />;
+  const paged = await getTags(0, 20);
+  return <TagsTable tags={paged.content} totalElements={paged.totalElements} initialPage={1} />;
 }
 
 export default async function TagsPage() {

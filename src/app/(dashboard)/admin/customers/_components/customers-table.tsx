@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -10,17 +10,33 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import type { Customer } from "@/types";
 
+const PAGE_SIZE = 20;
+
 type Props = {
   customers: Customer[];
+  totalElements: number;
+  initialPage: number;
 };
 
-export function CustomersTable({ customers: initialCustomers }: Props) {
+export function CustomersTable({ customers: initialCustomers, totalElements: initialTotal, initialPage }: Props) {
   const [customers, setCustomers] = useState(initialCustomers);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const t = useTranslations("customers");
   const tCommon = useTranslations("common");
+
+  const fetchPage = useCallback(async (page: number) => {
+    const { apiGet } = await import("@/services/api-client");
+    const data = await apiGet<{ content: Customer[]; totalElements: number }>(
+      `/customers?page=${page - 1}&size=${PAGE_SIZE}`,
+    );
+    setCustomers(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
+  }, []);
 
   const filtered = customers.filter((c) => {
     if (!search) return true;
@@ -38,9 +54,9 @@ export function CustomersTable({ customers: initialCustomers }: Props) {
     setDeleting(true);
     const { deleteCustomer } = await import("@/services/customers.service");
     await deleteCustomer(deleteId);
-    setCustomers((prev) => prev.filter((c) => c.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   const columns: Column<Customer>[] = [
@@ -125,6 +141,10 @@ export function CustomersTable({ customers: initialCustomers }: Props) {
         rowKey={(row) => row.id}
         emptyMessage={t("noCustomers")}
         emptyDescription={t("noCustomersDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

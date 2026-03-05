@@ -14,16 +14,24 @@ import type { PurchaseOrder, PurchaseOrderStatus } from "@/types";
 
 const STATUSES: PurchaseOrderStatus[] = Object.values(PurchaseOrderStatusCode);
 
+const PAGE_SIZE = 20;
+
 type Props = {
   purchaseOrders: PurchaseOrder[];
+  totalElements: number;
+  initialPage: number;
   currencyOptions?: CurrencyFormatOptions;
 };
 
 export function PurchaseOrdersTable({
   purchaseOrders: initial,
+  totalElements: initialTotal,
+  initialPage,
   currencyOptions,
 }: Props) {
   const [orders, setOrders] = useState(initial);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
@@ -31,20 +39,29 @@ export function PurchaseOrdersTable({
   const t = useTranslations("purchaseOrders");
   const tCommon = useTranslations("common");
 
-  const refetch = useCallback(async (status: string) => {
+  const refetch = useCallback(async (status: string, page: number) => {
     const { apiGet } = await import("@/services/api-client");
-    let path = "/purchase-orders?page=0&size=200";
+    let path = `/purchase-orders?page=${page - 1}&size=${PAGE_SIZE}`;
     if (status) path += `&status=${status}`;
     const data = await apiGet<{
       content: PurchaseOrder[];
       totalElements: number;
     }>(path);
     setOrders(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
   }, []);
+
+  const fetchPage = useCallback(
+    async (page: number) => {
+      await refetch(statusFilter, page);
+    },
+    [refetch, statusFilter],
+  );
 
   function handleStatusChange(value: string) {
     setStatusFilter(value);
-    refetch(value);
+    refetch(value, 1);
   }
 
   async function handleDelete() {
@@ -54,9 +71,9 @@ export function PurchaseOrdersTable({
       "@/services/purchase-orders.service"
     );
     await deletePurchaseOrder(deleteId);
-    setOrders((prev) => prev.filter((o) => o.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   const filtered = orders.filter((o) => {
@@ -184,6 +201,10 @@ export function PurchaseOrdersTable({
         rowKey={(row) => row.id}
         emptyMessage={t("noOrders")}
         emptyDescription={t("noOrdersDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

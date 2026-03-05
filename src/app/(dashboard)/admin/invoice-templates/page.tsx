@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 async function TemplatesData() {
-  const page = await getInvoiceTemplates();
-  return <InvoiceTemplatesTable templates={page.content} />;
+  const page = await getInvoiceTemplates(0, 20);
+  return <InvoiceTemplatesTable templates={page.content} totalElements={page.totalElements} initialPage={1} />;
 }
 
 export default async function InvoiceTemplatesPage() {

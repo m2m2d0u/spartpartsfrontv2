@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 async function SuppliersData() {
-  const page = await getSuppliers(0, 200);
-  return <SuppliersTable suppliers={page.content} />;
+  const page = await getSuppliers(0, 20);
+  return <SuppliersTable suppliers={page.content} totalElements={page.totalElements} initialPage={1} />;
 }
 
 export default async function SuppliersPage() {

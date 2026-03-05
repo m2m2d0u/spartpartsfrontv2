@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -10,16 +10,24 @@ import { Permission } from "@/types";
 import { useLookup } from "@/stores/lookup-store";
 import type { CarModel, CarBrand } from "@/types";
 
+const PAGE_SIZE = 20;
+
 type Props = {
   carModels: CarModel[];
   brands: CarBrand[];
+  totalElements: number;
+  initialPage: number;
 };
 
 export function CarModelsTable({
   carModels: initialCarModels,
   brands,
+  totalElements: initialTotal,
+  initialPage,
 }: Props) {
   const [carModels, setCarModels] = useState(initialCarModels);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
@@ -27,6 +35,16 @@ export function CarModelsTable({
   const { invalidateModels } = useLookup();
   const t = useTranslations("carModels");
   const tCommon = useTranslations("common");
+
+  const fetchPage = useCallback(async (page: number) => {
+    const { apiGet } = await import("@/services/api-client");
+    const data = await apiGet<{ content: CarModel[]; totalElements: number }>(
+      `/car-models?page=${page - 1}&size=${PAGE_SIZE}`,
+    );
+    setCarModels(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
+  }, []);
 
   const filtered = carModels.filter((m) => {
     const matchesSearch =
@@ -44,9 +62,9 @@ export function CarModelsTable({
     );
     await deleteCarModel(deleteId);
     invalidateModels();
-    setCarModels((prev) => prev.filter((m) => m.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   function formatYearRange(from: number | null, to: number | null): string {
@@ -148,6 +166,10 @@ export function CarModelsTable({
         rowKey={(row) => row.id}
         emptyMessage={t("noCarModels")}
         emptyDescription={t("noCarModelsDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

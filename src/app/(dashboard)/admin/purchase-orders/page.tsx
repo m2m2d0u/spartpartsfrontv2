@@ -16,12 +16,14 @@ export const metadata: Metadata = {
 
 async function PurchaseOrdersData() {
   const [page, settings] = await Promise.all([
-    getPurchaseOrders(0, 200),
+    getPurchaseOrders(0, 20),
     getCompanySettings(),
   ]);
   return (
     <PurchaseOrdersTable
       purchaseOrders={page.content}
+      totalElements={page.totalElements}
+      initialPage={1}
       currencyOptions={{
         symbol: settings.currencySymbol,
         position: settings.currencyPosition,

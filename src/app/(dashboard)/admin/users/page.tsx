@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 async function UsersData() {
-  const usersPage = await getUsers(0, 200);
-  return <UsersTable users={usersPage.content} />;
+  const usersPage = await getUsers(0, 20);
+  return <UsersTable users={usersPage.content} totalElements={usersPage.totalElements} initialPage={1} />;
 }
 
 export default async function UsersPage() {

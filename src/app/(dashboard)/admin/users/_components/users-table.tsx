@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -11,17 +11,33 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import type { User } from "@/types";
 
+const PAGE_SIZE = 20;
+
 type Props = {
   users: User[];
+  totalElements: number;
+  initialPage: number;
 };
 
-export function UsersTable({ users: initialUsers }: Props) {
+export function UsersTable({ users: initialUsers, totalElements: initialTotal, initialPage }: Props) {
   const [users, setUsers] = useState(initialUsers);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const t = useTranslations("users");
+
+  const fetchPage = useCallback(async (page: number) => {
+    const { apiGet } = await import("@/services/api-client");
+    const data = await apiGet<{ content: User[]; totalElements: number }>(
+      `/users?page=${page - 1}&size=${PAGE_SIZE}`,
+    );
+    setUsers(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
+  }, []);
 
   const roleOptions = useMemo(() => {
     const map = new Map<string, string>();
@@ -47,11 +63,9 @@ export function UsersTable({ users: initialUsers }: Props) {
     setDeleting(true);
     const { deleteUser } = await import("@/services/users.service");
     await deleteUser(deleteId);
-    setUsers((prev) =>
-      prev.map((u) => (u.id === deleteId ? { ...u, isActive: false } : u)),
-    );
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   const columns: Column<User>[] = [
@@ -155,6 +169,10 @@ export function UsersTable({ users: initialUsers }: Props) {
         rowKey={(row) => row.id}
         emptyMessage={t("noUsers")}
         emptyDescription={t("noUsersDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

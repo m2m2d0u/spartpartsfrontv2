@@ -14,8 +14,14 @@ export const metadata: Metadata = {
 };
 
 async function PartsData() {
-  const paged = await getParts();
-  return <PartsTable parts={paged.content} />;
+  const paged = await getParts(0, 20);
+  return (
+    <PartsTable
+      parts={paged.content}
+      totalElements={paged.totalElements}
+      initialPage={1}
+    />
+  );
 }
 
 export default async function PartsPage() {

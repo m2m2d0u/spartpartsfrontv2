@@ -16,12 +16,14 @@ export const metadata: Metadata = {
 
 async function InvoicesData() {
   const [page, settings] = await Promise.all([
-    getInvoices(0, 200),
+    getInvoices(0, 20),
     getCompanySettings(),
   ]);
   return (
     <InvoicesTable
       invoices={page.content}
+      totalElements={page.totalElements}
+      initialPage={1}
       currencyOptions={{
         symbol: settings.currencySymbol,
         position: settings.currencyPosition,

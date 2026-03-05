@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -9,17 +9,33 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import type { Category } from "@/types";
 
+const PAGE_SIZE = 20;
+
 type Props = {
   categories: Category[];
+  totalElements: number;
+  initialPage: number;
 };
 
-export function CategoriesTable({ categories: initialCategories }: Props) {
+export function CategoriesTable({ categories: initialCategories, totalElements: initialTotal, initialPage }: Props) {
   const [categories, setCategories] = useState(initialCategories);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const t = useTranslations("categories");
   const tCommon = useTranslations("common");
+
+  const fetchPage = useCallback(async (page: number) => {
+    const { apiGet } = await import("@/services/api-client");
+    const data = await apiGet<{ content: Category[]; totalElements: number }>(
+      `/categories?page=${page - 1}&size=${PAGE_SIZE}`,
+    );
+    setCategories(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
+  }, []);
 
   const filtered = categories.filter(
     (c) =>
@@ -34,9 +50,9 @@ export function CategoriesTable({ categories: initialCategories }: Props) {
       "@/services/categories.service"
     );
     await deleteCategory(deleteId);
-    setCategories((prev) => prev.filter((c) => c.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   const columns: Column<Category>[] = [
@@ -109,6 +125,10 @@ export function CategoriesTable({ categories: initialCategories }: Props) {
         rowKey={(row) => row.id}
         emptyMessage={t("noCategories")}
         emptyDescription={t("noCategoriesDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

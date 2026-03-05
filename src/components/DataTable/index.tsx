@@ -32,6 +32,12 @@ type DataTableProps<T> = {
   emptyMessage?: string;
   emptyDescription?: string;
   title?: string;
+  /** Server-side pagination: total number of elements across all pages */
+  totalElements?: number;
+  /** Server-side pagination: current 1-based page */
+  currentPage?: number;
+  /** Server-side pagination: callback when page changes */
+  onPageChange?: (page: number) => void;
 };
 
 export function DataTable<T>({
@@ -45,29 +51,49 @@ export function DataTable<T>({
   emptyMessage,
   emptyDescription,
   title,
+  totalElements,
+  currentPage,
+  onPageChange,
 }: DataTableProps<T>) {
   const t = useTranslations("common");
   const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(1);
+  const [localPage, setLocalPage] = useState(1);
 
-  const totalItems = data.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
+  const isServerPaginated = totalElements !== undefined && onPageChange !== undefined;
 
-  // Clamp page when data shrinks (search filter / delete)
-  const safePage = page > totalPages && totalPages > 0 ? totalPages : page;
-  if (safePage !== page) {
-    setPage(safePage);
+  // Client-side pagination
+  const clientTotalItems = data.length;
+  const clientTotalPages = Math.ceil(clientTotalItems / pageSize);
+  const safeLocalPage = localPage > clientTotalPages && clientTotalPages > 0 ? clientTotalPages : localPage;
+  if (safeLocalPage !== localPage) {
+    setLocalPage(safeLocalPage);
   }
 
+  // Resolved values depending on mode
+  const activePage = isServerPaginated ? (currentPage ?? 1) : safeLocalPage;
+  const totalItems = isServerPaginated ? totalElements : clientTotalItems;
+  const totalPages = isServerPaginated
+    ? Math.ceil(totalElements / pageSize)
+    : clientTotalPages;
+
   const paginatedData = useMemo(() => {
-    const start = (safePage - 1) * pageSize;
+    if (isServerPaginated) return data;
+    const start = (safeLocalPage - 1) * pageSize;
     return data.slice(start, start + pageSize);
-  }, [data, safePage, pageSize]);
+  }, [data, safeLocalPage, pageSize, isServerPaginated]);
+
+  function handlePageChange(newPage: number) {
+    if (isServerPaginated) {
+      onPageChange(newPage);
+    } else {
+      setLocalPage(newPage);
+    }
+  }
 
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
     setSearchQuery(value);
-    setPage(1);
+    if (!isServerPaginated) setLocalPage(1);
     onSearch?.(value);
   }
 
@@ -150,15 +176,15 @@ export function DataTable<T>({
             <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
               <p className="text-body-sm text-dark-6">
                 {t("showing", {
-                  start: (safePage - 1) * pageSize + 1,
-                  end: Math.min(safePage * pageSize, totalItems),
+                  start: (activePage - 1) * pageSize + 1,
+                  end: Math.min(activePage * pageSize, totalItems),
                   total: totalItems,
                 })}
               </p>
               <Pagination
-                page={safePage}
+                page={activePage}
                 totalPages={totalPages}
-                onPageChange={setPage}
+                onPageChange={handlePageChange}
               />
             </div>
           </div>

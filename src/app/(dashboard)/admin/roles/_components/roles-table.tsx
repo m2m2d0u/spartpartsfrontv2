@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -11,20 +11,36 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import type { Role } from "@/types";
 
+const PAGE_SIZE = 20;
+
 type Props = {
   roles: Role[];
+  totalElements: number;
+  initialPage: number;
 };
 
 type TypeFilter = "" | "system" | "custom";
 
-export function RolesTable({ roles: initialRoles }: Props) {
+export function RolesTable({ roles: initialRoles, totalElements: initialTotal, initialPage }: Props) {
   const [roles, setRoles] = useState(initialRoles);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("");
   const t = useTranslations("roles");
   const tCommon = useTranslations("common");
+
+  const fetchPage = useCallback(async (page: number) => {
+    const { apiGet } = await import("@/services/api-client");
+    const data = await apiGet<{ content: Role[]; totalElements: number }>(
+      `/roles?page=${page - 1}&size=${PAGE_SIZE}`,
+    );
+    setRoles(data.content);
+    setTotalElements(data.totalElements);
+    setCurrentPage(page);
+  }, []);
 
   function translateRole(role: Role) {
     return role.displayName;
@@ -47,12 +63,12 @@ export function RolesTable({ roles: initialRoles }: Props) {
     try {
       const { deleteRole } = await import("@/services/roles.service");
       await deleteRole(deleteId);
-      setRoles((prev) => prev.filter((r) => r.id !== deleteId));
     } catch {
       // error handled silently
     }
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   const columns: Column<Role>[] = [
@@ -157,6 +173,10 @@ export function RolesTable({ roles: initialRoles }: Props) {
         rowKey={(row) => row.id}
         emptyMessage={t("noRoles")}
         emptyDescription={t("noRolesDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog

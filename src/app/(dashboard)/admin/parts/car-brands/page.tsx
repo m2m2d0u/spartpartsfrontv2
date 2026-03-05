@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 async function CarBrandsData() {
-  const paged = await getCarBrands();
-  return <CarBrandsTable carBrands={paged.content} />;
+  const paged = await getCarBrands(0, 20);
+  return <CarBrandsTable carBrands={paged.content} totalElements={paged.totalElements} initialPage={1} />;
 }
 
 export default async function CarBrandsPage() {

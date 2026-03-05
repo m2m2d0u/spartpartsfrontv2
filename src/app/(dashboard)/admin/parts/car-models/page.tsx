@@ -16,13 +16,15 @@ export const metadata: Metadata = {
 
 async function CarModelsData() {
   const [modelsPaged, brandsPaged] = await Promise.all([
-    getCarModels(),
+    getCarModels(undefined, 0, 20),
     getCarBrands(),
   ]);
   return (
     <CarModelsTable
       carModels={modelsPaged.content}
       brands={brandsPaged.content}
+      totalElements={modelsPaged.totalElements}
+      initialPage={1}
     />
   );
 }

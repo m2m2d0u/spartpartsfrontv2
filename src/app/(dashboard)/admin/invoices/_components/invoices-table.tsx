@@ -17,13 +17,19 @@ const STATUSES: InvoiceStatus[] = Object.values(InvoiceStatusCode);
 
 const TYPES: InvoiceType[] = Object.values(InvoiceTypeCode);
 
+const PAGE_SIZE = 20;
+
 type Props = {
   invoices: Invoice[];
+  totalElements: number;
+  initialPage: number;
   currencyOptions?: CurrencyFormatOptions;
 };
 
-export function InvoicesTable({ invoices: initial, currencyOptions }: Props) {
+export function InvoicesTable({ invoices: initial, totalElements: initialTotal, initialPage, currencyOptions }: Props) {
   const [invoices, setInvoices] = useState(initial);
+  const [totalElements, setTotalElements] = useState(initialTotal);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
@@ -33,9 +39,9 @@ export function InvoicesTable({ invoices: initial, currencyOptions }: Props) {
   const tCommon = useTranslations("common");
 
   const refetch = useCallback(
-    async (status: string, type: string) => {
+    async (status: string, type: string, page: number) => {
       const { apiGet } = await import("@/services/api-client");
-      let path = "/invoices?page=0&size=200";
+      let path = `/invoices?page=${page - 1}&size=${PAGE_SIZE}`;
       if (status) path += `&status=${status}`;
       if (type) path += `&invoiceType=${type}`;
       const data = await apiGet<{
@@ -43,18 +49,27 @@ export function InvoicesTable({ invoices: initial, currencyOptions }: Props) {
         totalElements: number;
       }>(path);
       setInvoices(data.content);
+      setTotalElements(data.totalElements);
+      setCurrentPage(page);
     },
     [],
   );
 
+  const fetchPage = useCallback(
+    async (page: number) => {
+      await refetch(statusFilter, typeFilter, page);
+    },
+    [refetch, statusFilter, typeFilter],
+  );
+
   function handleStatusChange(value: string) {
     setStatusFilter(value);
-    refetch(value, typeFilter);
+    refetch(value, typeFilter, 1);
   }
 
   function handleTypeChange(value: string) {
     setTypeFilter(value);
-    refetch(statusFilter, value);
+    refetch(statusFilter, value, 1);
   }
 
   async function handleDelete() {
@@ -62,9 +77,9 @@ export function InvoicesTable({ invoices: initial, currencyOptions }: Props) {
     setDeleting(true);
     const { deleteInvoice } = await import("@/services/invoices.service");
     await deleteInvoice(deleteId);
-    setInvoices((prev) => prev.filter((inv) => inv.id !== deleteId));
     setDeleteId(null);
     setDeleting(false);
+    fetchPage(currentPage);
   }
 
   async function handleDownload(id: string, invoiceNumber: string) {
@@ -223,6 +238,10 @@ export function InvoicesTable({ invoices: initial, currencyOptions }: Props) {
         rowKey={(row) => row.id}
         emptyMessage={t("noInvoices")}
         emptyDescription={t("noInvoicesDescription")}
+        pageSize={PAGE_SIZE}
+        totalElements={search ? undefined : totalElements}
+        currentPage={search ? undefined : currentPage}
+        onPageChange={search ? undefined : fetchPage}
       />
 
       <ConfirmDialog
