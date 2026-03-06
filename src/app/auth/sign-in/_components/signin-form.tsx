@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { EmailIcon, PasswordIcon } from "@/assets/icons";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { useAuth } from "@/context/auth-context";
@@ -11,6 +12,7 @@ export function SigninForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
+  const t = useTranslations("auth");
   const callbackUrl = searchParams.get("callbackUrl") || "/admin";
 
   const [email, setEmail] = useState("");
@@ -21,7 +23,7 @@ export function SigninForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
-      setError("Email and password are required.");
+      setError(t("emailAndPasswordRequired"));
       return;
     }
 
@@ -33,7 +35,7 @@ export function SigninForm() {
       router.push(callbackUrl);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Login failed. Please try again.",
+        err instanceof Error ? err.message : t("loginFailed"),
       );
     } finally {
       setLoading(false);
@@ -50,9 +52,9 @@ export function SigninForm() {
 
       <InputGroup
         type="email"
-        label="Email"
+        label={t("email")}
         className="mb-4 [&_input]:py-[15px]"
-        placeholder="Enter your email"
+        placeholder={t("emailPlaceholder")}
         name="email"
         handleChange={(e) => {
           setEmail(e.target.value);
@@ -64,9 +66,9 @@ export function SigninForm() {
 
       <InputGroup
         type="password"
-        label="Password"
+        label={t("password")}
         className="mb-4 [&_input]:py-[15px]"
-        placeholder="Enter your password"
+        placeholder={t("passwordPlaceholder")}
         name="password"
         handleChange={(e) => {
           setPassword(e.target.value);
@@ -81,7 +83,7 @@ export function SigninForm() {
           href="/auth/forgot-password"
           className="text-sm text-primary hover:underline"
         >
-          Forgot password?
+          {t("forgotPassword")}
         </Link>
       </div>
 
@@ -90,7 +92,7 @@ export function SigninForm() {
         disabled={loading}
         className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90 disabled:opacity-50"
       >
-        Sign In
+        {t("signIn")}
         {loading && (
           <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-t-transparent" />
         )}

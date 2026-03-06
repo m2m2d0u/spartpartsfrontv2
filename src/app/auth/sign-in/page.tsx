@@ -1,20 +1,23 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { SigninForm } from "./_components/signin-form";
 
 export const metadata: Metadata = {
   title: "Sign In",
 };
 
-export default function SignInPage() {
+export default async function SignInPage() {
+  const t = await getTranslations("auth");
+
   return (
     <>
       <div className="mb-8">
         <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white">
-          Welcome back
+          {t("welcomeBack")}
         </h1>
         <p className="text-body-sm text-dark-4 dark:text-dark-6">
-          Sign in to your account to continue
+          {t("welcomeBackDescription")}
         </p>
       </div>
 

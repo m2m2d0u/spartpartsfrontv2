@@ -4,7 +4,6 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getStockTransferById } from "@/services/stock-transfers.server";
 import { getWarehouseById } from "@/services/warehouses.server";
-import { getParts } from "@/services/parts.server";
 import { StockTransferForm } from "../../_components/stock-transfer-form";
 
 export const metadata: Metadata = {
@@ -17,10 +16,7 @@ type Props = {
 
 export default async function EditStockTransferPage({ params }: Props) {
   const { id } = await params;
-  const [transfer, partsPage] = await Promise.all([
-    getStockTransferById(id).catch(() => null),
-    getParts(0, 500),
-  ]);
+  const transfer = await getStockTransferById(id).catch(() => null);
 
   if (!transfer || transfer.status !== "PENDING") notFound();
 
@@ -35,12 +31,6 @@ export default async function EditStockTransferPage({ params }: Props) {
   const t = await getTranslations("stockTransfers");
   const tNav = await getTranslations("nav");
   const tCommon = await getTranslations("common");
-
-  const partOptions = partsPage.content.map((p) => ({
-    id: p.id,
-    name: p.name,
-    partNumber: p.partNumber,
-  }));
 
   return (
     <>
@@ -59,7 +49,6 @@ export default async function EditStockTransferPage({ params }: Props) {
       />
 
       <StockTransferForm
-        parts={partOptions}
         transfer={transfer}
         initialWarehouses={initialWarehouses}
       />

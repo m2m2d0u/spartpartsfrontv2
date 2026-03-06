@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
@@ -25,30 +25,36 @@ export function PartsTable({ parts: initialParts, totalElements: initialTotal, i
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
   const t = useTranslations("parts");
   const tCommon = useTranslations("common");
 
-  const fetchPage = useCallback(async (page: number) => {
+  const fetchParts = useCallback(async (page: number, query: string) => {
     const { apiGet } = await import("@/services/api-client");
+    const params = new URLSearchParams({
+      page: String(page - 1),
+      size: String(PAGE_SIZE),
+    });
+    if (query) params.set("name", query);
     const data = await apiGet<{ content: Part[]; totalElements: number }>(
-      `/parts?page=${page - 1}&size=${PAGE_SIZE}`,
+      `/parts?${params}`,
     );
     setParts(data.content);
     setTotalElements(data.totalElements);
     setCurrentPage(page);
   }, []);
 
-  const filtered = search
-    ? parts.filter(
-        (p) =>
-          p.name.toLowerCase().includes(search.toLowerCase()) ||
-          p.partNumber.toLowerCase().includes(search.toLowerCase()) ||
-          (p.reference ?? "").toLowerCase().includes(search.toLowerCase()) ||
-          (p.categoryName ?? "").toLowerCase().includes(search.toLowerCase()) ||
-          (p.carBrandName ?? "").toLowerCase().includes(search.toLowerCase()) ||
-          (p.carModelName ?? "").toLowerCase().includes(search.toLowerCase()),
-      )
-    : parts;
+  const handleSearch = useCallback((query: string) => {
+    setSearch(query);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchParts(1, query);
+    }, 300);
+  }, [fetchParts]);
+
+  const handlePageChange = useCallback((page: number) => {
+    fetchParts(page, search);
+  }, [fetchParts, search]);
 
   async function handleDelete() {
     if (!deleteId) return;
@@ -57,7 +63,7 @@ export function PartsTable({ parts: initialParts, totalElements: initialTotal, i
     await deletePart(deleteId);
     setDeleteId(null);
     setDeleting(false);
-    fetchPage(currentPage);
+    fetchParts(currentPage, search);
   }
 
   const columns: Column<Part>[] = [
@@ -168,16 +174,16 @@ export function PartsTable({ parts: initialParts, totalElements: initialTotal, i
     <>
       <DataTable
         columns={columns}
-        data={filtered}
-        onSearch={setSearch}
+        data={parts}
+        onSearch={handleSearch}
         searchPlaceholder={t("searchParts")}
         rowKey={(row) => row.id}
         emptyMessage={t("noParts")}
         emptyDescription={t("noPartsDescription")}
         pageSize={PAGE_SIZE}
-        totalElements={search ? undefined : totalElements}
-        currentPage={search ? undefined : currentPage}
-        onPageChange={search ? undefined : fetchPage}
+        totalElements={totalElements}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
       />
 
       <ConfirmDialog

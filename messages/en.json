@@ -393,7 +393,9 @@
     "notes": "Notes",
     "addPartNotesPlaceholder": "Optional notes about this stock entry",
     "addPartValidation": "Please select a part and enter a valid quantity",
-    "addPartFailed": "Failed to add part to stock. Please try again."
+    "addPartFailed": "Failed to add part to stock. Please try again.",
+    "adjustmentNotesPlaceholder": "Reason for adjustment",
+    "quantityChange": "Stock movement: {delta}"
   },
   "stockMovements": {
     "title": "Stock Movements",
@@ -457,7 +459,21 @@
     "updateTransfer": "Update Transfer",
     "failedSave": "Failed to save transfer. Please try again.",
     "warehousesMustDiffer": "Source and destination must be different",
-    "atLeastOneItem": "At least one item is required"
+    "atLeastOneItem": "At least one item is required",
+    "selectSourceFirst": "Select a source warehouse to see available parts",
+    "available": "Available",
+    "maxAvailable": "Maximum available: {count}",
+    "exceedsAvailable": "{part}: requested {requested} but only {available} available",
+    "approve": "Approve",
+    "complete": "Complete",
+    "cancel": "Cancel",
+    "approveTransferTitle": "Approve Transfer",
+    "approveTransferDescription": "This will mark the transfer as in transit. Stock availability will be verified. Continue?",
+    "completeTransferTitle": "Complete Transfer",
+    "completeTransferDescription": "This will deduct stock from the source warehouse and add it to the destination warehouse. This action cannot be undone. Continue?",
+    "cancelTransferTitle": "Cancel Transfer",
+    "cancelTransferDescription": "Are you sure you want to cancel this transfer? This action cannot be undone.",
+    "failedStatusChange": "Failed to update transfer status. Please try again."
   },
   "storeOverrides": {
     "title": "Store Overrides — {storeName}",
@@ -1019,13 +1035,25 @@
     "status_CANCELLED": "Cancelled"
   },
   "auth": {
+    "welcomeBack": "Welcome back",
+    "welcomeBackDescription": "Sign in to your account to continue",
     "email": "Email",
     "emailPlaceholder": "Enter your email",
     "emailRequired": "Email is required",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "emailAndPasswordRequired": "Email and password are required.",
+    "loginFailed": "Login failed. Please try again.",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign In",
+    "forgotPasswordTitle": "Forgot Password",
+    "forgotPasswordDescription": "Enter your email and we'll send you a reset link",
     "sendResetLink": "Send Reset Link",
     "resetLinkSent": "Reset link sent!",
     "resetLinkDescription": "If an account exists with that email, you will receive a password reset link shortly. Check your inbox.",
     "backToSignIn": "Back to Sign In",
+    "resetPasswordTitle": "Reset Password",
+    "resetPasswordDescription": "Enter your new password below",
     "newPassword": "New Password",
     "newPasswordPlaceholder": "Minimum 8 characters",
     "confirmPassword": "Confirm Password",
@@ -1033,8 +1061,15 @@
     "resetPasswordButton": "Reset Password",
     "resetPasswordFailed": "Failed to reset password. The link may have expired.",
     "passwordResetSuccess": "Your password has been reset successfully.",
-    "signIn": "Sign In",
     "invalidResetLink": "This reset link is invalid or has expired.",
-    "requestNewLink": "Request a new reset link"
+    "requestNewLink": "Request a new reset link",
+    "brandTagline": "Manage your inventory\nwith confidence.",
+    "brandDescription": "Track stock, manage orders, handle invoices and procurement — all from one powerful dashboard.",
+    "multiStore": "Multi-store",
+    "support": "Support",
+    "realTime": "Real-time",
+    "stockTracking": "Stock tracking",
+    "roleBased": "Role-based",
+    "accessControl": "Access control"
   }
 }

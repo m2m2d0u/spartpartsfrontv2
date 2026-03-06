@@ -80,30 +80,36 @@ export function StoreOverridesForm({ store, companySettings }: Props) {
         name: store.name,
         code: store.code,
         isActive: store.isActive,
-        // Preserve existing image URLs
+        street: store.street || undefined,
+        city: store.city || undefined,
+        state: store.state || undefined,
+        postalCode: store.postalCode || undefined,
+        country: store.country || undefined,
+        phone: store.phone || undefined,
+        email: store.email || undefined,
         logoUrl: store.logoUrl ?? undefined,
         stampImageUrl: store.stampImageUrl ?? undefined,
-        ninea: values.ninea || undefined,
-        rccm: values.rccm || undefined,
-        taxId: values.taxId || undefined,
-        invoicePrefix: values.invoicePrefix || undefined,
-        proformaPrefix: values.proformaPrefix || undefined,
-        depositPrefix: values.depositPrefix || undefined,
-        creditNotePrefix: values.creditNotePrefix || undefined,
-        orderPrefix: values.orderPrefix || undefined,
+        ninea: values.ninea || null,
+        rccm: values.rccm || null,
+        taxId: values.taxId || null,
+        invoicePrefix: values.invoicePrefix || null,
+        proformaPrefix: values.proformaPrefix || null,
+        depositPrefix: values.depositPrefix || null,
+        creditNotePrefix: values.creditNotePrefix || null,
+        orderPrefix: values.orderPrefix || null,
         defaultPaymentTerms: values.defaultPaymentTerms
           ? parseInt(values.defaultPaymentTerms)
-          : undefined,
+          : null,
         defaultProformaValidity: values.defaultProformaValidity
           ? parseInt(values.defaultProformaValidity)
-          : undefined,
-        defaultInvoiceNotes: values.defaultInvoiceNotes || undefined,
-        currencySymbol: values.currencySymbol || undefined,
-        currencyPosition: values.currencyPosition || undefined,
+          : null,
+        defaultInvoiceNotes: values.defaultInvoiceNotes || null,
+        currencySymbol: values.currencySymbol || null,
+        currencyPosition: values.currencyPosition || null,
         currencyDecimals: values.currencyDecimals
           ? parseInt(values.currencyDecimals)
-          : undefined,
-        thousandsSeparator: values.thousandsSeparator || undefined,
+          : null,
+        thousandsSeparator: values.thousandsSeparator || null,
       });
       setSaved(true);
     },

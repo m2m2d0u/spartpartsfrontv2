@@ -37,6 +37,7 @@ export function WarehouseStockTable({ warehouses, stores }: Props) {
   const [editItem, setEditItem] = useState<WarehouseStock | null>(null);
   const [editQuantity, setEditQuantity] = useState("");
   const [minStockValue, setMinStockValue] = useState("");
+  const [editNotes, setEditNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
   // Add part state
@@ -87,22 +88,42 @@ export function WarehouseStockTable({ warehouses, stores }: Props) {
     setEditItem(item);
     setEditQuantity(String(item.quantity));
     setMinStockValue(String(item.minStockLevel));
+    setEditNotes("");
   }
 
   async function handleSaveMinStock() {
     if (!editItem) return;
     setSaving(true);
-    const { updateWarehouseStock } = await import(
+
+    const { updateWarehouseStock, adjustWarehouseStock } = await import(
       "@/services/warehouse-stock.service"
     );
-    await updateWarehouseStock(editItem.id, {
-      quantity: Number(editQuantity),
-      minStockLevel: Number(minStockValue),
-    });
+
+    const newMinStock = Number(minStockValue);
+    const newQuantity = Number(editQuantity);
+    const quantityDelta = newQuantity - editItem.quantity;
+
+    // Update minStockLevel
+    if (newMinStock !== editItem.minStockLevel) {
+      await updateWarehouseStock(editItem.id, {
+        minStockLevel: newMinStock,
+      });
+    }
+
+    // Adjust quantity via stock movement if changed
+    if (quantityDelta !== 0) {
+      await adjustWarehouseStock({
+        warehouseId: selectedWarehouse,
+        partId: editItem.partId,
+        quantity: quantityDelta,
+        notes: editNotes || undefined,
+      });
+    }
+
     setStockItems((prev) =>
       prev.map((item) =>
         item.id === editItem.id
-          ? { ...item, quantity: Number(editQuantity), minStockLevel: Number(minStockValue) }
+          ? { ...item, quantity: newQuantity, minStockLevel: newMinStock }
           : item,
       ),
     );
@@ -341,7 +362,7 @@ export function WarehouseStockTable({ warehouses, stores }: Props) {
         />
       )}
 
-      {/* Edit Min Stock Level dialog */}
+      {/* Edit Stock dialog */}
       <FormDialog
         open={!!editItem}
         onClose={() => setEditItem(null)}
@@ -367,6 +388,23 @@ export function WarehouseStockTable({ warehouses, stores }: Props) {
           handleChange={(e) => setMinStockValue(e.target.value)}
           required
         />
+        {editItem && Number(editQuantity) !== editItem.quantity && (
+          <div>
+            <label className="text-body-sm font-medium text-dark dark:text-white">
+              {t("notes")}
+            </label>
+            <textarea
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              placeholder={t("adjustmentNotesPlaceholder")}
+              rows={2}
+              className="mt-3 w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+            />
+            <p className="mt-1 text-body-xs text-dark-6">
+              {t("quantityChange", { delta: Number(editQuantity) - editItem.quantity > 0 ? `+${Number(editQuantity) - editItem.quantity}` : String(Number(editQuantity) - editItem.quantity) })}
+            </p>
+          </div>
+        )}
       </FormDialog>
 
       {/* Add Part to Stock dialog */}

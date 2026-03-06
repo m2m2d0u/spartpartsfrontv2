@@ -393,7 +393,9 @@
     "notes": "Notes",
     "addPartNotesPlaceholder": "Notes optionnelles sur cette entrée de stock",
     "addPartValidation": "Veuillez sélectionner une pièce et entrer une quantité valide",
-    "addPartFailed": "Échec de l'ajout de la pièce au stock. Veuillez réessayer."
+    "addPartFailed": "Échec de l'ajout de la pièce au stock. Veuillez réessayer.",
+    "adjustmentNotesPlaceholder": "Raison de l'ajustement",
+    "quantityChange": "Mouvement de stock : {delta}"
   },
   "stockMovements": {
     "title": "Mouvements de stock",
@@ -457,7 +459,21 @@
     "updateTransfer": "Mettre à jour le transfert",
     "failedSave": "L'enregistrement du transfert a échoué. Veuillez réessayer.",
     "warehousesMustDiffer": "La source et la destination doivent être différentes",
-    "atLeastOneItem": "Au moins un article est requis"
+    "atLeastOneItem": "Au moins un article est requis",
+    "selectSourceFirst": "Sélectionnez un entrepôt source pour voir les pièces disponibles",
+    "available": "Disponible",
+    "maxAvailable": "Maximum disponible : {count}",
+    "exceedsAvailable": "{part} : {requested} demandés mais seulement {available} disponibles",
+    "approve": "Approuver",
+    "complete": "Terminer",
+    "cancel": "Annuler",
+    "approveTransferTitle": "Approuver le transfert",
+    "approveTransferDescription": "Cela marquera le transfert comme en transit. La disponibilité du stock sera vérifiée. Continuer ?",
+    "completeTransferTitle": "Terminer le transfert",
+    "completeTransferDescription": "Cela déduira le stock de l'entrepôt source et l'ajoutera à l'entrepôt de destination. Cette action est irréversible. Continuer ?",
+    "cancelTransferTitle": "Annuler le transfert",
+    "cancelTransferDescription": "Êtes-vous sûr de vouloir annuler ce transfert ? Cette action est irréversible.",
+    "failedStatusChange": "Échec de la mise à jour du statut du transfert. Veuillez réessayer."
   },
   "storeOverrides": {
     "title": "Paramètres du magasin — {storeName}",
@@ -1019,13 +1035,25 @@
     "status_CANCELLED": "Annulé"
   },
   "auth": {
+    "welcomeBack": "Bon retour",
+    "welcomeBackDescription": "Connectez-vous à votre compte pour continuer",
     "email": "E-mail",
     "emailPlaceholder": "Entrez votre e-mail",
     "emailRequired": "L'e-mail est requis",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "emailAndPasswordRequired": "L'e-mail et le mot de passe sont requis.",
+    "loginFailed": "Échec de la connexion. Veuillez réessayer.",
+    "forgotPassword": "Mot de passe oublié ?",
+    "signIn": "Se connecter",
+    "forgotPasswordTitle": "Mot de passe oublié",
+    "forgotPasswordDescription": "Entrez votre e-mail et nous vous enverrons un lien de réinitialisation",
     "sendResetLink": "Envoyer le lien de réinitialisation",
     "resetLinkSent": "Lien envoyé !",
     "resetLinkDescription": "Si un compte existe avec cet e-mail, vous recevrez un lien de réinitialisation sous peu. Vérifiez votre boîte de réception.",
     "backToSignIn": "Retour à la connexion",
+    "resetPasswordTitle": "Réinitialiser le mot de passe",
+    "resetPasswordDescription": "Entrez votre nouveau mot de passe ci-dessous",
     "newPassword": "Nouveau mot de passe",
     "newPasswordPlaceholder": "Minimum 8 caractères",
     "confirmPassword": "Confirmer le mot de passe",
@@ -1033,8 +1061,15 @@
     "resetPasswordButton": "Réinitialiser le mot de passe",
     "resetPasswordFailed": "Échec de la réinitialisation. Le lien a peut-être expiré.",
     "passwordResetSuccess": "Votre mot de passe a été réinitialisé avec succès.",
-    "signIn": "Se connecter",
     "invalidResetLink": "Ce lien de réinitialisation est invalide ou a expiré.",
-    "requestNewLink": "Demander un nouveau lien"
+    "requestNewLink": "Demander un nouveau lien",
+    "brandTagline": "Gérez votre inventaire\nen toute confiance.",
+    "brandDescription": "Suivez les stocks, gérez les commandes, les factures et les achats — le tout depuis un seul tableau de bord.",
+    "multiStore": "Multi-magasin",
+    "support": "Support",
+    "realTime": "Temps réel",
+    "stockTracking": "Suivi des stocks",
+    "roleBased": "Basé sur les rôles",
+    "accessControl": "Contrôle d'accès"
   }
 }

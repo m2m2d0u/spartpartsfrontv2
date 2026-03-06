@@ -12,6 +12,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
 
+  // Redirect root to /admin dashboard
+  if (token && pathname === "/") {
+    return NextResponse.redirect(new URL("/admin", request.url));
+  }
+
   // If not logged in, redirect to sign-in with callbackUrl
   if (!token) {
     const signInUrl = new URL("/auth/sign-in", request.url);

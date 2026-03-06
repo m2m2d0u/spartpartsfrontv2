@@ -75,7 +75,6 @@ export type UpdateStockTransferRequest = CreateStockTransferRequest;
 
 /** Mirrors backend UpdateWarehouseStockRequest */
 export type UpdateWarehouseStockRequest = {
-  quantity: number;
   minStockLevel: number;
 };
 

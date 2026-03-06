@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TransferActions } from "./_components/transfer-actions";
 
 export const metadata: Metadata = {
   title: "Stock Transfer Details",
@@ -45,14 +46,20 @@ export default async function StockTransferDetailPage({ params }: Props) {
           { label: transfer.transferNumber },
         ]}
         actions={
-          transfer.status === "PENDING" ? (
-            <Link
-              href={`/admin/stock/transfers/${transfer.id}/edit`}
-              className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-            >
-              {tCommon("edit")}
-            </Link>
-          ) : undefined
+          <div className="flex items-center gap-3">
+            {transfer.status === "PENDING" && (
+              <Link
+                href={`/admin/stock/transfers/${transfer.id}/edit`}
+                className="inline-flex items-center rounded-lg border border-stroke px-5 py-2.5 text-sm font-medium text-dark hover:bg-gray-2 dark:border-dark-3 dark:text-white dark:hover:bg-dark-2"
+              >
+                {tCommon("edit")}
+              </Link>
+            )}
+            <TransferActions
+              transferId={transfer.id}
+              status={transfer.status}
+            />
+          </div>
         }
       />
 

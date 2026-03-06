@@ -20,7 +20,6 @@ export default async function AdminDashboardPage() {
   let data;
   try {
     data = await getDashboard();
-    console.log(data);
   } catch {
     return (
       <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">

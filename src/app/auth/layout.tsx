@@ -1,8 +1,13 @@
-export default function AuthLayout({
+import { getTranslations } from "next-intl/server";
+import { LanguageSwitcher } from "@/components/Layouts/header/language-switcher";
+
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = await getTranslations("auth");
+
   return (
     <div className="flex min-h-screen">
       {/* Left panel — branding */}
@@ -31,28 +36,31 @@ export default function AuthLayout({
         </div>
 
         <div className="space-y-8">
-          <h2 className="text-4xl font-bold leading-tight text-white">
-            Manage your inventory
-            <br />
-            with confidence.
+          <h2 className="whitespace-pre-line text-4xl font-bold leading-tight text-white">
+            {t("brandTagline")}
           </h2>
           <p className="max-w-md text-lg text-white/70">
-            Track stock, manage orders, handle invoices and procurement — all
-            from one powerful dashboard.
+            {t("brandDescription")}
           </p>
 
           <div className="flex gap-6">
             <div className="rounded-xl bg-white/10 px-5 py-4 backdrop-blur-sm">
-              <p className="text-2xl font-bold text-white">Multi-store</p>
-              <p className="text-sm text-white/60">Support</p>
+              <p className="text-2xl font-bold text-white">
+                {t("multiStore")}
+              </p>
+              <p className="text-sm text-white/60">{t("support")}</p>
             </div>
             <div className="rounded-xl bg-white/10 px-5 py-4 backdrop-blur-sm">
-              <p className="text-2xl font-bold text-white">Real-time</p>
-              <p className="text-sm text-white/60">Stock tracking</p>
+              <p className="text-2xl font-bold text-white">
+                {t("realTime")}
+              </p>
+              <p className="text-sm text-white/60">{t("stockTracking")}</p>
             </div>
             <div className="rounded-xl bg-white/10 px-5 py-4 backdrop-blur-sm">
-              <p className="text-2xl font-bold text-white">Role-based</p>
-              <p className="text-sm text-white/60">Access control</p>
+              <p className="text-2xl font-bold text-white">
+                {t("roleBased")}
+              </p>
+              <p className="text-sm text-white/60">{t("accessControl")}</p>
             </div>
           </div>
         </div>
@@ -63,7 +71,10 @@ export default function AuthLayout({
       </div>
 
       {/* Right panel — form */}
-      <div className="flex w-full items-center justify-center bg-gray-2 p-6 dark:bg-[#020d1a] lg:w-1/2">
+      <div className="relative flex w-full items-center justify-center bg-gray-2 p-6 dark:bg-[#020d1a] lg:w-1/2">
+        <div className="absolute right-6 top-6">
+          <LanguageSwitcher />
+        </div>
         <div className="w-full max-w-[480px]">
           {/* Mobile logo — hidden on desktop */}
           <div className="mb-8 flex items-center gap-3 lg:hidden">
