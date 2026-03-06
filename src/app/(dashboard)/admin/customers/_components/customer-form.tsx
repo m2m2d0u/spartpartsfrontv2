@@ -6,7 +6,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useTranslations } from "next-intl";
 import InputGroup from "@/components/FormElements/InputGroup";
-import { Switch } from "@/components/FormElements/switch";
 import { FormSection } from "@/components/FormSection";
 import type { Customer } from "@/types";
 
@@ -34,7 +33,6 @@ export function CustomerForm({ customer }: Props) {
     country: Yup.string(),
     taxId: Yup.string(),
     notes: Yup.string(),
-    portalAccess: Yup.boolean(),
   });
 
   const formik = useFormik({
@@ -50,7 +48,6 @@ export function CustomerForm({ customer }: Props) {
       country: customer?.country || "Sénégal",
       taxId: customer?.taxId || "",
       notes: customer?.notes || "",
-      portalAccess: customer?.portalAccess ?? false,
     },
     validationSchema: customerSchema,
     onSubmit: async (values) => {
@@ -67,7 +64,6 @@ export function CustomerForm({ customer }: Props) {
         country: values.country || undefined,
         taxId: values.taxId || undefined,
         notes: values.notes || undefined,
-        portalAccess: values.portalAccess,
       };
 
       try {
@@ -229,12 +225,6 @@ export function CustomerForm({ customer }: Props) {
             placeholder={t("notesPlaceholder")}
           />
         </div>
-
-        <Switch
-          label={t("portalAccessLabel")}
-          checked={formik.values.portalAccess}
-          onChange={(checked) => formik.setFieldValue("portalAccess", checked)}
-        />
 
         <div className="flex items-center gap-3 pt-2">
           <button

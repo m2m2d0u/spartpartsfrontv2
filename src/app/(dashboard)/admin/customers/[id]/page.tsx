@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { getCustomerById } from "@/services/customers.server";
 
 export const metadata: Metadata = {
@@ -57,15 +56,10 @@ export default async function CustomerDetailPage({ params }: Props) {
         {/* Main info */}
         <div className="xl:col-span-2">
           <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark dark:shadow-card">
-            <div className="mb-4 flex items-center gap-3">
+            <div className="mb-4">
               <h3 className="text-lg font-semibold text-dark dark:text-white">
                 {t("customerInformation")}
               </h3>
-              <StatusBadge
-                variant={customer.portalAccess ? "success" : "neutral"}
-              >
-                {customer.portalAccess ? t("portalEnabled") : t("portalDisabled")}
-              </StatusBadge>
             </div>
 
             <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">

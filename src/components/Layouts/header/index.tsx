@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import { useSidebarContext } from "../sidebar/sidebar-context";
 import { LanguageSwitcher } from "./language-switcher";
 import { MenuIcon } from "./icons";
-import { Notification } from "./notification";
 import { ThemeToggleSwitch } from "./theme-toggle";
 import { UserInfo } from "./user-info";
 
@@ -59,8 +58,6 @@ export function Header() {
         <LanguageSwitcher />
 
         <ThemeToggleSwitch />
-
-        <Notification />
 
         <div className="shrink-0">
           <UserInfo />

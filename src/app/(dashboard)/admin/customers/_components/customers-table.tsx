@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/DataTable";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
@@ -93,15 +92,6 @@ export function CustomersTable({ customers: initialCustomers, totalElements: ini
       key: "city",
       header: tCommon("city"),
       render: (row) => row.city || "—",
-    },
-    {
-      key: "portal",
-      header: t("portalAccess"),
-      render: (row) => (
-        <StatusBadge variant={row.portalAccess ? "success" : "neutral"}>
-          {row.portalAccess ? t("enabled") : t("disabled")}
-        </StatusBadge>
-      ),
     },
     {
       key: "actions",

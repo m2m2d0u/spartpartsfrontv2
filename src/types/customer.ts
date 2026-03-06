@@ -12,7 +12,6 @@ export type Customer = {
   country: string;
   taxId: string;
   notes: string;
-  portalAccess: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -30,7 +29,6 @@ export type CreateCustomerRequest = {
   country?: string;
   taxId?: string;
   notes?: string;
-  portalAccess?: boolean;
 };
 
 /** Mirrors backend UpdateCustomerRequest */
