@@ -9,6 +9,7 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import { getInvoiceTemplateById } from "@/services/invoice-templates.server";
 import { TemplateImageThumbnail } from "../_components/template-image-thumbnail";
+import { TemplatePreviewButton } from "../_components/template-preview-button";
 
 export const metadata: Metadata = {
   title: "Invoice Template Details",
@@ -39,14 +40,44 @@ export default async function InvoiceTemplateDetailPage({ params }: Props) {
           { label: template.name },
         ]}
         actions={
-          <PermissionGate permission={Permission.INVOICE_UPDATE}>
-            <Link
-              href={`/admin/invoice-templates/${template.id}/edit`}
-              className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
-            >
-              {tCommon("edit")}
-            </Link>
-          </PermissionGate>
+          <div className="flex items-center gap-3">
+            <TemplatePreviewButton
+              design={template.design}
+              templateData={{
+                name: template.name,
+                description: template.description || undefined,
+                isDefault: template.isDefault,
+                primaryColor: template.primaryColor,
+                accentColor: template.accentColor,
+                fontFamily: template.fontFamily,
+                design: template.design,
+                headerLayout: template.headerLayout,
+                logoUrl: template.logoUrl ?? undefined,
+                headerImageUrl: template.headerImageUrl ?? undefined,
+                footerImageUrl: template.footerImageUrl ?? undefined,
+                stampImageUrl: template.stampImageUrl ?? undefined,
+                signatureImageUrl: template.signatureImageUrl ?? undefined,
+                watermarkImageUrl: template.watermarkImageUrl ?? undefined,
+                showNinea: template.showNinea,
+                showRccm: template.showRccm,
+                showTaxId: template.showTaxId,
+                showWarehouseAddress: template.showWarehouseAddress,
+                showCustomerTaxId: template.showCustomerTaxId,
+                showPaymentTerms: template.showPaymentTerms,
+                showDiscountColumn: template.showDiscountColumn,
+                taxRateId: template.taxRateId ?? undefined,
+                defaultNotes: template.defaultNotes || undefined,
+              }}
+            />
+            <PermissionGate permission={Permission.INVOICE_UPDATE}>
+              <Link
+                href={`/admin/invoice-templates/${template.id}/edit`}
+                className="inline-flex items-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-opacity-90"
+              >
+                {tCommon("edit")}
+              </Link>
+            </PermissionGate>
+          </div>
         }
       />
 
