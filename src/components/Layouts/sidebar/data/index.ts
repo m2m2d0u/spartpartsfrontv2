@@ -76,14 +76,14 @@ export function getNavData(
               title: t("invoiceTemplates"),
               url: "/admin/invoice-templates",
             },
-            {
-              title: t("payments"),
-              url: "/admin/payments",
-            },
-            {
-              title: t("returns"),
-              url: "/admin/returns",
-            },
+            // {
+            //   title: t("payments"),
+            //   url: "/admin/payments",
+            // },
+            // {
+            //   title: t("returns"),
+            //   url: "/admin/returns",
+            // },
           ],
         },
         {
@@ -108,13 +108,13 @@ export function getNavData(
           permission: Permission.CUSTOMER_VIEW,
           items: [],
         },
-        {
-          title: t("orders"),
-          url: "/admin/orders",
-          icon: Icons.ShoppingCartIcon,
-          permission: Permission.ORDER_VIEW,
-          items: [],
-        },
+        // {
+        //   title: t("orders"),
+        //   url: "/admin/orders",
+        //   icon: Icons.ShoppingCartIcon,
+        //   permission: Permission.ORDER_VIEW,
+        //   items: [],
+        // },
         {
           title: t("stock"),
           icon: Icons.StackIcon,
