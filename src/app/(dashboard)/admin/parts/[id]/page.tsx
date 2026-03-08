@@ -212,13 +212,23 @@ export default async function PartDetailPage({ params }: Props) {
                 {part.images.map((img) => (
                   <div
                     key={img.id}
-                    className="aspect-square overflow-hidden rounded-lg border border-stroke dark:border-dark-3"
+                    className={`relative aspect-square overflow-hidden rounded-lg border-2 ${img.isMain ? "border-primary" : "border-stroke dark:border-dark-3"}`}
                   >
                     <img
                       src={img.url}
                       alt={part.name}
                       className="h-full w-full object-cover"
                     />
+                    {img.isMain && (
+                      <div className="absolute left-1.5 top-1.5">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-primary px-2 py-0.5 text-body-xs font-medium text-white">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="shrink-0">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" />
+                          </svg>
+                          {t("mainImage")}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

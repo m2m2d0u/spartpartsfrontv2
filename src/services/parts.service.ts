@@ -50,6 +50,14 @@ export async function replacePartImages(
   return apiPutFormData<PartImage[]>(`/parts/${partId}/replace-images`, formData);
 }
 
+/** Set an image as the main image for a part */
+export async function setMainImage(
+  partId: string,
+  imageId: string,
+): Promise<PartImage> {
+  return apiPut<PartImage>(`/parts/${partId}/images/${imageId}/set-main`);
+}
+
 /** Bulk import parts from an Excel/CSV file */
 export type BulkImportResult = {
   totalRows: number;

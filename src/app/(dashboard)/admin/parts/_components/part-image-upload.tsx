@@ -21,6 +21,7 @@ export function PartImageUpload({ partId, initialImages }: Props) {
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [settingMainId, setSettingMainId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -109,6 +110,23 @@ export function PartImageUpload({ partId, initialImages }: Props) {
     }
   }
 
+  async function handleSetMain(imageId: string) {
+    setSettingMainId(imageId);
+    setError("");
+
+    try {
+      const { setMainImage } = await import("@/services/parts.service");
+      await setMainImage(partId, imageId);
+      setImages((prev) =>
+        prev.map((img) => ({ ...img, isMain: img.id === imageId })),
+      );
+    } catch {
+      setError(t("imageSetMainFailed"));
+    } finally {
+      setSettingMainId(null);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <h4 className="text-body-sm font-medium text-dark dark:text-white">
@@ -119,13 +137,46 @@ export function PartImageUpload({ partId, initialImages }: Props) {
       {images.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {images.map((img) => (
-            <div key={img.id} className="group relative aspect-square overflow-hidden rounded-lg border border-stroke dark:border-dark-3">
+            <div key={img.id} className={`group relative aspect-square overflow-hidden rounded-lg border-2 ${img.isMain ? "border-primary" : "border-stroke dark:border-dark-3"}`}>
               <img
                 src={img.url}
                 alt=""
                 className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+              {/* Main badge */}
+              {img.isMain && (
+                <div className="absolute left-1.5 top-1.5">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-primary px-2 py-0.5 text-body-xs font-medium text-white">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="shrink-0">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" />
+                    </svg>
+                    {t("mainImage")}
+                  </span>
+                </div>
+              )}
+              {/* Hover overlay with actions */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                {!img.isMain && (
+                  <button
+                    type="button"
+                    onClick={() => handleSetMain(img.id)}
+                    disabled={settingMainId === img.id}
+                    className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-dark hover:bg-opacity-90 disabled:opacity-50"
+                  >
+                    {settingMainId === img.id ? (
+                      <svg
+                        className="size-4 animate-spin"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                    ) : (
+                      t("setAsMain")
+                    )}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => handleDeleteImage(img.id)}
@@ -138,19 +189,8 @@ export function PartImageUpload({ partId, initialImages }: Props) {
                       viewBox="0 0 24 24"
                       fill="none"
                     >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                      />
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                   ) : (
                     tCommon("delete")

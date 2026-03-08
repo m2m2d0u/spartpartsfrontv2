@@ -3,6 +3,7 @@ export type PartImage = {
   id: string;
   url: string;
   sortOrder: number;
+  isMain: boolean;
 };
 
 /** Mirrors backend PartResponse */
