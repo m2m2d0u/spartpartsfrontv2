@@ -1197,6 +1197,8 @@
     "partsAvailable": "Parts Available",
     "categoriesCount": "{count} Categories",
     "exploreCollection": "Explore our collection",
-    "partsCount": "{count} parts"
+    "partsCount": "{count} parts",
+    "portalClosedTitle": "Store Currently Unavailable",
+    "portalClosedDescription": "Our online store is currently closed. Please check back later."
   }
 }

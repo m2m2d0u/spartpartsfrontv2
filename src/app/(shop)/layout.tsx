@@ -1,12 +1,27 @@
 import { CartProvider } from "@/context/cart-context";
 import { ShopNavbar } from "@/components/shop/shop-navbar";
 import { ShopFooter } from "@/components/shop/shop-footer";
+import { PortalDisabledView } from "@/components/shop/portal-disabled-view";
+import { getShopCompanySettings } from "@/services/shop.server";
 
-export default function ShopLayout({
+export default async function ShopLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  let portalEnabled = true;
+
+  try {
+    const settings = await getShopCompanySettings();
+    portalEnabled = settings.portalEnabled !== false;
+  } catch {
+    // If we can't reach the backend, allow access (graceful degradation)
+  }
+
+  if (!portalEnabled) {
+    return <PortalDisabledView />;
+  }
+
   return (
     <CartProvider>
       <div className="flex min-h-screen flex-col bg-gray-1 dark:bg-dark">

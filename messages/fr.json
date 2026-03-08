@@ -1197,6 +1197,8 @@
     "partsAvailable": "Pièces disponibles",
     "categoriesCount": "{count} Catégories",
     "exploreCollection": "Explorez notre collection",
-    "partsCount": "{count} pièces"
+    "partsCount": "{count} pièces",
+    "portalClosedTitle": "Boutique actuellement indisponible",
+    "portalClosedDescription": "Notre boutique en ligne est actuellement fermée. Veuillez revenir plus tard."
   }
 }
