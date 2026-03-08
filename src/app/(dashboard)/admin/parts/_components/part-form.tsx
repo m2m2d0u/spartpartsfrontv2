@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -13,6 +13,7 @@ import { FormSection } from "@/components/FormSection";
 import { FormDialog } from "@/components/ui/form-dialog";
 import { useLookup } from "@/stores/lookup-store";
 import type { Part, Category } from "@/types";
+import { PartImageUpload } from "./part-image-upload";
 
 type Props = {
   part?: Part;
@@ -131,22 +132,46 @@ export function PartForm({ part, categories: initialCategories }: Props) {
     label: c.name,
   }));
 
-  const brandItems = brands.map((b) => ({
-    value: b.id,
-    label: b.name,
-  }));
+  const brandItems = useMemo(() => {
+    const items = brands.map((b) => ({
+      value: b.id,
+      label: b.name,
+    }));
+    // Ensure the part's current brand is always in the list (even before lookup loads)
+    if (part?.carBrandId && part.carBrandName && !items.some((i) => i.value === part.carBrandId)) {
+      items.unshift({ value: part.carBrandId, label: part.carBrandName });
+    }
+    return items;
+  }, [brands, part?.carBrandId, part?.carBrandName]);
 
-  const modelItems = formik.values.carBrandId
-    ? getModelsByBrand(formik.values.carBrandId).map((m) => ({
-        value: m.id,
-        label: m.name,
-      }))
-    : [];
+  const modelItems = useMemo(() => {
+    if (!formik.values.carBrandId) return [];
+    const items = getModelsByBrand(formik.values.carBrandId).map((m) => ({
+      value: m.id,
+      label: m.name,
+    }));
+    // Ensure the part's current model is always in the list
+    if (part?.carModelId && part.carModelName && !items.some((i) => i.value === part.carModelId)) {
+      items.unshift({ value: part.carModelId, label: part.carModelName });
+    }
+    return items;
+  }, [formik.values.carBrandId, getModelsByBrand, part?.carModelId, part?.carModelName]);
 
-  const tagItems = tags.map((t) => ({
-    value: t.id,
-    label: t.name,
-  }));
+  const tagItems = useMemo(() => {
+    const items = tags.map((t) => ({
+      value: t.id,
+      label: t.name,
+    }));
+    // Ensure the part's current tags are always in the list
+    if (part?.tags) {
+      for (const tag of part.tags) {
+        if (!items.some((i) => i.value === tag.id)) {
+          items.push({ value: tag.id, label: tag.name });
+        }
+      }
+    }
+    return items;
+  }, [tags, part?.tags]);
 
   function fieldError(name: keyof typeof formik.values) {
     return formik.touched[name] ? (formik.errors[name] as string) : undefined;
@@ -398,6 +423,7 @@ export function PartForm({ part, categories: initialCategories }: Props) {
           onChange={(ids) => formik.setFieldValue("tagIds", ids)}
           onCreateNew={handleCreateTag}
           createNewLabel={(term) => t("createNewTag", { name: term })}
+          selectedLabel={(count) => t("tagsSelected", { count })}
         />
 
         <div className="border-t border-stroke pt-5 dark:border-dark-3">
@@ -460,6 +486,12 @@ export function PartForm({ part, categories: initialCategories }: Props) {
           checked={formik.values.published}
           onChange={(checked) => formik.setFieldValue("published", checked)}
         />
+
+        {isEditing && part && (
+          <div className="border-t border-stroke pt-5 dark:border-dark-3">
+            <PartImageUpload partId={part.id} initialImages={part.images} />
+          </div>
+        )}
 
         <div className="flex items-center gap-3 pt-2">
           <button

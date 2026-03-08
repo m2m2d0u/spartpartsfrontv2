@@ -21,6 +21,7 @@ type Props = {
   className?: string;
   onCreateNew?: (searchTerm: string) => void;
   createNewLabel?: (searchTerm: string) => string;
+  selectedLabel?: (count: number) => string;
   maxVisible?: number;
 };
 
@@ -38,6 +39,7 @@ export function SearchableMultiSelect({
   className,
   onCreateNew,
   createNewLabel = (term: string) => `Create "${term}"`,
+  selectedLabel,
   maxVisible = 50,
 }: Props) {
   const id = useId();
@@ -126,7 +128,7 @@ export function SearchableMultiSelect({
         >
           <span className="truncate">
             {value.length > 0
-              ? `${value.length} selected`
+              ? (selectedLabel?.(value.length) ?? `${value.length} selected`)
               : placeholder}
           </span>
           <ChevronUpIcon

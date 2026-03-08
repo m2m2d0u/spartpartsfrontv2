@@ -1,5 +1,5 @@
 import type { Part, PartImage, CreatePartRequest, UpdatePartRequest } from "@/types";
-import { apiPost, apiPostFormData, apiPut, apiDelete, apiGetBlob } from "./api-client";
+import { apiPost, apiPostFormData, apiPut, apiPutFormData, apiDelete, apiGetBlob } from "./api-client";
 
 export async function createPart(data: CreatePartRequest): Promise<Part> {
   return apiPost<Part>("/parts", data);
@@ -28,6 +28,26 @@ export async function removePartImage(
   imageId: string,
 ): Promise<void> {
   return apiDelete(`/parts/${partId}/images/${imageId}`);
+}
+
+/** Upload multiple images for a part */
+export async function uploadPartImages(
+  partId: string,
+  files: File[],
+): Promise<PartImage[]> {
+  const formData = new FormData();
+  files.forEach((file) => formData.append("files", file));
+  return apiPostFormData<PartImage[]>(`/parts/${partId}/upload-images`, formData);
+}
+
+/** Replace all images for a part */
+export async function replacePartImages(
+  partId: string,
+  files: File[],
+): Promise<PartImage[]> {
+  const formData = new FormData();
+  files.forEach((file) => formData.append("files", file));
+  return apiPutFormData<PartImage[]>(`/parts/${partId}/replace-images`, formData);
 }
 
 /** Bulk import parts from an Excel/CSV file */
