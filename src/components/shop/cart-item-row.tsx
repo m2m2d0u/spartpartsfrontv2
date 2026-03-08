@@ -6,6 +6,7 @@ import type { CartItem } from "@/context/cart-context";
 import type { CurrencyFormatOptions } from "@/lib/format-number";
 import { formatCurrency } from "@/lib/format-number";
 import { QuantitySelector } from "./quantity-selector";
+import { NoImagePlaceholder } from "./no-image-placeholder";
 
 type CartItemRowProps = {
   item: CartItem;
@@ -35,22 +36,7 @@ export function CartItemRow({
             className="object-cover"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-dark-5 dark:text-dark-6">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
-          </div>
+          <NoImagePlaceholder size="sm" />
         )}
       </div>
 

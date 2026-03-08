@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getShopOrder, getShopStoreConfig } from "@/services/shop.server";
+import { getShopOrder, getShopCompanySettings } from "@/services/shop.server";
 import { OrderConfirmationView } from "@/components/shop/order-confirmation-view";
 
 type Props = {
@@ -19,23 +19,23 @@ export default async function OrderConfirmationPage({ params }: Props) {
   const { orderNumber } = await params;
 
   let order;
-  let storeConfig;
+  let companySettings;
 
   try {
-    [order, storeConfig] = await Promise.all([
+    [order, companySettings] = await Promise.all([
       getShopOrder(orderNumber),
-      getShopStoreConfig(),
+      getShopCompanySettings(),
     ]);
   } catch {
     notFound();
   }
 
-  const currencyOptions = storeConfig
+  const currencyOptions = companySettings
     ? {
-        symbol: storeConfig.currencySymbol,
-        position: storeConfig.currencyPosition,
-        decimals: storeConfig.currencyDecimals,
-        thousandsSeparator: storeConfig.thousandsSeparator,
+        symbol: companySettings.currencySymbol,
+        position: companySettings.currencyPosition,
+        decimals: companySettings.currencyDecimals,
+        thousandsSeparator: companySettings.thousandsSeparator,
       }
     : undefined;
 

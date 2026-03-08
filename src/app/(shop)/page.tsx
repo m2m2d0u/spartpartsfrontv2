@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import type { PortalPart, PortalCategory, PortalStoreConfig } from "@/types/portal";
-import { getShopParts, getShopCategories, getShopStoreConfig } from "@/services/shop.server";
+import type { PortalPart, PortalCategory, PortalCompanySettings } from "@/types/portal";
+import { getShopParts, getShopCategories, getShopCompanySettings } from "@/services/shop.server";
 import { HomepageView } from "@/components/shop/homepage-view";
 
 export const metadata: Metadata = {
@@ -12,27 +12,27 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   let categories: PortalCategory[] = [];
   let featuredParts: PortalPart[] = [];
-  let storeConfig: PortalStoreConfig | null = null;
+  let companySettings: PortalCompanySettings | null = null;
 
   try {
-    const [partsResult, categoriesResult, configResult] = await Promise.all([
+    const [partsResult, categoriesResult, settingsResult] = await Promise.all([
       getShopParts(0, 8),
       getShopCategories(),
-      getShopStoreConfig(),
+      getShopCompanySettings(),
     ]);
     featuredParts = partsResult.content;
     categories = categoriesResult;
-    storeConfig = configResult;
+    companySettings = settingsResult;
   } catch {
     // Backend not ready — show page with empty data
   }
 
-  const currencyOptions = storeConfig
+  const currencyOptions = companySettings
     ? {
-        symbol: storeConfig.currencySymbol,
-        position: storeConfig.currencyPosition,
-        decimals: storeConfig.currencyDecimals,
-        thousandsSeparator: storeConfig.thousandsSeparator,
+        symbol: companySettings.currencySymbol,
+        position: companySettings.currencyPosition,
+        decimals: companySettings.currencyDecimals,
+        thousandsSeparator: companySettings.thousandsSeparator,
       }
     : undefined;
 

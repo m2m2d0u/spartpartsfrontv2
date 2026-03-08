@@ -5,7 +5,7 @@ import type {
   PortalPart,
   PortalPartDetail,
   PortalCategory,
-  PortalStoreConfig,
+  PortalCompanySettings,
   PortalOrderConfirmation,
 } from "@/types/portal";
 import { publicGet } from "./public-api";
@@ -42,8 +42,8 @@ export async function getShopCategories(): Promise<PortalCategory[]> {
   return publicGet<PortalCategory[]>("/portal/categories");
 }
 
-export async function getShopStoreConfig(): Promise<PortalStoreConfig> {
-  return publicGet<PortalStoreConfig>("/portal/store-config");
+export async function getShopCompanySettings(): Promise<PortalCompanySettings> {
+  return publicGet<PortalCompanySettings>("/portal/company-settings");
 }
 
 export async function getShopOrder(

@@ -22,7 +22,7 @@ export function PartDetailView({ part, currencyOptions }: PartDetailViewProps) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const isOutOfStock = part.totalStock <= 0;
+  const isOutOfStock = part.availableStock <= 0;
 
   function handleAddToCart() {
     addItem(
@@ -32,7 +32,7 @@ export function PartDetailView({ part, currencyOptions }: PartDetailViewProps) {
         name: part.name,
         unitPrice: part.sellingPrice,
         imageUrl: part.images.find((img) => img.isMain)?.url ?? part.images[0]?.url ?? null,
-        maxStock: part.totalStock,
+        maxStock: part.availableStock,
       },
       quantity,
     );
@@ -62,13 +62,13 @@ export function PartDetailView({ part, currencyOptions }: PartDetailViewProps) {
           <span className="text-3xl font-bold text-primary">
             {formatCurrency(part.sellingPrice, currencyOptions)}
           </span>
-          <StockBadge totalStock={part.totalStock} />
+          <StockBadge totalStock={part.availableStock} />
         </div>
 
         {/* Stock units */}
-        {part.totalStock > 0 && (
+        {part.availableStock > 0 && (
           <p className="text-sm text-dark-5 dark:text-dark-6">
-            {t("units", { count: part.totalStock })}
+            {t("units", { count: part.availableStock })}
           </p>
         )}
 
@@ -129,7 +129,7 @@ export function PartDetailView({ part, currencyOptions }: PartDetailViewProps) {
             <QuantitySelector
               value={quantity}
               onChange={setQuantity}
-              max={part.totalStock}
+              max={part.availableStock}
             />
             <button
               onClick={handleAddToCart}

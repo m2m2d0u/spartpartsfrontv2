@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import type { PortalPart } from "@/types/portal";
 import { formatCurrency, type CurrencyFormatOptions } from "@/lib/format-number";
 import { StockBadge } from "./stock-badge";
+import { NoImagePlaceholder } from "./no-image-placeholder";
 
 type PartCardProps = {
   part: PortalPart;
@@ -29,25 +30,10 @@ export function PartCard({ part, currencyOptions }: PartCardProps) {
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-dark-5 dark:text-dark-6">
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
-          </div>
+          <NoImagePlaceholder size="md" />
         )}
         <div className="absolute right-2 top-2">
-          <StockBadge totalStock={part.totalStock} />
+          <StockBadge totalStock={part.availableStock} />
         </div>
       </div>
 

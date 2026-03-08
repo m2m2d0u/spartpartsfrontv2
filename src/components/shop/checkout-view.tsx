@@ -13,6 +13,7 @@ import type { CurrencyFormatOptions } from "@/lib/format-number";
 import { formatCurrency } from "@/lib/format-number";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { EmptyState } from "@/components/ui/empty-state";
+import { NoImagePlaceholder } from "./no-image-placeholder";
 
 type CheckoutViewProps = {
   currencyOptions?: CurrencyFormatOptions;
@@ -261,11 +262,7 @@ export function CheckoutView({ currencyOptions }: CheckoutViewProps) {
                         className="object-cover"
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center text-dark-5 dark:text-dark-6">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                        </svg>
-                      </div>
+                      <NoImagePlaceholder size="xs" />
                     )}
                   </div>
                   <div className="flex-1 truncate">

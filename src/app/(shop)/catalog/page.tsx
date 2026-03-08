@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { PagedResponse } from "@/types";
-import type { PortalPart, PortalCategory, PortalStoreConfig } from "@/types/portal";
-import { getShopParts, getShopCategories, getShopStoreConfig } from "@/services/shop.server";
+import type { PortalPart, PortalCategory, PortalCompanySettings } from "@/types/portal";
+import { getShopParts, getShopCategories, getShopCompanySettings } from "@/services/shop.server";
 import { CatalogView } from "@/components/shop/catalog-view";
 
 export const metadata: Metadata = {
@@ -22,26 +22,26 @@ const emptyPage: PagedResponse<PortalPart> = {
 export default async function CatalogPage() {
   let initialData: PagedResponse<PortalPart>;
   let categories: PortalCategory[];
-  let storeConfig: PortalStoreConfig | null;
+  let companySettings: PortalCompanySettings | null;
 
   try {
-    [initialData, categories, storeConfig] = await Promise.all([
+    [initialData, categories, companySettings] = await Promise.all([
       getShopParts(0, 20),
       getShopCategories(),
-      getShopStoreConfig(),
+      getShopCompanySettings(),
     ]);
   } catch {
     initialData = emptyPage;
     categories = [];
-    storeConfig = null;
+    companySettings = null;
   }
 
-  const currencyOptions = storeConfig
+  const currencyOptions = companySettings
     ? {
-        symbol: storeConfig.currencySymbol,
-        position: storeConfig.currencyPosition,
-        decimals: storeConfig.currencyDecimals,
-        thousandsSeparator: storeConfig.thousandsSeparator,
+        symbol: companySettings.currencySymbol,
+        position: companySettings.currencyPosition,
+        decimals: companySettings.currencyDecimals,
+        thousandsSeparator: companySettings.thousandsSeparator,
       }
     : undefined;
 

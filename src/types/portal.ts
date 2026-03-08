@@ -11,7 +11,8 @@ export type PortalPart = {
   carBrandName: string | null;
   carModelName: string | null;
   mainImageUrl: string | null;
-  totalStock: number;
+  images: PartImage[];
+  availableStock: number;
 };
 
 /** Detailed part for the portal detail page */
@@ -27,7 +28,7 @@ export type PortalPartDetail = {
   carModelName: string | null;
   images: PartImage[];
   tags: { id: string; name: string }[];
-  totalStock: number;
+  availableStock: number;
 };
 
 /** Category summary for portal filters */
@@ -38,14 +39,27 @@ export type PortalCategory = {
   partCount: number;
 };
 
-/** Store configuration for portal display */
-export type PortalStoreConfig = {
-  storeName: string;
+/** Company settings for portal display */
+export type PortalCompanySettings = {
+  companyName: string;
   logoUrl: string | null;
+  street: string | null;
+  city: string | null;
+  state: string | null;
+  postalCode: string | null;
+  country: string | null;
+  phone: string | null;
+  email: string | null;
   currencySymbol: string;
   currencyPosition: string;
   currencyDecimals: number;
   thousandsSeparator: string;
+  defaultTaxRate: number | null;
+  portalEnabled: boolean | null;
+  portalMinOrderAmount: number | null;
+  portalShippingFlatRate: number | null;
+  portalFreeShippingAbove: number | null;
+  portalTermsText: string | null;
 };
 
 /** Public order placement request */

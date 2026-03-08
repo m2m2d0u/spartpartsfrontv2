@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getShopPartById, getShopStoreConfig } from "@/services/shop.server";
+import { getShopPartById, getShopCompanySettings } from "@/services/shop.server";
 import { PartDetailView } from "@/components/shop/part-detail-view";
 import Link from "next/link";
 
@@ -25,23 +25,23 @@ export default async function PartDetailPage({ params }: Props) {
   const { id } = await params;
 
   let part;
-  let storeConfig;
+  let companySettings;
 
   try {
-    [part, storeConfig] = await Promise.all([
+    [part, companySettings] = await Promise.all([
       getShopPartById(id),
-      getShopStoreConfig(),
+      getShopCompanySettings(),
     ]);
   } catch {
     notFound();
   }
 
-  const currencyOptions = storeConfig
+  const currencyOptions = companySettings
     ? {
-        symbol: storeConfig.currencySymbol,
-        position: storeConfig.currencyPosition,
-        decimals: storeConfig.currencyDecimals,
-        thousandsSeparator: storeConfig.thousandsSeparator,
+        symbol: companySettings.currencySymbol,
+        position: companySettings.currencyPosition,
+        decimals: companySettings.currencyDecimals,
+        thousandsSeparator: companySettings.thousandsSeparator,
       }
     : undefined;
 

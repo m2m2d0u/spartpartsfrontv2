@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import type { PartImage } from "@/types/part";
+import { NoImagePlaceholder } from "./no-image-placeholder";
 
 type ImageGalleryProps = {
   images: PartImage[];
@@ -25,23 +26,7 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
 
   if (sortedImages.length === 0) {
     return (
-      <div className="flex aspect-square items-center justify-center rounded-xl bg-gray-2 dark:bg-dark-3">
-        <svg
-          width="64"
-          height="64"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-dark-5 dark:text-dark-6"
-        >
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-          <circle cx="8.5" cy="8.5" r="1.5" />
-          <polyline points="21 15 16 10 5 21" />
-        </svg>
-      </div>
+      <NoImagePlaceholder size="lg" className="aspect-square rounded-xl" />
     );
   }
 

@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import type { PortalPart, PortalCategory } from "@/types/portal";
 import type { CurrencyFormatOptions } from "@/lib/format-number";
 import { PartCard } from "./part-card";
+import { NoImagePlaceholder } from "./no-image-placeholder";
 
 type HomepageViewProps = {
   categories: PortalCategory[];
@@ -95,21 +96,7 @@ export function HomepageView({
                       className="rounded-full object-cover"
                     />
                   ) : (
-                    <svg
-                      width="28"
-                      height="28"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-primary"
-                    >
-                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                      <path d="M2 17l10 5 10-5" />
-                      <path d="M2 12l10 5 10-5" />
-                    </svg>
+                    <NoImagePlaceholder size="sm" className="rounded-full bg-transparent dark:bg-transparent" />
                   )}
                 </div>
                 <h3 className="text-sm font-semibold text-dark dark:text-white">

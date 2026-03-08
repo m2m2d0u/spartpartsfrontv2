@@ -8,6 +8,7 @@ import type { CurrencyFormatOptions } from "@/lib/format-number";
 import { searchShopParts, getShopCarBrands, getShopCarModels } from "@/services/shop.service";
 import { PartCard } from "./part-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SearchableSelect } from "@/components/FormElements/searchable-select";
 
 type CatalogViewProps = {
   initialData: PagedResponse<PortalPart>;
@@ -158,43 +159,37 @@ export function CatalogView({
         </div>
 
         {/* Filter row */}
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="rounded-lg border border-stroke bg-transparent px-4 py-2.5 text-sm text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark dark:text-white dark:focus:border-primary"
-          >
-            {categoryItems.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="w-48">
+            <SearchableSelect
+              items={categoryItems}
+              value={categoryId}
+              onChange={(v) => setCategoryId(v)}
+              placeholder={t("allCategories")}
+              searchPlaceholder={t("searchCategories")}
+            />
+          </div>
 
-          <select
-            value={brandId}
-            onChange={(e) => setBrandId(e.target.value)}
-            className="rounded-lg border border-stroke bg-transparent px-4 py-2.5 text-sm text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark dark:text-white dark:focus:border-primary"
-          >
-            {brandItems.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
+          <div className="w-48">
+            <SearchableSelect
+              items={brandItems}
+              value={brandId}
+              onChange={(v) => setBrandId(v)}
+              placeholder={t("allBrands")}
+              searchPlaceholder={t("searchBrands")}
+            />
+          </div>
 
           {brandId && (
-            <select
-              value={modelId}
-              onChange={(e) => setModelId(e.target.value)}
-              className="rounded-lg border border-stroke bg-transparent px-4 py-2.5 text-sm text-dark outline-none transition focus:border-primary dark:border-dark-3 dark:bg-dark dark:text-white dark:focus:border-primary"
-            >
-              {modelItems.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
+            <div className="w-48">
+              <SearchableSelect
+                items={modelItems}
+                value={modelId}
+                onChange={(v) => setModelId(v)}
+                placeholder={t("allModels")}
+                searchPlaceholder={t("searchModels")}
+              />
+            </div>
           )}
 
           {hasFilters && (

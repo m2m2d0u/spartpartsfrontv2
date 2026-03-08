@@ -8,7 +8,7 @@ import { useClickOutside } from "@/hooks/use-click-outside";
 type Item = { value: string; label: string };
 
 type Props = {
-  label: string;
+  label?: string;
   items: Item[];
   placeholder?: string;
   searchPlaceholder?: string;
@@ -95,14 +95,16 @@ export function SearchableSelect({
   }
 
   return (
-    <div className={cn("space-y-3", className)} ref={containerRef}>
-      <label
-        htmlFor={id}
-        className="block text-body-sm font-medium text-dark dark:text-white"
-      >
-        {label}
-        {required && <span className="ml-1 select-none text-red">*</span>}
-      </label>
+    <div className={cn(label && "space-y-3", className)} ref={containerRef}>
+      {label && (
+        <label
+          htmlFor={id}
+          className="block text-body-sm font-medium text-dark dark:text-white"
+        >
+          {label}
+          {required && <span className="ml-1 select-none text-red">*</span>}
+        </label>
+      )}
 
       {/* Hidden native input for formik */}
       {name && <input type="hidden" name={name} value={value || ""} />}

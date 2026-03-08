@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CartView } from "@/components/shop/cart-view";
-import { getShopStoreConfig } from "@/services/shop.server";
+import { getShopCompanySettings } from "@/services/shop.server";
 
 export const metadata: Metadata = {
   title: "Cart | Spare Parts Store",
@@ -8,20 +8,20 @@ export const metadata: Metadata = {
 };
 
 export default async function CartPage() {
-  let storeConfig;
+  let companySettings;
 
   try {
-    storeConfig = await getShopStoreConfig();
+    companySettings = await getShopCompanySettings();
   } catch {
-    storeConfig = null;
+    companySettings = null;
   }
 
-  const currencyOptions = storeConfig
+  const currencyOptions = companySettings
     ? {
-        symbol: storeConfig.currencySymbol,
-        position: storeConfig.currencyPosition,
-        decimals: storeConfig.currencyDecimals,
-        thousandsSeparator: storeConfig.thousandsSeparator,
+        symbol: companySettings.currencySymbol,
+        position: companySettings.currencyPosition,
+        decimals: companySettings.currencyDecimals,
+        thousandsSeparator: companySettings.thousandsSeparator,
       }
     : undefined;
 
