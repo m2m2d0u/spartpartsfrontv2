@@ -14,3 +14,4 @@ export * from "./user";
 export * from "./car";
 export * from "./stock";
 export * from "./role";
+export * from "./portal";

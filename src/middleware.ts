@@ -12,13 +12,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
 
-  // Redirect root to /admin dashboard
-  if (token && pathname === "/") {
-    return NextResponse.redirect(new URL("/admin", request.url));
-  }
-
-  // If not logged in, redirect to sign-in with callbackUrl
-  if (!token) {
+  // Protected admin routes: redirect to sign-in if not authenticated
+  if (pathname.startsWith("/admin") && !token) {
     const signInUrl = new URL("/auth/sign-in", request.url);
     signInUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(signInUrl);
@@ -30,12 +25,10 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all routes except:
-     * - /auth/* (login pages)
-     * - /_next/* (Next.js internals)
-     * - /images/* (static images)
-     * - favicon.ico, .svg, .png, etc. (static files)
+     * Match only:
+     * - /admin/* (protected dashboard routes)
+     * - /auth/* (login pages — for redirect-if-logged-in logic)
      */
-    "/((?!auth|_next|images|favicon\\.ico|.*\\.).*)",
+    "/(admin|auth)(.*)",
   ],
 };
