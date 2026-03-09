@@ -4,6 +4,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 /** @type {import("next").NextConfig} */
 const nextConfig = {
+  output: "standalone",
   images: {
     unoptimized: process.env.NODE_ENV === "development",
     remotePatterns: [
@@ -31,6 +32,11 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "9000"
+      },
+      {
+        protocol: "https",
+        hostname: "spare.symmetry.sn",
+        port: ""
       }
     ]
   }
