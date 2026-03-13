@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { CartView } from "@/components/shop/cart-view";
 import { getShopCompanySettings } from "@/services/shop.server";
 
-export const metadata: Metadata = {
-  title: "Cart | Spare Parts Store",
-  description: "Review your shopping cart.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("shop");
+  return { title: t("shoppingCart") };
+}
 
 export default async function CartPage() {
   let companySettings;

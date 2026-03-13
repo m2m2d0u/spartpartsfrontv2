@@ -5,9 +5,10 @@ import { getStockMovements } from "@/services/stock-movements.server";
 import { getWarehouses } from "@/services/warehouses.server";
 import { StockMovementsTable } from "./_components/stock-movements-table";
 
-export const metadata: Metadata = {
-  title: "Stock Movements",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("stockMovements");
+  return { title: t("title") };
+}
 
 export default async function StockMovementsPage() {
   const [movementsPage, warehousesPage] = await Promise.all([

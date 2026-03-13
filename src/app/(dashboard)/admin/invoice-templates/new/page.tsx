@@ -4,9 +4,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getAllTaxRates } from "@/services/tax-rates.server";
 import { InvoiceTemplateForm } from "../_components/invoice-template-form";
 
-export const metadata: Metadata = {
-  title: "New Invoice Template",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("invoiceTemplates");
+  return { title: t("newTemplate") };
+}
 
 export default async function NewInvoiceTemplatePage() {
   const [t, tNav, taxRates] = await Promise.all([

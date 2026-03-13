@@ -6,9 +6,10 @@ import { getUserById } from "@/services/users.server";
 import { getActiveRoles } from "@/services/roles.server";
 import { UserForm } from "../../_components/user-form";
 
-export const metadata: Metadata = {
-  title: "Edit User",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("users");
+  return { title: t("editUser") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

@@ -9,9 +9,10 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import { UsersTable } from "./_components/users-table";
 
-export const metadata: Metadata = {
-  title: "Users",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("users");
+  return { title: t("title") };
+}
 
 async function UsersData() {
   const usersPage = await getUsers(0, 20);

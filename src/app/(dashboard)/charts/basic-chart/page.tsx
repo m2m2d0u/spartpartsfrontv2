@@ -3,10 +3,12 @@ import { CampaignVisitors } from "@/components/Charts/campaign-visitors";
 import { UsedDevices } from "@/components/Charts/used-devices";
 import { createTimeFrameExtractor } from "@/utils/timeframe-extractor";
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Basic Chart",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return { title: t("basicChart") };
+}
 
 type PropsType = {
   searchParams: Promise<{

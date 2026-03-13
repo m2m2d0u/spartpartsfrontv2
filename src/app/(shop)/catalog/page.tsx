@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import type { PagedResponse } from "@/types";
 import type { PortalPart, PortalCategory, PortalCompanySettings } from "@/types/portal";
 import { getShopParts, getShopCategories, getShopCompanySettings } from "@/services/shop.server";
 import { CatalogView } from "@/components/shop/catalog-view";
 
-export const metadata: Metadata = {
-  title: "Catalog | Spare Parts Store",
-  description: "Browse our catalog of spare parts and accessories.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("shop");
+  return { title: t("catalog") };
+}
 
 const emptyPage: PagedResponse<PortalPart> = {
   content: [],

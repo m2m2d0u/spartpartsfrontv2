@@ -7,9 +7,10 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import { getSupplierById } from "@/services/suppliers.server";
 
-export const metadata: Metadata = {
-  title: "Supplier Detail",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("suppliers");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

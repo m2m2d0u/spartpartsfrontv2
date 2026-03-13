@@ -6,9 +6,10 @@ import { getInvoiceTemplateById } from "@/services/invoice-templates.server";
 import { getAllTaxRates } from "@/services/tax-rates.server";
 import { InvoiceTemplateForm } from "../../_components/invoice-template-form";
 
-export const metadata: Metadata = {
-  title: "Edit Invoice Template",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("invoiceTemplates");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

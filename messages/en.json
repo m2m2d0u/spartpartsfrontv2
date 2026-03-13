@@ -49,7 +49,14 @@
     "noAssignedUsers": "No users assigned.",
     "failedUserAssignment": "Failed to update user assignment.",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "tables": "Tables",
+    "buttons": "Buttons",
+    "alerts": "Alerts",
+    "calendar": "Calendar",
+    "formLayout": "Form Layout",
+    "formElements": "Form Elements",
+    "basicChart": "Basic Chart"
   },
   "nav": {
     "spareParts": "SPARE PARTS",

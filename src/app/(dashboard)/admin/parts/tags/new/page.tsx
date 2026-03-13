@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { TagForm } from "../_components/tag-form";
 
-export const metadata: Metadata = {
-  title: "New Tag",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("tags");
+  return { title: t("newTag") };
+}
 
 export default async function NewTagPage() {
   const t = await getTranslations("tags");

@@ -9,9 +9,10 @@ import { getWarehouses } from "@/services/warehouses.server";
 import { getCompanySettings } from "@/services/company-settings.server";
 import { PurchaseOrderForm } from "../../_components/purchase-order-form";
 
-export const metadata: Metadata = {
-  title: "Edit Purchase Order",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("purchaseOrders");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

@@ -10,9 +10,10 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 import { WarehousesTable } from "./_components/warehouses-table";
 
-export const metadata: Metadata = {
-  title: "Warehouses",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("warehouses");
+  return { title: t("title") };
+}
 
 async function WarehousesData() {
   const [warehousesPage, storesPage] = await Promise.all([

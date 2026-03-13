@@ -9,9 +9,10 @@ import { Permission } from "@/types";
 import { getTags } from "@/services/tags.server";
 import { TagsTable } from "./_components/tags-table";
 
-export const metadata: Metadata = {
-  title: "Tags",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("tags");
+  return { title: t("title") };
+}
 
 async function TagsData() {
   const paged = await getTags(0, 20);

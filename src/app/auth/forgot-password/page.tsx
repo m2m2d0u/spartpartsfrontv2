@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { ForgotPasswordForm } from "./_components/forgot-password-form";
 
-export const metadata: Metadata = {
-  title: "Forgot Password",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth");
+  return { title: t("forgotPasswordTitle") };
+}
 
 export default async function ForgotPasswordPage() {
   const t = await getTranslations("auth");

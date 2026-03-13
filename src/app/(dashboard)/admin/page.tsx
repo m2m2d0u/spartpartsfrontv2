@@ -10,9 +10,10 @@ import { TopSellingTable } from "@/components/dashboard/top-selling-table";
 import { RecentOrdersTable } from "@/components/dashboard/recent-orders-table";
 import { RecentMovementsTable } from "@/components/dashboard/recent-movements-table";
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("dashboard");
+  return { title: t("title") };
+}
 
 export default async function AdminDashboardPage() {
   const t = await getTranslations("dashboard");

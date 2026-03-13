@@ -49,7 +49,14 @@
     "noAssignedUsers": "Aucun utilisateur affecté.",
     "failedUserAssignment": "Échec de la mise à jour de l'affectation.",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "tables": "Tableaux",
+    "buttons": "Boutons",
+    "alerts": "Alertes",
+    "calendar": "Calendrier",
+    "formLayout": "Mise en page du formulaire",
+    "formElements": "Éléments de formulaire",
+    "basicChart": "Graphique de base"
   },
   "nav": {
     "spareParts": "PIÈCES DÉTACHÉES",

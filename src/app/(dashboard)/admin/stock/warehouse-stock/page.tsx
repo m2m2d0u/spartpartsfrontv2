@@ -5,9 +5,10 @@ import { getWarehouses } from "@/services/warehouses.server";
 import { getStores } from "@/services/stores.server";
 import { WarehouseStockTable } from "./_components/warehouse-stock-table";
 
-export const metadata: Metadata = {
-  title: "Warehouse Stock",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("warehouseStock");
+  return { title: t("title") };
+}
 
 export default async function WarehouseStockPage() {
   const [warehousesPage, storesPage] = await Promise.all([

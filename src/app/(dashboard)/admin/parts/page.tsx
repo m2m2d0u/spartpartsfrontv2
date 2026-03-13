@@ -9,9 +9,10 @@ import { Permission } from "@/types";
 import { getParts } from "@/services/parts.server";
 import { PartsTable } from "./_components/parts-table";
 
-export const metadata: Metadata = {
-  title: "Parts",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("parts");
+  return { title: t("title") };
+}
 
 async function PartsData() {
   const paged = await getParts(0, 20);

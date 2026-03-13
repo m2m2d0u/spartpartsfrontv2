@@ -7,9 +7,10 @@ import { getPermissions } from "@/services/permissions.server";
 import { RoleForm } from "../../_components/role-form";
 import { RolePermissions } from "../../_components/role-permissions";
 
-export const metadata: Metadata = {
-  title: "Edit Role",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("roles");
+  return { title: t("editRole") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

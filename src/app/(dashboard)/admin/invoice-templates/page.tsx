@@ -9,9 +9,10 @@ import { Permission } from "@/types";
 import { getInvoiceTemplates } from "@/services/invoice-templates.server";
 import { InvoiceTemplatesTable } from "./_components/invoice-templates-table";
 
-export const metadata: Metadata = {
-  title: "Invoice Templates",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("invoiceTemplates");
+  return { title: t("title") };
+}
 
 async function TemplatesData() {
   const page = await getInvoiceTemplates(0, 20);

@@ -14,9 +14,10 @@ import { AdminResetPasswordButton } from "../_components/admin-reset-password";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 
-export const metadata: Metadata = {
-  title: "User Detail",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("users");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

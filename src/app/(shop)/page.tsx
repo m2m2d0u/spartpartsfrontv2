@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import type { PortalPart, PortalCategory, PortalCompanySettings } from "@/types/portal";
 import { getShopParts, getShopCategories, getShopCompanySettings } from "@/services/shop.server";
 import { HomepageView } from "@/components/shop/homepage-view";
 
-export const metadata: Metadata = {
-  title: "Spare Parts Store",
-  description:
-    "Quality spare parts for every vehicle. Browse our catalog of genuine and aftermarket parts with fast delivery and competitive prices.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("shop");
+  return { title: t("storeName") };
+}
 
 export default async function HomePage() {
   let categories: PortalCategory[] = [];

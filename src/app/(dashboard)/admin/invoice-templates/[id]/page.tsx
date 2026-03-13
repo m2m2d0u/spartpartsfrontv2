@@ -11,9 +11,10 @@ import { getInvoiceTemplateById } from "@/services/invoice-templates.server";
 import { TemplateImageThumbnail } from "../_components/template-image-thumbnail";
 import { TemplatePreviewButton } from "../_components/template-preview-button";
 
-export const metadata: Metadata = {
-  title: "Invoice Template Details",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("invoiceTemplates");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

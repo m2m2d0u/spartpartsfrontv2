@@ -6,9 +6,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getPartById } from "@/services/parts.server";
 
-export const metadata: Metadata = {
-  title: "Part Detail",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("parts");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

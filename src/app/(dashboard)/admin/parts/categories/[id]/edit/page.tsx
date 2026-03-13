@@ -5,9 +5,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getCategoryById } from "@/services/categories.server";
 import { CategoryForm } from "../../_components/category-form";
 
-export const metadata: Metadata = {
-  title: "Edit Category",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("categories");
+  return { title: t("editCategory") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

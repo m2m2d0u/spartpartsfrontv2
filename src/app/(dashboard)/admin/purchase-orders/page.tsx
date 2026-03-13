@@ -10,9 +10,10 @@ import { getPurchaseOrders } from "@/services/purchase-orders.server";
 import { getCompanySettings } from "@/services/company-settings.server";
 import { PurchaseOrdersTable } from "./_components/purchase-orders-table";
 
-export const metadata: Metadata = {
-  title: "Purchase Orders",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("purchaseOrders");
+  return { title: t("title") };
+}
 
 async function PurchaseOrdersData() {
   const [page, settings] = await Promise.all([

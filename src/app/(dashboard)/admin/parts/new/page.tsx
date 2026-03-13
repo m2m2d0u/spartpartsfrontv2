@@ -4,9 +4,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getCategories } from "@/services/categories.server";
 import { PartForm } from "../_components/part-form";
 
-export const metadata: Metadata = {
-  title: "New Part",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("parts");
+  return { title: t("newPart") };
+}
 
 export default async function NewPartPage() {
   const categoriesPage = await getCategories();

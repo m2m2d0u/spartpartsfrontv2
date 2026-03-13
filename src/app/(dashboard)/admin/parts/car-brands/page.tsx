@@ -9,9 +9,10 @@ import { Permission } from "@/types";
 import { getCarBrands } from "@/services/car-brands.server";
 import { CarBrandsTable } from "./_components/car-brands-table";
 
-export const metadata: Metadata = {
-  title: "Car Brands",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("carBrands");
+  return { title: t("title") };
+}
 
 async function CarBrandsData() {
   const paged = await getCarBrands(0, 20);

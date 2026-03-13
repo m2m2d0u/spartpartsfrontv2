@@ -9,9 +9,10 @@ import { getCompanySettings } from "@/services/company-settings.server";
 import { InvoiceForm } from "../../_components/invoice-form";
 import { InvoiceStatusCode, InvoiceTypeCode } from "@/types";
 
-export const metadata: Metadata = {
-  title: "Edit Invoice",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("invoices");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

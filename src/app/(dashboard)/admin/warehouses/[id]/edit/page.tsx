@@ -6,9 +6,10 @@ import { getWarehouseById } from "@/services/warehouses.server";
 import { getStores } from "@/services/stores.server";
 import { WarehouseForm } from "../../_components/warehouse-form";
 
-export const metadata: Metadata = {
-  title: "Edit Warehouse",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("warehouses");
+  return { title: t("editWarehouse") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

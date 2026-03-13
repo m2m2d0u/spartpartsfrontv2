@@ -9,9 +9,10 @@ import { Permission } from "@/types";
 import { getCategories } from "@/services/categories.server";
 import { CategoriesTable } from "./_components/categories-table";
 
-export const metadata: Metadata = {
-  title: "Categories",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("categories");
+  return { title: t("title") };
+}
 
 async function CategoriesData() {
   const paged = await getCategories(0, 20);

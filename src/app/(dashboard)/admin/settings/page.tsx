@@ -9,9 +9,10 @@ import { InvoiceDefaultsForm } from "./_components/invoice-defaults-form";
 import { CurrencySettingsForm } from "./_components/currency-settings-form";
 import { PortalSettingsForm } from "./_components/portal-settings-form";
 
-export const metadata: Metadata = {
-  title: "Company Settings",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("settings");
+  return { title: t("title") };
+}
 
 export default async function SettingsPage() {
   const [settings, taxRatesPage] = await Promise.all([

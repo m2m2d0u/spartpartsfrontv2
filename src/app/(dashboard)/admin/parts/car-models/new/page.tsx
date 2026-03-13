@@ -4,9 +4,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getCarBrands } from "@/services/car-brands.server";
 import { CarModelForm } from "../_components/car-model-form";
 
-export const metadata: Metadata = {
-  title: "New Car Model",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("carModels");
+  return { title: t("newCarModel") };
+}
 
 export default async function NewCarModelPage() {
   const t = await getTranslations("carModels");

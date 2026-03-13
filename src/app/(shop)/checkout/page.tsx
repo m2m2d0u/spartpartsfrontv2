@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { CheckoutView } from "@/components/shop/checkout-view";
 import { getShopCompanySettings } from "@/services/shop.server";
 
-export const metadata: Metadata = {
-  title: "Checkout | Spare Parts Store",
-  description: "Complete your order.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("shop");
+  return { title: t("checkout") };
+}
 
 export default async function CheckoutPage() {
   let companySettings;

@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { RoleForm } from "../_components/role-form";
 
-export const metadata: Metadata = {
-  title: "New Role",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("roles");
+  return { title: t("newRole") };
+}
 
 export default async function NewRolePage() {
   const t = await getTranslations("roles");

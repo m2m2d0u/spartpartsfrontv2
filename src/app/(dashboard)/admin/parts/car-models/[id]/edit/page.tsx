@@ -6,9 +6,10 @@ import { getCarModelById } from "@/services/car-models.server";
 import { getCarBrands } from "@/services/car-brands.server";
 import { CarModelForm } from "../../_components/car-model-form";
 
-export const metadata: Metadata = {
-  title: "Edit Car Model",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("carModels");
+  return { title: t("editCarModel") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

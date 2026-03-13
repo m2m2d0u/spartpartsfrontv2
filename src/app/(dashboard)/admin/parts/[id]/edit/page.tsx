@@ -6,9 +6,10 @@ import { getPartById } from "@/services/parts.server";
 import { getCategories } from "@/services/categories.server";
 import { PartForm } from "../../_components/part-form";
 
-export const metadata: Metadata = {
-  title: "Edit Part",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("parts");
+  return { title: t("editPart") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

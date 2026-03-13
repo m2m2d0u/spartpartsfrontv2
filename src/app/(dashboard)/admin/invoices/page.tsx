@@ -10,9 +10,10 @@ import { getInvoices } from "@/services/invoices.server";
 import { getCompanySettings } from "@/services/company-settings.server";
 import { InvoicesTable } from "./_components/invoices-table";
 
-export const metadata: Metadata = {
-  title: "Invoices",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("invoices");
+  return { title: t("title") };
+}
 
 async function InvoicesData() {
   const [page, settings] = await Promise.all([

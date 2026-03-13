@@ -3,9 +3,10 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { SigninForm } from "./_components/signin-form";
 
-export const metadata: Metadata = {
-  title: "Sign In",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth");
+  return { title: t("signIn") };
+}
 
 export default async function SignInPage() {
   const t = await getTranslations("auth");

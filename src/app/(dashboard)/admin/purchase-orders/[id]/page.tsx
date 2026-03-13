@@ -12,9 +12,10 @@ import { formatCurrency, type CurrencyFormatOptions } from "@/lib/format-number"
 import { getPurchaseOrderById } from "@/services/purchase-orders.server";
 import { getCompanySettings } from "@/services/company-settings.server";
 
-export const metadata: Metadata = {
-  title: "Purchase Order Detail",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("purchaseOrders");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

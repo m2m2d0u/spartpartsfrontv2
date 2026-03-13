@@ -1,11 +1,12 @@
 import { Alert } from "@/components/ui-elements/alert";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Alerts",
-  // other metadata
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return { title: t("alerts") };
+}
 
 export default function Page() {
   return (

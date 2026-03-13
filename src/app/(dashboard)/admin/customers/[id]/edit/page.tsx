@@ -5,9 +5,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getCustomerById } from "@/services/customers.server";
 import { CustomerForm } from "../../_components/customer-form";
 
-export const metadata: Metadata = {
-  title: "Edit Customer",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("customers");
+  return { title: t("editCustomer") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

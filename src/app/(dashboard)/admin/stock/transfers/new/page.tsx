@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { StockTransferForm } from "../_components/stock-transfer-form";
 
-export const metadata: Metadata = {
-  title: "New Stock Transfer",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("stockTransfers");
+  return { title: t("newTransfer") };
+}
 
 export default async function NewStockTransferPage() {
   const t = await getTranslations("stockTransfers");

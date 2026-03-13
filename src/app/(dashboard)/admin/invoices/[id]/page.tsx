@@ -22,9 +22,10 @@ import {
 import { InvoiceStatusActions } from "../_components/invoice-status-actions";
 import { InvoicePdfActions } from "../_components/invoice-pdf-actions";
 
-export const metadata: Metadata = {
-  title: "Invoice Details",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("invoices");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

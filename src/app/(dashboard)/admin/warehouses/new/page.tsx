@@ -4,9 +4,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getStores } from "@/services/stores.server";
 import { WarehouseForm } from "../_components/warehouse-form";
 
-export const metadata: Metadata = {
-  title: "New Warehouse",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("warehouses");
+  return { title: t("newWarehouse") };
+}
 
 type Props = {
   searchParams: Promise<{ storeId?: string }>;

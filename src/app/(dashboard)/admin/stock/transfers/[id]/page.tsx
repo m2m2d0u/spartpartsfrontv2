@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/table";
 import { TransferActions } from "./_components/transfer-actions";
 
-export const metadata: Metadata = {
-  title: "Stock Transfer Details",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("stockTransfers");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

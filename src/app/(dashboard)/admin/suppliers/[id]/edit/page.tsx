@@ -5,9 +5,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getSupplierById } from "@/services/suppliers.server";
 import { SupplierForm } from "../../_components/supplier-form";
 
-export const metadata: Metadata = {
-  title: "Edit Supplier",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("suppliers");
+  return { title: t("editSupplier") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

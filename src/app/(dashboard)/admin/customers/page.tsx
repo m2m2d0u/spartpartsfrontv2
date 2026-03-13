@@ -9,9 +9,10 @@ import { Permission } from "@/types";
 import { getCustomers } from "@/services/customers.server";
 import { CustomersTable } from "./_components/customers-table";
 
-export const metadata: Metadata = {
-  title: "Customers",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("customers");
+  return { title: t("title") };
+}
 
 async function CustomersData() {
   const customersPage = await getCustomers(0, 20);

@@ -5,9 +5,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getCarBrandById } from "@/services/car-brands.server";
 import { CarBrandForm } from "../../_components/car-brand-form";
 
-export const metadata: Metadata = {
-  title: "Edit Car Brand",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("carBrands");
+  return { title: t("editCarBrand") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

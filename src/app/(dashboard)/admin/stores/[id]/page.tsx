@@ -16,9 +16,10 @@ import { PermissionGate } from "@/components/PermissionGate";
 import { UserAssignments } from "@/components/user-assignments";
 import { Permission } from "@/types";
 
-export const metadata: Metadata = {
-  title: "Store Detail",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("stores");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

@@ -9,9 +9,10 @@ import { Permission } from "@/types";
 import { getStockTransfers } from "@/services/stock-transfers.server";
 import { StockTransfersTable } from "./_components/stock-transfers-table";
 
-export const metadata: Metadata = {
-  title: "Stock Transfers",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("stockTransfers");
+  return { title: t("title") };
+}
 
 async function TransfersData() {
   const transfersPage = await getStockTransfers();

@@ -4,9 +4,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getActiveRoles } from "@/services/roles.server";
 import { UserForm } from "../_components/user-form";
 
-export const metadata: Metadata = {
-  title: "New User",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("users");
+  return { title: t("newUser") };
+}
 
 export default async function NewUserPage() {
   const [t, tNav, roles] = await Promise.all([

@@ -3,9 +3,10 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { ResetPasswordForm } from "./_components/reset-password-form";
 
-export const metadata: Metadata = {
-  title: "Reset Password",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth");
+  return { title: t("resetPasswordTitle") };
+}
 
 export default async function ResetPasswordPage() {
   const t = await getTranslations("auth");

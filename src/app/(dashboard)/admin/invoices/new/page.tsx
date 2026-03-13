@@ -6,9 +6,10 @@ import { getInvoiceTemplates } from "@/services/invoice-templates.server";
 import { getCompanySettings } from "@/services/company-settings.server";
 import { InvoiceForm } from "../_components/invoice-form";
 
-export const metadata: Metadata = {
-  title: "New Invoice",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("invoices");
+  return { title: t("newInvoice") };
+}
 
 export default async function NewInvoicePage() {
   const [customersPage, templatesPage, settings] = await Promise.all([

@@ -5,9 +5,10 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getCustomerById } from "@/services/customers.server";
 
-export const metadata: Metadata = {
-  title: "Customer Detail",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("customers");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

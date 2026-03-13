@@ -6,9 +6,10 @@ import { getStoreById } from "@/services/stores.server";
 import { getCompanySettings } from "@/services/company-settings.server";
 import { StoreOverridesForm } from "./_components/store-overrides-form";
 
-export const metadata: Metadata = {
-  title: "Store Settings",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("stores");
+  return { title: t("storeSettings") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

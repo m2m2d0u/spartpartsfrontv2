@@ -9,9 +9,10 @@ import { getRoleById } from "@/services/roles.server";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Permission } from "@/types";
 
-export const metadata: Metadata = {
-  title: "Role Detail",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("roles");
+  return { title: t("title") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

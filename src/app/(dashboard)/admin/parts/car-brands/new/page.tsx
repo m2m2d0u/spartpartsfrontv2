@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { CarBrandForm } from "../_components/car-brand-form";
 
-export const metadata: Metadata = {
-  title: "New Car Brand",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("carBrands");
+  return { title: t("newCarBrand") };
+}
 
 export default async function NewCarBrandPage() {
   const t = await getTranslations("carBrands");

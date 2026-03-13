@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { StoreForm } from "../_components/store-form";
 
-export const metadata: Metadata = {
-  title: "New Store",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("stores");
+  return { title: t("newStore") };
+}
 
 export default async function NewStorePage() {
   const t = await getTranslations("stores");

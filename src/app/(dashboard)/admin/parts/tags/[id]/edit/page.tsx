@@ -5,9 +5,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { getTagById } from "@/services/tags.server";
 import { TagForm } from "../../_components/tag-form";
 
-export const metadata: Metadata = {
-  title: "Edit Tag",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("tags");
+  return { title: t("editTag") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;

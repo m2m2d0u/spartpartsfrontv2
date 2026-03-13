@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { BulkImportForm } from "../_components/bulk-import-form";
 
-export const metadata: Metadata = {
-  title: "Import Parts",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("parts");
+  return { title: t("bulkImportPageTitle") };
+}
 
 export default async function ImportPartsPage() {
   const t = await getTranslations("parts");

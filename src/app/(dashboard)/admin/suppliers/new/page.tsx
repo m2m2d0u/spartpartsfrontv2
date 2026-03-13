@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/PageHeader";
 import { SupplierForm } from "../_components/supplier-form";
 
-export const metadata: Metadata = {
-  title: "New Supplier",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("suppliers");
+  return { title: t("newSupplier") };
+}
 
 export default async function NewSupplierPage() {
   const t = await getTranslations("suppliers");

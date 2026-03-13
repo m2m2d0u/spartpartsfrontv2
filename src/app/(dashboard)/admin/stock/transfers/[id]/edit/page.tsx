@@ -6,9 +6,10 @@ import { getStockTransferById } from "@/services/stock-transfers.server";
 import { getWarehouseById } from "@/services/warehouses.server";
 import { StockTransferForm } from "../../_components/stock-transfer-form";
 
-export const metadata: Metadata = {
-  title: "Edit Stock Transfer",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("stockTransfers");
+  return { title: t("editTransfer") };
+}
 
 type Props = {
   params: Promise<{ id: string }>;
