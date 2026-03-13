@@ -7,7 +7,6 @@ import {
   DropdownTrigger,
 } from "@/components/ui/dropdown";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { LogOutIcon, SettingsIcon, UserIcon } from "./icons";
@@ -25,8 +24,14 @@ export function UserInfo() {
     email: user?.email ?? "",
     role: user?.roleDisplayName ?? "",
     level: user?.roleLevel ?? "",
-    img: "/images/user/user-03.png",
   };
+
+  const initials = USER.name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
 
   return (
     <Dropdown isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -34,14 +39,12 @@ export function UserInfo() {
         <span className="sr-only">{t("myAccount")}</span>
 
         <figure className="flex items-center gap-3">
-          <Image
-            src={USER.img}
-            className="size-12"
-            alt={`Avatar of ${USER.name}`}
-            role="presentation"
-            width={200}
-            height={200}
-          />
+          <div
+            className="size-12 flex items-center justify-center rounded-full bg-primary text-white font-semibold text-base select-none"
+            aria-label={`Avatar of ${USER.name}`}
+          >
+            {initials}
+          </div>
           <figcaption className="flex items-center gap-1 font-medium text-dark dark:text-dark-6 max-[1024px]:sr-only">
             <div className="text-left">
               <span className="block">{USER.name}</span>
@@ -71,14 +74,12 @@ export function UserInfo() {
         <h2 className="sr-only">{t("userInformation")}</h2>
 
         <figure className="flex items-center gap-2.5 px-5 py-3.5">
-          <Image
-            src={USER.img}
-            className="size-12"
-            alt={`Avatar for ${USER.name}`}
-            role="presentation"
-            width={200}
-            height={200}
-          />
+          <div
+            className="size-12 flex items-center justify-center rounded-full bg-primary text-white font-semibold text-base select-none"
+            aria-label={`Avatar for ${USER.name}`}
+          >
+            {initials}
+          </div>
 
           <figcaption className="space-y-1.5 text-base font-medium">
             <div className="leading-none text-dark dark:text-white">
