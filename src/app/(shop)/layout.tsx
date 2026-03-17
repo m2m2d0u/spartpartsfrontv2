@@ -1,7 +1,7 @@
+import { redirect } from "next/navigation";
 import { CartProvider } from "@/context/cart-context";
 import { ShopNavbar } from "@/components/shop/shop-navbar";
 import { ShopFooter } from "@/components/shop/shop-footer";
-import { PortalDisabledView } from "@/components/shop/portal-disabled-view";
 import { getShopCompanySettings } from "@/services/shop.server";
 
 export default async function ShopLayout({
@@ -19,7 +19,7 @@ export default async function ShopLayout({
   }
 
   if (!portalEnabled) {
-    return <PortalDisabledView />;
+    redirect("/admin");
   }
 
   return (
