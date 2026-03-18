@@ -56,7 +56,7 @@ export function FormDialog({
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
+    <div className="fixed left-0 right-0 top-[89px] bottom-0 z-20 flex items-center justify-center bg-black/50 lg:left-[290px]">
       <div
         ref={dialogRef}
         className="w-full max-w-md rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark"

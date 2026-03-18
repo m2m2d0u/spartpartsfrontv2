@@ -14,6 +14,7 @@ import { FormDialog } from "@/components/ui/form-dialog";
 import { useLookup } from "@/stores/lookup-store";
 import type { Part, Category } from "@/types";
 import { PartImageUpload } from "./part-image-upload";
+import { InitialStockModal } from "./initial-stock-modal";
 
 type Props = {
   part?: Part;
@@ -25,6 +26,12 @@ export function PartForm({ part, categories: initialCategories }: Props) {
   const isEditing = !!part;
   const [serverError, setServerError] = useState("");
   const [localCategories, setLocalCategories] = useState(initialCategories);
+  const [showStockModal, setShowStockModal] = useState(false);
+  const [createdPart, setCreatedPart] = useState<{
+    id: string;
+    name: string;
+    partNumber: string;
+  } | null>(null);
   const t = useTranslations("parts");
   const tCommon = useTranslations("common");
   const tVal = useTranslations("validation");
@@ -115,12 +122,18 @@ export function PartForm({ part, categories: initialCategories }: Props) {
           const { updatePart } = await import("@/services/parts.service");
           await updatePart(part.id, payload);
           router.push(`/admin/parts/${part.id}`);
+          router.refresh();
         } else {
           const { createPart } = await import("@/services/parts.service");
           const created = await createPart(payload);
-          router.push(`/admin/parts/${created.id}`);
+          // Show initial stock modal instead of immediately redirecting
+          setCreatedPart({
+            id: created.id,
+            name: created.name,
+            partNumber: created.partNumber,
+          });
+          setShowStockModal(true);
         }
-        router.refresh();
       } catch {
         setServerError(t("failedSave"));
       }
@@ -181,6 +194,20 @@ export function PartForm({ part, categories: initialCategories }: Props) {
     formik.setFieldValue("carBrandId", value);
     // Reset model when brand changes
     formik.setFieldValue("carModelId", "");
+  }
+
+  function handleStockComplete() {
+    if (createdPart) {
+      router.push(`/admin/parts/${createdPart.id}`);
+      router.refresh();
+    }
+  }
+
+  function handleStockSkip() {
+    if (createdPart) {
+      router.push(`/admin/parts/${createdPart.id}`);
+      router.refresh();
+    }
   }
 
   /* ── Inline creation state ─────────────────────────────── */
@@ -646,6 +673,18 @@ export function PartForm({ part, categories: initialCategories }: Props) {
           />
         </div>
       </FormDialog>
+
+      {/* Initial stock modal (shown after creating a new part) */}
+      {createdPart && (
+        <InitialStockModal
+          open={showStockModal}
+          partId={createdPart.id}
+          partName={createdPart.name}
+          partNumber={createdPart.partNumber}
+          onComplete={handleStockComplete}
+          onSkip={handleStockSkip}
+        />
+      )}
     </FormSection>
   );
 }
